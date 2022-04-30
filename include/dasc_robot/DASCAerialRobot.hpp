@@ -38,15 +38,22 @@ class DASCAerialRobot : public DASCRobot {
     private:
         enum class AerialRobotServerState {
                 kInit = 0,
-                kNormal,
+                kPosition,
+                kVelocity,
+                kAcceleration,
+                kAttitude,
+                kRate,
+                kControllerTimeout,
                 kFailSafe,
             };
         bool initialized_;
         ControlMode current_control_mode_;
         AerialRobotServerState server_state_;
         std::string robot_name_;
-        const uint64_t timeout_ms_;
-        std::atomic<uint64_t> timestamp_;
+        const uint64_t pos_vel_acc_timeout_ms_;
+        const uint64_t att_rate_timeout_ms_;
+        std::atomic<uint64_t> px4_timestamp_;
+        std::atomic<uint64_t> last_publish_timestamp_;
 
         std::mutex acc_queue_mutex_;
         std::mutex gyro_queue_mutex_;
@@ -79,6 +86,13 @@ class DASCAerialRobot : public DASCRobot {
         void vehicleAttitudeCallback(const VehicleAttitude::UniquePtr msg);
         void vehicleLocalPositionCallback(const VehicleLocalPosition::UniquePtr msg);
         void updateState();
+        void positionFSMUpdate();
+        void velocityFSMUpdate();
+        void accelerationFSMUpdate();
+        void attitudeFSMUpdate();
+        void rateFSMUpdate();
+        void controllerTimeoutFSMUpdate();
+        void failsafeFSMUpdate();
 };
 
 #endif // DASC_ROBOT_DASCAERIALROBOT_HPP_

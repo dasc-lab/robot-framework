@@ -8,7 +8,8 @@ DASCAerialRobot::DASCAerialRobot(std::string robot_name) :
     current_control_mode_(ControlMode::kPositionMode), 
     server_state_(AerialRobotServerState::kInit),
     robot_name_(robot_name),
-    timeout_ms_(200) {
+    pos_vel_acc_timeout_ms_(500),
+    att_rate_timeout_ms_(100) {
 }
 
 bool DASCAerialRobot::init() {
@@ -86,30 +87,65 @@ bool DASCAerialRobot::disarm() {
 }
 
 std::array<float, 3> DASCAerialRobot::getWorldPosition() {
+    std::lock_guard<std::mutex> pos_guard(this->world_position_queue_mutex_);
     return {0.0, 0.0, 0.0};
 }
 
 std::array<float, 3> DASCAerialRobot::getWorldVelocity() {
+    std::lock_guard<std::mutex> vel_guard(this->world_velocity_queue_mutex_);
     return {0.0, 0.0, 0.0};
 }
 
 std::array<float, 3> DASCAerialRobot::getWorldAcceleration() {
+    std::lock_guard<std::mutex> acc_guard(this->world_acceleration_queue_mutex_);
     return {0.0, 0.0, 0.0};
 }
 
 std::array<float, 3> DASCAerialRobot::getBodyAcceleration() {
+    std::lock_guard<std::mutex> acc_guard(this->acc_queue_mutex_);
     return {0.0, 0.0, 0.0};
 }
 
 std::array<float, 3> DASCAerialRobot::getBodyRate() {
+    std::lock_guard<std::mutex> gyro_guard(this->gyro_queue_mutex_);
     return {0.0, 0.0, 0.0};
 }
 
 std::array<float, 4> DASCAerialRobot::getBodyQuaternion() {
+    std::lock_guard<std::mutex> quat_guard(this->quaternion_queue_mutex_);
     return {1.0, 0.0, 0.0, 0.0};
 }
 
 bool DASCAerialRobot::setCmdMode(ControlMode mode) {
+    uint64_t current_timestamp;
+    switch (mode)
+    {
+    case ControlMode::kPositionMode:
+        this->server_state_ = AerialRobotServerState::kPosition;
+        break;
+    
+    case ControlMode::kVelocityMode:
+        this->server_state_ = AerialRobotServerState::kVelocity;
+        break;
+
+    case ControlMode::kAccelerationMode:
+        this->server_state_ = AerialRobotServerState::kAcceleration;
+        break;
+
+    case ControlMode::kAttitudeMode:
+        this->server_state_ = AerialRobotServerState::kAttitude;
+        break;
+
+    case ControlMode::kRateMode:
+        this->server_state_ = AerialRobotServerState::kRate;
+        break;
+
+    default:
+        RCLCPP_ERROR(this->get_logger(), "Unknow Control Mode %d", mode);
+        return false;
+    }
+    //update current_timestamp
+    this->last_publish_timestamp_ = current_timestamp;
     return true;
 }
 
@@ -210,7 +246,41 @@ void DASCAerialRobot::vehicleLocalPositionCallback(const VehicleLocalPosition::U
 }
 
 void DASCAerialRobot::updateState() {
+    if (this->server_state_ == AerialRobotServerState::kInit) {
+        RCLCPP_ERROR(this->get_logger(), "Server spinning in uninitialized state");
+        return;
+    }
+    else if (this->server_state_ == AerialRobotServerState::kPosition) {
+        this->positionFSMUpdate();
+    }
+    else if (this->server_state_ == AerialRobotServerState::kVelocity) {
+        this->velocityFSMUpdate();
+    }
+    else if (this->server_state_ == AerialRobotServerState::kAcceleration) {
+        this->accelerationFSMUpdate();
+    }
+    else if (this->server_state_ == AerialRobotServerState::kAttitude) {
+        this->attitudeFSMUpdate();
+    }
+    else if (this->server_state_ == AerialRobotServerState::kRate) {
+        this->rateFSMUpdate();
+    }
+    else if (this->server_state_ == AerialRobotServerState::kControllerTimeout) {
+        this->controllerTimeoutFSMUpdate();
+    }
+    else if (this->server_state_ == AerialRobotServerState::kFailSafe) {
+        this->failsafeFSMUpdate();
+    }
+    else {
+        RCLCPP_ERROR(this->get_logger(), "Unknow server state %d", this->server_state_);
+        return;
+    }
+
     return;
+}
+
+void DASCAerialRobot::positionFSMUpdate() {
+    // che
 }
 
 int main(int argc, char* argv[]) {
