@@ -11,6 +11,14 @@ nav_order: 2
 
 How to update and build the documentation.
 
+References:
+1. https://just-the-docs.github.io/just-the-docs/
+2. https://just-the-docs.github.io/just-the-docs/docs/index-test/
+3. https://pdmosses.github.io/just-the-docs-tests/
+4. https://pdmosses.github.io/test-nav/
+
+
+
 
 ## Updating: 
 1. Clone the repo locally
