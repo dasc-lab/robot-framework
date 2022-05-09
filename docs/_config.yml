@@ -22,8 +22,8 @@ title: DASC Robot Framework
 email: devansh@umich.edu
 description: >- # this means to ignore newlines until "baseurl:"
   Documentation on setting up robots in DASC Lab, UMich.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://dasc-lab.github.io/robot-framework/" # the base hostname & protocol for your site, e.g. http://example.com
+baseurl: "/robot-framework" # the subpath of your site, e.g. /blog
+url: "https://dasc-lab.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: 
 github_username:  dasc-lab
 
