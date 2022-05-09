@@ -1,4 +1,4 @@
-I"·:<h1 class="no_toc" id="configuration">Configuration</h1>
+I"®:<h1 class="no_toc" id="configuration">Configuration</h1>
 
 <p class="fs-6 fw-300">Just the Docs has some specific configuration parameters that can be defined in your Jekyll siteâ€™s _config.yml file.</p>
 
@@ -130,7 +130,7 @@ jtd.addEvent(toggleDarkMode, 'click', function(){
 });
 </script>
 
-<p>See <a href="/docs/docs/docs/customization/">Customization</a> for more information.</p>
+<p>See <a href="//docs/customization/">Customization</a> for more information.</p>
 
 <h2 id="google-analytics">Google Analytics</h2>
 

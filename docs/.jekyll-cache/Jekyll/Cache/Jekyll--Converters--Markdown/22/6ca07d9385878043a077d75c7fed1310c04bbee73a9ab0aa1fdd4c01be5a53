@@ -1,4 +1,4 @@
-I"B<h1 id="navigation-structure">Navigation Structure</h1>
+I"B<h1 id="navigation-structure">Navigation Structure</h1>
 
 <details open="" class="no_toc">
   <summary class="text-delta">
@@ -234,7 +234,7 @@
 
 <h2 id="auxiliary-links">Auxiliary Links</h2>
 
-<p>To add auxiliary links to your site (in the upper right on all pages), add it to the <code class="language-plaintext highlighter-rouge">aux_links</code> <a href="/docs/docs/docs/configuration/#aux-links">configuration option</a> in your site’s <code class="language-plaintext highlighter-rouge">_config.yml</code> file.</p>
+<p>To add auxiliary links to your site (in the upper right on all pages), add it to the <code class="language-plaintext highlighter-rouge">aux_links</code> <a href="//docs/configuration/#aux-links">configuration option</a> in your site’s <code class="language-plaintext highlighter-rouge">_config.yml</code> file.</p>
 
 <h4 id="example-6">Example</h4>
 
