@@ -22,7 +22,7 @@ title: DASC Robot Framework
 email: devansh@umich.edu
 description: >- # this means to ignore newlines until "baseurl:"
   Documentation on setting up robots in DASC Lab, UMich.
-baseurl: "/robot-framework/docs" # the subpath of your site, e.g. /blog
+baseurl: "/robot-framework" # the subpath of your site, e.g. /blog
 url: "https://dasc-lab.github.io" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: 
 github_username:  dasc-lab
@@ -69,7 +69,7 @@ last_edit_time_format: "%b %e %Y at %I:%M %p"
 gh_edit_link: true
 gh_edit_link_text: "Edit this page on GitHub."
 gh_edit_repository: "https://github.com/dasc-lab/robot-framework"
-gh_edit_branch: "master"
+gh_edit_branch: "master/docs"
 gh_edit_view_mode: "blob"
 
 footer_content: "DASC LAB UMich"
