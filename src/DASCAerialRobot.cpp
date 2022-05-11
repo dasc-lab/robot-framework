@@ -220,7 +220,7 @@ bool DASCAerialRobot::getBodyQuaternion(std::array<float, 4>& quat, bool blockin
         return false;
     }
 
-    return false;;
+    return true;
 }
 
 bool DASCAerialRobot::setCmdMode(ControlMode mode) {
@@ -757,19 +757,19 @@ int main(int argc, char* argv[]) {
     // drone4->cmdOffboardMode();
     // drone4->arm();
     std::cout << "Arm" << std::endl;
-    // for(int i = 0; i < 10; i++) {
-    //     std::array<float, 4> quat;
-    //     drone1->getBodyQuaternion(quat, true);
-    //     std::cout << quat[0] << quat[1] << quat[2] << quat[3] << std::endl;
-    // }
-    for (int i = 0; i < 200; i++) {
-        drone1->cmdWorldPosition(x + 1, y - 1, z, 0.0);
-        // drone2->cmdWorldPosition(x + 1, y + 1, z, 0.0);
-        // drone3->cmdWorldPosition(x - 1, y + 1, z, 0.0);
-        // drone4->cmdWorldPosition(x - 1, y - 1, z, 0.0);
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    for(int i = 0; i < 10; i++) {
+        std::array<float, 4> quat;
+        drone1->getBodyQuaternion(quat, true);
+        std::cout << quat[0] << quat[1] << quat[2] << quat[3] << std::endl;
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(20000));
+    // for (int i = 0; i < 200; i++) {
+    //     drone1->cmdWorldPosition(x + 1, y - 1, z, 0.0);
+    //     // drone2->cmdWorldPosition(x + 1, y + 1, z, 0.0);
+    //     // drone3->cmdWorldPosition(x - 1, y + 1, z, 0.0);
+    //     // drone4->cmdWorldPosition(x - 1, y - 1, z, 0.0);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // }
+    // std::this_thread::sleep_for(std::chrono::milliseconds(20000));
 
     server_exec_thread.join();
     rclcpp::shutdown();
