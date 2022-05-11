@@ -12,8 +12,17 @@ nav_order: 1
 
 ## Load the OS
 
-
 ## Install Docker
+
+First check that you have internet access:
+
+After logging in, run this command:
+```
+ping google.com
+```
+
+you should see that some bytes are being received. 
+
 
 
 
