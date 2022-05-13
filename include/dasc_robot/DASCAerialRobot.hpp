@@ -45,6 +45,9 @@ class DASCAerialRobot : public DASCRobot {
          * @param alt Altitude AMSL, (meters)
          */
         void setGPSGlobalOrigin(double lat, double lon, double alt);
+        void emergencyStop();
+        bool takeoff();
+        bool land();
     private:
         enum class AerialRobotServerState {
             kInit = 0,
@@ -69,6 +72,7 @@ class DASCAerialRobot : public DASCRobot {
         uint8_t robot_id_;
         
         std::atomic<uint64_t> px4_timestamp_;
+        std::atomic<uint64_t> px4_server_timestamp_;
         std::atomic<uint64_t> last_publish_timestamp_;
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         std::mutex acc_queue_mutex_;
@@ -111,8 +115,7 @@ class DASCAerialRobot : public DASCRobot {
         void rateFSMUpdate();
         void controllerTimeoutFSMUpdate();
         void failsafeFSMUpdate();
-        void emergencyStop();
-
+        uint64_t get_current_timestamp();
         double clampToPi(double yaw);
         std::array<double, 4> ned_to_enu(const std::array<double, 4> &quat);
         std::array<double, 4> enu_to_ned(const std::array<double, 4> &quat);

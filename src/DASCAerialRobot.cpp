@@ -98,7 +98,7 @@ bool DASCAerialRobot::arm() {
         return false;
     }
     VehicleCommand msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.param1 = 1.0;
     msg.param2 = 21196; // set param2 to 21196 to force arm/disarm operation
     msg.command = VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM;
@@ -117,7 +117,7 @@ bool DASCAerialRobot::disarm() {
         return false;
     }
     VehicleCommand msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.param1 = 0.0;
     msg.command = VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM;
 	msg.target_system = this->robot_id_;
@@ -275,7 +275,7 @@ bool DASCAerialRobot::cmdWorldPosition(double x, double y, double z, double yaw,
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     TrajectorySetpoint msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.x = y;
     msg.y = x;
     msg.z = -z;
@@ -298,7 +298,7 @@ bool DASCAerialRobot::cmdWorldVelocity(double x, double y, double z, double yaw,
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     TrajectorySetpoint msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.x = NAN;
     msg.y = NAN;
     msg.z = NAN;
@@ -321,7 +321,7 @@ bool DASCAerialRobot::cmdWorldAcceleration(double x, double y, double z, double 
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     TrajectorySetpoint msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.x = NAN;
     msg.y = NAN;
     msg.z = NAN;
@@ -347,7 +347,7 @@ bool DASCAerialRobot::cmdAttitude(double q_w, double q_x, double q_y, double q_z
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     VehicleAttitudeSetpoint msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.roll_body = NAN;
     msg.pitch_body = NAN;
     msg.yaw_body = NAN;
@@ -369,13 +369,13 @@ bool DASCAerialRobot::cmdRates(double roll, double pitch, double yaw, double thr
         return false;
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
-    VehicleAttitudeSetpoint msg;
-    msg.timestamp = px4_timestamp_.load();
-    msg.roll_body = roll;
-    msg.pitch_body = pitch;
-    msg.yaw_body = yaw;
+    VehicleRatesSetpoint msg;
+    msg.timestamp = get_current_timestamp();
+    msg.roll = roll;
+    msg.pitch = -pitch;
+    msg.yaw = -yaw;
     msg.thrust_body[2] = -thrust;
-    this->vehicle_attitude_publisher_->publish(msg);
+    this->vehicle_rates_publisher_->publish(msg);
     return true;
 }
 
@@ -385,7 +385,7 @@ bool DASCAerialRobot::cmdOffboardMode() {
         return false;
     }
     VehicleCommand msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.command = VehicleCommand::VEHICLE_CMD_DO_SET_MODE;
     msg.param1 = 1;
     msg.param2 = 6; // PX4_CUSTOM_MAIN_MODE_OFFBOARD
@@ -400,6 +400,9 @@ bool DASCAerialRobot::cmdOffboardMode() {
 
 void DASCAerialRobot::timesyncCallback(const px4_msgs::msg::Timesync::UniquePtr msg) {
     this->px4_timestamp_.store(msg->timestamp);
+    this->px4_server_timestamp_.store(this->get_clock()->now().nanoseconds());
+    // RCLCPP_INFO(this->get_logger(), "store: %lu", msg->timestamp);
+    // RCLCPP_INFO(this->get_logger(), "px4_server_timestamp_: %lu", px4_server_timestamp_.load());
     // RCLCPP_INFO(this->get_logger(), "Time Sync callback");
 }
 
@@ -548,7 +551,7 @@ void DASCAerialRobot::updateState() {
 
 void DASCAerialRobot::positionFSMUpdate() {
     OffboardControlMode msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.position = true;
     offboard_control_mode_publisher_->publish(msg);
 }
@@ -562,7 +565,7 @@ void DASCAerialRobot::velocityFSMUpdate() {
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.velocity = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -577,7 +580,7 @@ void DASCAerialRobot::accelerationFSMUpdate() {
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.acceleration = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -592,7 +595,7 @@ void DASCAerialRobot::attitudeFSMUpdate() {
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.attitude = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -607,7 +610,7 @@ void DASCAerialRobot::rateFSMUpdate() {
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.body_rate = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -621,7 +624,7 @@ void DASCAerialRobot::controllerTimeoutFSMUpdate() {
          * https://github.com/PX4/PX4-Autopilot/blob/master/src/modules/commander/Commander.cpp
          */
         VehicleCommand msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.command = VehicleCommand::VEHICLE_CMD_DO_SET_MODE;
         msg.param1 = 1;
         msg.param2 = 4; // PX4_CUSTOM_MAIN_MODE_AUTO
@@ -659,7 +662,7 @@ void DASCAerialRobot::controllerTimeoutFSMUpdate() {
 void DASCAerialRobot::failsafeFSMUpdate() {
     if (this->server_state_ == AerialRobotServerState::kFailSafe) {
         VehicleCommand msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.command = VehicleCommand::VEHICLE_CMD_DO_SET_MODE;
         msg.param1 = 1;
         msg.param2 = 4; // PX4_CUSTOM_MAIN_MODE_AUTO
@@ -684,7 +687,7 @@ void DASCAerialRobot::failsafeFSMUpdate() {
 
 void DASCAerialRobot::emergencyStop() {
     VehicleCommand msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.command = VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM;
     msg.param1 = VehicleCommand::ARMING_ACTION_DISARM;
     msg.param2 = 21196; // set param2 to 21196 to force arm/disarm operation
@@ -702,7 +705,7 @@ void DASCAerialRobot::setGPSGlobalOrigin(double lat, double lon, double alt) {
      * https://github.com/PX4/PX4-Autopilot/blob/master/msg/vehicle_command.msg
      */
     VehicleCommand msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.command = VehicleCommand::VEHICLE_CMD_SET_GPS_GLOBAL_ORIGIN;
     msg.param5 = lat;
     msg.param6 = lon;
@@ -741,6 +744,14 @@ std::array<double, 4> DASCAerialRobot::enu_to_ned(const std::array<double, 4> &q
     return {quat_ned.w(), quat_ned.x(), -quat_ned.y(), -quat_ned.z()};
 }
 
+uint64_t DASCAerialRobot::get_current_timestamp() {
+    auto delta = this->get_clock()->now().nanoseconds() - this->px4_server_timestamp_;
+    // RCLCPP_INFO(this->get_logger(), "px4: %lu", px4_timestamp_.load());
+    // RCLCPP_INFO(this->get_logger(), "delta: %lu", delta);
+    // RCLCPP_INFO(this->get_logger(), "time: %lu", px4_timestamp_.load() + delta);
+    return px4_timestamp_.load() + delta;
+}
+
 int main(int argc, char* argv[]) {
 	std::cout << "Starting offboard control node..." << std::endl;
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
@@ -765,7 +776,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Node start" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
     double x = 0, y = 0, z = 2;
-    drone1->setCmdMode(DASCRobot::ControlMode::kAttitudeMode);
+    drone1->setCmdMode(DASCRobot::ControlMode::kRateMode);
     // drone2->setCmdMode(DASCRobot::ControlMode::kPositionMode);
     // drone3->setCmdMode(DASCRobot::ControlMode::kPositionMode);
     // drone4->setCmdMode(DASCRobot::ControlMode::kPositionMode);
@@ -773,9 +784,8 @@ int main(int argc, char* argv[]) {
     // drone2->setGPSGlobalOrigin(47.3977419, 8.5455950, 488.105);
     // drone3->setGPSGlobalOrigin(47.3977419, 8.5455950, 488.105);
     // drone4->setGPSGlobalOrigin(47.3977419, 8.5455950, 488.105);
-    auto quat = px4_ros_com::frame_transforms::utils::quaternion::quaternion_from_euler(0, 0, 0);
     for (int i = 0; i < 50; i++) {
-        drone1->cmdAttitude(quat.w(), quat.x(), quat.y(), quat.z(), 0.75);
+        drone1->cmdRates(0, 0, 0, 0.75);
         // drone2->cmdWorldPosition(x + 1, y + 1, z, 0.0);
         // drone3->cmdWorldPosition(x - 1, y + 1, z, 0.0);
         // drone4->cmdWorldPosition(x - 1, y - 1, z, 0.0);
@@ -803,9 +813,8 @@ int main(int argc, char* argv[]) {
     //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
     // }
     // std::this_thread::sleep_for(std::chrono::milliseconds(20000));
-    quat = px4_ros_com::frame_transforms::utils::quaternion::quaternion_from_euler(0.0, 0.2, 1.57);
     while(rclcpp::ok()) {
-        drone1->cmdAttitude(quat.w(), quat.x(), quat.y(), quat.z(), 0.75);
+        drone1->cmdRates(0, 0, 0.5, 0.75);
         // drone1->cmdWorldPosition(x + 1, y - 1, z, 0.0);
         // drone2->cmdWorldPosition(x + 1, y + 1, z, 0.0);
         // drone3->cmdWorldPosition(x - 1, y + 1, z, 0.0);
