@@ -25,13 +25,15 @@ find_package(sensor_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
+find_package(px4_ros_com REQUIRED)
 
 add_executable(dascRobot src/DASCAerialRobot.cpp)
-ament_target_dependencies(dascRobot rclcpp px4_msgs geometry_msgs tf2 tf2_ros)
+ament_target_dependencies(dascRobot rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com)
 target_include_directories(dascRobot PUBLIC
   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
 )
+
 
 install(TARGETS
   dascRobot

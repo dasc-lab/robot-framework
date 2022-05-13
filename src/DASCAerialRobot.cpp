@@ -2,6 +2,7 @@
 #include "DASCAerialRobot.hpp"
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <tf2/LinearMath/Quaternion.h>
+#include "frame_transforms.h"
 
 using std::placeholders::_1;
 using namespace std::chrono_literals;
@@ -11,7 +12,7 @@ DASCAerialRobot::DASCAerialRobot(std::string robot_name, uint8_t id) :
     current_control_mode_(ControlMode::kPositionMode), 
     server_state_(AerialRobotServerState::kInit),
     robot_name_(robot_name),
-    pos_vel_acc_timeout_ns_(5e8), // 500ms
+    vel_acc_timeout_ns_(5e8), // 500ms
     att_rate_timeout_ns_(1e8), // 100ms
     controllerTimeoutCount_(0),
     robot_id_(id) {
@@ -97,7 +98,7 @@ bool DASCAerialRobot::arm() {
         return false;
     }
     VehicleCommand msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.param1 = 1.0;
     msg.param2 = 21196; // set param2 to 21196 to force arm/disarm operation
     msg.command = VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM;
@@ -116,7 +117,7 @@ bool DASCAerialRobot::disarm() {
         return false;
     }
     VehicleCommand msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.param1 = 0.0;
     msg.command = VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM;
 	msg.target_system = this->robot_id_;
@@ -128,13 +129,13 @@ bool DASCAerialRobot::disarm() {
     return true;
 }
 
-std::array<float, 3> DASCAerialRobot::getWorldPosition() {
+std::array<double, 3> DASCAerialRobot::getWorldPosition() {
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getWorldPosition with uninitialized server!");
         return {NAN, NAN, NAN};
     }
     std::lock_guard<std::mutex> pos_guard(this->world_position_queue_mutex_);
-    std::array<float, 3> pos = {NAN, NAN, NAN};
+    std::array<double, 3> pos = {NAN, NAN, NAN};
     if (this->world_position_queue.size() > 0) {
         pos = this->world_position_queue.front();
         this->world_velocity_queue.pop();
@@ -142,13 +143,13 @@ std::array<float, 3> DASCAerialRobot::getWorldPosition() {
     return pos;
 }
 
-std::array<float, 3> DASCAerialRobot::getWorldVelocity() {
+std::array<double, 3> DASCAerialRobot::getWorldVelocity() {
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getWorldVelocity with uninitialized server!");
         return {NAN, NAN, NAN};
     }
     std::lock_guard<std::mutex> vel_guard(this->world_velocity_queue_mutex_);
-    std::array<float, 3> vel = {NAN, NAN, NAN};
+    std::array<double, 3> vel = {NAN, NAN, NAN};
     if (this->world_velocity_queue.size() > 0) {
         vel = this->world_velocity_queue.front();
         this->world_velocity_queue.pop();
@@ -156,13 +157,13 @@ std::array<float, 3> DASCAerialRobot::getWorldVelocity() {
     return vel;
 }
 
-std::array<float, 3> DASCAerialRobot::getWorldAcceleration() {
+std::array<double, 3> DASCAerialRobot::getWorldAcceleration() {
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getWorldAcceleration with uninitialized server!");
         return {NAN, NAN, NAN};
     }
     std::lock_guard<std::mutex> acc_guard(this->world_acceleration_queue_mutex_);
-    std::array<float, 3> acc = {NAN, NAN, NAN};
+    std::array<double, 3> acc = {NAN, NAN, NAN};
     if (this->world_acceleration_queue.size() > 0) {
         acc = this->world_acceleration_queue.front();
         this->world_acceleration_queue.pop();
@@ -170,13 +171,13 @@ std::array<float, 3> DASCAerialRobot::getWorldAcceleration() {
     return acc;
 }
 
-std::array<float, 3> DASCAerialRobot::getBodyAcceleration() {
+std::array<double, 3> DASCAerialRobot::getBodyAcceleration() {
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getBodyAcceleration with uninitialized server!");
         return {NAN, NAN, NAN};
     }
     std::lock_guard<std::mutex> acc_guard(this->acc_queue_mutex_);
-    std::array<float, 3> acc = {NAN, NAN, NAN};
+    std::array<double, 3> acc = {NAN, NAN, NAN};
     if (this->accelerometer_m_s2_queue_.size() > 0) {
         acc = this->accelerometer_m_s2_queue_.front();
         this->accelerometer_m_s2_queue_.pop();
@@ -184,13 +185,13 @@ std::array<float, 3> DASCAerialRobot::getBodyAcceleration() {
     return acc;
 }
 
-std::array<float, 3> DASCAerialRobot::getBodyRate() {
+std::array<double, 3> DASCAerialRobot::getBodyRate() {
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getBodyRate with uninitialized server!");
         return {NAN, NAN, NAN};
     }
     std::lock_guard<std::mutex> gyro_guard(this->gyro_queue_mutex_);
-    std::array<float, 3> gyro = {NAN, NAN, NAN};
+    std::array<double, 3> gyro = {NAN, NAN, NAN};
     if (this->gyro_rad_queue_.size() > 0) {
         gyro = this->gyro_rad_queue_.front();
         this->gyro_rad_queue_.pop();
@@ -198,7 +199,7 @@ std::array<float, 3> DASCAerialRobot::getBodyRate() {
     return gyro;
 }
 
-bool DASCAerialRobot::getBodyQuaternion(std::array<float, 4>& quat, bool blocking) {
+bool DASCAerialRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocking) {
     quat = {NAN, NAN, NAN, NAN};
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getBodyQuaternion with uninitialized server!");
@@ -206,21 +207,20 @@ bool DASCAerialRobot::getBodyQuaternion(std::array<float, 4>& quat, bool blockin
     }
     std::unique_lock<std::mutex> quat_ulock(this->quaternion_queue_mutex_);
     if (blocking && this->quaternion_queue_.size() == 0) {
-        RCLCPP_INFO(this->get_logger(), "Queue Empty Wait");
+        //RCLCPP_INFO(this->get_logger(), "Queue Empty Wait");
         this->quaternion_queue_cv_.wait(quat_ulock);
-        RCLCPP_INFO(this->get_logger(), "Wake");
+        //RCLCPP_INFO(this->get_logger(), "Wake");
     }
     if (this->quaternion_queue_.size() > 0) {
-        RCLCPP_INFO(this->get_logger(), "Queue not empty");
         quat = this->quaternion_queue_.front();
         this->quaternion_queue_.pop();
     }
     else {
-        RCLCPP_ERROR(this->get_logger(), "Quaternion queue empty");
+        //RCLCPP_ERROR(this->get_logger(), "Quaternion queue empty");
         return false;
     }
 
-    return false;;
+    return true;
 }
 
 bool DASCAerialRobot::setCmdMode(ControlMode mode) {
@@ -264,7 +264,7 @@ bool DASCAerialRobot::setCmdMode(ControlMode mode) {
     return true;
 }
 
-bool DASCAerialRobot::cmdWorldPosition(float x, float y, float z, float yaw) {
+bool DASCAerialRobot::cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate) {
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdWorldPosition with uninitialized server!");
         return false;
@@ -275,77 +275,107 @@ bool DASCAerialRobot::cmdWorldPosition(float x, float y, float z, float yaw) {
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     TrajectorySetpoint msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.x = y;
     msg.y = x;
     msg.z = -z;
     msg.yaw = clampToPi(-yaw + M_PI_2);
+    msg.yawspeed = -yaw_rate;
+    msg.vx = NAN;
+    msg.vy = NAN;
+    msg.vz = NAN;
+    msg.acceleration = {NAN, NAN, NAN};
+    msg.jerk = {NAN, NAN, NAN};
+    msg.thrust = {NAN, NAN, NAN};
     this->trajectory_setpoint_publisher_->publish(msg);
     return true;
 }
 
-bool DASCAerialRobot::cmdWorldVelocity(float x, float y, float z, float yaw_rate) {
+bool DASCAerialRobot::cmdWorldVelocity(double x, double y, double z, double yaw, double yaw_rate) {
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdWorldVelocity with uninitialized server!");
         return false;
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     TrajectorySetpoint msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
+    msg.x = NAN;
+    msg.y = NAN;
+    msg.z = NAN;
+    msg.yaw = clampToPi(-yaw + M_PI_2);;
+    msg.yawspeed = -yaw_rate;
     msg.vx = y;
     msg.vy = x;
     msg.vz = -z;
-    msg.yawspeed = -yaw_rate;
+    msg.acceleration = {NAN, NAN, NAN};
+    msg.jerk = {NAN, NAN, NAN};
+    msg.thrust = {NAN, NAN, NAN};
     this->trajectory_setpoint_publisher_->publish(msg);
     return true;
 }
 
-bool DASCAerialRobot::cmdWorldAcceleration(float x, float y, float z, float yaw) {
+bool DASCAerialRobot::cmdWorldAcceleration(double x, double y, double z, double yaw, double yaw_rate) {
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdWorldAcceleration with uninitialized server!");
         return false;
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     TrajectorySetpoint msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
+    msg.x = NAN;
+    msg.y = NAN;
+    msg.z = NAN;
+    msg.yaw = clampToPi(-yaw + M_PI_2);;
+    msg.yawspeed = -yaw_rate;
+    msg.vx = NAN;
+    msg.vy = NAN;
+    msg.vz = NAN;
     msg.acceleration[0] = y;
     msg.acceleration[1] = x;
     msg.acceleration[2] = -z;
+    msg.jerk = {NAN, NAN, NAN};
+    msg.thrust = {NAN, NAN, NAN};
     msg.yaw = clampToPi(-yaw + M_PI_2);
     this->trajectory_setpoint_publisher_->publish(msg);
     return true;
 }
 
-bool DASCAerialRobot::cmdAttitude(float q_w, float q_x, float q_y, float q_z, float thrust) {
+bool DASCAerialRobot::cmdAttitude(double q_w, double q_x, double q_y, double q_z, double thrust) {
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdAttitude with uninitialized server!");
         return false;
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     VehicleAttitudeSetpoint msg;
-    msg.timestamp = px4_timestamp_.load();
-    msg.q_d[0] = q_w;
-    msg.q_d[1] = q_y;
-    msg.q_d[2] = q_x;
-    msg.q_d[3] = -q_z;
+    msg.timestamp = get_current_timestamp();
+    msg.roll_body = NAN;
+    msg.pitch_body = NAN;
+    msg.yaw_body = NAN;
+    msg.yaw_sp_move_rate = NAN;
+    std::array<double, 4> quat_enu = {q_w, q_x, q_y, q_z};
+    std::array<double, 4> quat_ned = enu_to_ned(quat_enu);
+    msg.q_d[0] = quat_ned[0];
+    msg.q_d[1] = quat_ned[1];
+    msg.q_d[2] = quat_ned[2];
+    msg.q_d[3] = quat_ned[3];
     msg.thrust_body[2] = -thrust;
     this->vehicle_attitude_publisher_->publish(msg);
     return true;
 }
 
-bool DASCAerialRobot::cmdRates(float roll, float pitch, float yaw, float thrust) {
+bool DASCAerialRobot::cmdRates(double roll, double pitch, double yaw, double thrust) {
     if (this->server_state_ == AerialRobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdRates with uninitialized server!");
         return false;
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
-    VehicleAttitudeSetpoint msg;
-    msg.timestamp = px4_timestamp_.load();
-    msg.roll_body = roll;
-    msg.pitch_body = pitch;
-    msg.yaw_body = yaw;
+    VehicleRatesSetpoint msg;
+    msg.timestamp = get_current_timestamp();
+    msg.roll = roll;
+    msg.pitch = -pitch;
+    msg.yaw = -yaw;
     msg.thrust_body[2] = -thrust;
-    this->vehicle_attitude_publisher_->publish(msg);
+    this->vehicle_rates_publisher_->publish(msg);
     return true;
 }
 
@@ -355,7 +385,7 @@ bool DASCAerialRobot::cmdOffboardMode() {
         return false;
     }
     VehicleCommand msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.command = VehicleCommand::VEHICLE_CMD_DO_SET_MODE;
     msg.param1 = 1;
     msg.param2 = 6; // PX4_CUSTOM_MAIN_MODE_OFFBOARD
@@ -370,11 +400,14 @@ bool DASCAerialRobot::cmdOffboardMode() {
 
 void DASCAerialRobot::timesyncCallback(const px4_msgs::msg::Timesync::UniquePtr msg) {
     this->px4_timestamp_.store(msg->timestamp);
+    this->px4_server_timestamp_.store(this->get_clock()->now().nanoseconds());
+    // RCLCPP_INFO(this->get_logger(), "store: %lu", msg->timestamp);
+    // RCLCPP_INFO(this->get_logger(), "px4_server_timestamp_: %lu", px4_server_timestamp_.load());
     // RCLCPP_INFO(this->get_logger(), "Time Sync callback");
 }
 
 void DASCAerialRobot::sensorCombinedCallback(const SensorCombined::UniquePtr msg) {
-    std::array<float, 3> acc, gyro;
+    std::array<double, 3> acc, gyro;
     std::lock_guard<std::mutex> acc_guard(this->acc_queue_mutex_);
     std::lock_guard<std::mutex> gyro_guard(this->gyro_queue_mutex_);
     // msg->accelerometer_m_s2 in FRD, convert to ROS
@@ -397,25 +430,24 @@ void DASCAerialRobot::sensorCombinedCallback(const SensorCombined::UniquePtr msg
 }
 
 void DASCAerialRobot::vehicleAttitudeCallback(const VehicleAttitude::UniquePtr msg) {
-    std::array<float, 4> quat;
-    RCLCPP_INFO(this->get_logger(), "try lock quat");
+    std::array<double, 4> quat;
+    //RCLCPP_INFO(this->get_logger(), "try lock quat");
     std::lock_guard<std::mutex> quat_guard(this->quaternion_queue_mutex_);
-    RCLCPP_INFO(this->get_logger(), "lock quat");
     quat[0] = msg->q[0];
     quat[1] = msg->q[1];
     quat[2] = msg->q[2];
     quat[3] = msg->q[3];
-    this->quaternion_queue_.push(quat);
+    auto quat_enu = ned_to_enu(quat);
+    this->quaternion_queue_.push(quat_enu);
     if (this->quaternion_queue_.size() > 1) {
         this->quaternion_queue_.pop();
     }
     this->quaternion_queue_cv_.notify_all();
-    RCLCPP_INFO(this->get_logger(), "notify all");
     // RCLCPP_INFO(this->get_logger(), "Vehicle Attitude callback");
 }
 
 void DASCAerialRobot::vehicleLocalPositionCallback(const VehicleLocalPosition::UniquePtr msg) {
-    std::array<float, 3> pos, vel, acc;
+    std::array<double, 3> pos, vel, acc;
     std::lock_guard<std::mutex> pos_guard(this->world_position_queue_mutex_);
     std::lock_guard<std::mutex> vel_guard(this->world_velocity_queue_mutex_);
     std::lock_guard<std::mutex> acc_guard(this->world_acceleration_queue_mutex_);
@@ -449,7 +481,7 @@ void DASCAerialRobot::vehicleLocalPositionCallback(const VehicleLocalPosition::U
         this->world_acceleration_queue.pop();
     }
 
-    std::array<float, 4> quat;
+    std::array<double, 4> quat;
     bool success = this->getBodyQuaternion(quat, false);
     if (success) {
         geometry_msgs::msg::TransformStamped transform_msg;
@@ -463,7 +495,6 @@ void DASCAerialRobot::vehicleLocalPositionCallback(const VehicleLocalPosition::U
         transform_msg.transform.rotation.x = quat[1];
         transform_msg.transform.rotation.y = quat[2];
         transform_msg.transform.rotation.z = quat[3];
-
         this->tf_broadcaster_->sendTransform(transform_msg);
     }
 
@@ -519,30 +550,22 @@ void DASCAerialRobot::updateState() {
 }
 
 void DASCAerialRobot::positionFSMUpdate() {
-    rclcpp::Time current_time = this->get_clock()->now();
-    if (current_time.nanoseconds() - this->last_publish_timestamp_ > this->pos_vel_acc_timeout_ns_) {
-        this->server_state_ = AerialRobotServerState::kControllerTimeout;
-        this->last_server_state_ = AerialRobotServerState::kPosition;
-        RCLCPP_WARN(this->get_logger(), "Position Timeout, switch to ControllerTimeout state!");
-    }
-    else {
-        OffboardControlMode msg;
-        msg.timestamp = px4_timestamp_.load();
-        msg.position = true;
-        offboard_control_mode_publisher_->publish(msg);
-    }
+    OffboardControlMode msg;
+    msg.timestamp = get_current_timestamp();
+    msg.position = true;
+    offboard_control_mode_publisher_->publish(msg);
 }
 
 void DASCAerialRobot::velocityFSMUpdate() {
     rclcpp::Time current_time = this->get_clock()->now();
-    if (current_time.nanoseconds() - this->last_publish_timestamp_ > this->pos_vel_acc_timeout_ns_) {
+    if (current_time.nanoseconds() - this->last_publish_timestamp_ > this->vel_acc_timeout_ns_) {
         this->server_state_ = AerialRobotServerState::kControllerTimeout;
         this->last_server_state_ = AerialRobotServerState::kVelocity;
         RCLCPP_WARN(this->get_logger(), "Velocity Timeout, switch to ControllerTimeout state!");
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.velocity = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -550,14 +573,14 @@ void DASCAerialRobot::velocityFSMUpdate() {
 
 void DASCAerialRobot::accelerationFSMUpdate() {
     rclcpp::Time current_time = this->get_clock()->now();
-    if (current_time.nanoseconds() - this->last_publish_timestamp_ > this->pos_vel_acc_timeout_ns_) {
+    if (current_time.nanoseconds() - this->last_publish_timestamp_ > this->vel_acc_timeout_ns_) {
         this->server_state_ = AerialRobotServerState::kControllerTimeout;
         this->last_server_state_ = AerialRobotServerState::kAcceleration;
         RCLCPP_WARN(this->get_logger(), "Acceleration Timeout, switch to ControllerTimeout state!");
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.acceleration = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -572,7 +595,7 @@ void DASCAerialRobot::attitudeFSMUpdate() {
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.attitude = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -587,7 +610,7 @@ void DASCAerialRobot::rateFSMUpdate() {
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.body_rate = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -601,7 +624,7 @@ void DASCAerialRobot::controllerTimeoutFSMUpdate() {
          * https://github.com/PX4/PX4-Autopilot/blob/master/src/modules/commander/Commander.cpp
          */
         VehicleCommand msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.command = VehicleCommand::VEHICLE_CMD_DO_SET_MODE;
         msg.param1 = 1;
         msg.param2 = 4; // PX4_CUSTOM_MAIN_MODE_AUTO
@@ -625,7 +648,7 @@ void DASCAerialRobot::controllerTimeoutFSMUpdate() {
         else if ((last_server_state_ == AerialRobotServerState::kPosition || 
                   last_server_state_ == AerialRobotServerState::kVelocity || 
                   last_server_state_ == AerialRobotServerState::kAcceleration) && 
-                  current_time.nanoseconds() - last_publish_timestamp_ < pos_vel_acc_timeout_ns_) {
+                  current_time.nanoseconds() - last_publish_timestamp_ < vel_acc_timeout_ns_) {
             this->server_state_ = last_server_state_;
         }
         else if ((last_server_state_ == AerialRobotServerState::kAttitude || 
@@ -639,7 +662,7 @@ void DASCAerialRobot::controllerTimeoutFSMUpdate() {
 void DASCAerialRobot::failsafeFSMUpdate() {
     if (this->server_state_ == AerialRobotServerState::kFailSafe) {
         VehicleCommand msg;
-        msg.timestamp = px4_timestamp_.load();
+        msg.timestamp = get_current_timestamp();
         msg.command = VehicleCommand::VEHICLE_CMD_DO_SET_MODE;
         msg.param1 = 1;
         msg.param2 = 4; // PX4_CUSTOM_MAIN_MODE_AUTO
@@ -664,7 +687,7 @@ void DASCAerialRobot::failsafeFSMUpdate() {
 
 void DASCAerialRobot::emergencyStop() {
     VehicleCommand msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.command = VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM;
     msg.param1 = VehicleCommand::ARMING_ACTION_DISARM;
     msg.param2 = 21196; // set param2 to 21196 to force arm/disarm operation
@@ -676,13 +699,13 @@ void DASCAerialRobot::emergencyStop() {
     this->vehicle_command_publisher_->publish(msg);
 }
 
-void DASCAerialRobot::setGPSGlobalOrigin(float lat, float lon, float alt) {
+void DASCAerialRobot::setGPSGlobalOrigin(double lat, double lon, double alt) {
     /**
      * @brief Reference to following link
      * https://github.com/PX4/PX4-Autopilot/blob/master/msg/vehicle_command.msg
      */
     VehicleCommand msg;
-    msg.timestamp = px4_timestamp_.load();
+    msg.timestamp = get_current_timestamp();
     msg.command = VehicleCommand::VEHICLE_CMD_SET_GPS_GLOBAL_ORIGIN;
     msg.param5 = lat;
     msg.param6 = lon;
@@ -695,7 +718,7 @@ void DASCAerialRobot::setGPSGlobalOrigin(float lat, float lon, float alt) {
     this->vehicle_command_publisher_->publish(msg);
 }
 
-float DASCAerialRobot::clampToPi(float yaw) {
+double DASCAerialRobot::clampToPi(double yaw) {
     if (yaw > M_PI_2) {
         while (yaw > M_PI_2) {
             yaw -= M_PI;
@@ -709,11 +732,31 @@ float DASCAerialRobot::clampToPi(float yaw) {
     return yaw;
 }
 
+std::array<double, 4> DASCAerialRobot::ned_to_enu(const std::array<double, 4> &quat) {
+    Eigen::Quaternion<double> quat_ned = Eigen::Quaternion<double>(quat[0], quat[1], quat[2], quat[3]);
+    Eigen::Quaternion<double> quat_enu = px4_ros_com::frame_transforms::utils::quaternion::quaternion_from_euler(M_PI, M_PI, M_PI_2) * quat_ned;
+    return {quat_enu.w(), quat_enu.x(), -quat_enu.y(), -quat_enu.z()};
+}
+
+std::array<double, 4> DASCAerialRobot::enu_to_ned(const std::array<double, 4> &quat) {
+    Eigen::Quaternion<double> quat_enu = Eigen::Quaternion<double>(quat[0], quat[1], quat[2], quat[3]);
+    Eigen::Quaternion<double> quat_ned = px4_ros_com::frame_transforms::utils::quaternion::quaternion_from_euler(M_PI, M_PI, M_PI_2) * quat_enu;
+    return {quat_ned.w(), quat_ned.x(), -quat_ned.y(), -quat_ned.z()};
+}
+
+uint64_t DASCAerialRobot::get_current_timestamp() {
+    auto delta = this->get_clock()->now().nanoseconds() - this->px4_server_timestamp_;
+    // RCLCPP_INFO(this->get_logger(), "px4: %lu", px4_timestamp_.load());
+    // RCLCPP_INFO(this->get_logger(), "delta: %lu", delta);
+    // RCLCPP_INFO(this->get_logger(), "time: %lu", px4_timestamp_.load() + delta);
+    return px4_timestamp_.load() + delta;
+}
+
 int main(int argc, char* argv[]) {
 	std::cout << "Starting offboard control node..." << std::endl;
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
 	rclcpp::init(argc, argv);
-    auto drone1 = std::make_shared<DASCAerialRobot>("drone1", 1);
+    auto drone1 = std::make_shared<DASCAerialRobot>("drone2", 2);
     // auto drone2 = std::make_shared<DASCAerialRobot>("drone2", 2);
     // auto drone3 = std::make_shared<DASCAerialRobot>("drone3", 3);
     // auto drone4 = std::make_shared<DASCAerialRobot>("drone4", 4);
@@ -732,8 +775,8 @@ int main(int argc, char* argv[]) {
     std::thread server_exec_thread(server_spin_exec);
     std::cout << "Node start" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(3000));
-    float x = 0, y = 0, z = 2;
-    drone1->setCmdMode(DASCRobot::ControlMode::kPositionMode);
+    double x = 0, y = 0, z = 2;
+    drone1->setCmdMode(DASCRobot::ControlMode::kRateMode);
     // drone2->setCmdMode(DASCRobot::ControlMode::kPositionMode);
     // drone3->setCmdMode(DASCRobot::ControlMode::kPositionMode);
     // drone4->setCmdMode(DASCRobot::ControlMode::kPositionMode);
@@ -741,8 +784,8 @@ int main(int argc, char* argv[]) {
     // drone2->setGPSGlobalOrigin(47.3977419, 8.5455950, 488.105);
     // drone3->setGPSGlobalOrigin(47.3977419, 8.5455950, 488.105);
     // drone4->setGPSGlobalOrigin(47.3977419, 8.5455950, 488.105);
-    for (int i = 0; i < 20; i++) {
-        drone1->cmdWorldPosition(x + 1, y - 1, z, 0.0);
+    for (int i = 0; i < 50; i++) {
+        drone1->cmdRates(0, 0, 0, 0.75);
         // drone2->cmdWorldPosition(x + 1, y + 1, z, 0.0);
         // drone3->cmdWorldPosition(x - 1, y + 1, z, 0.0);
         // drone4->cmdWorldPosition(x - 1, y - 1, z, 0.0);
@@ -758,18 +801,26 @@ int main(int argc, char* argv[]) {
     // drone4->arm();
     std::cout << "Arm" << std::endl;
     // for(int i = 0; i < 10; i++) {
-    //     std::array<float, 4> quat;
+    //     std::array<double, 4> quat;
     //     drone1->getBodyQuaternion(quat, true);
     //     std::cout << quat[0] << quat[1] << quat[2] << quat[3] << std::endl;
     // }
-    for (int i = 0; i < 200; i++) {
-        drone1->cmdWorldPosition(x + 1, y - 1, z, 0.0);
+    // for (int i = 0; i < 200; i++) {
+    //     drone1->cmdWorldPosition(x + 1, y - 1, z, 0.0);
+    //     drone2->cmdWorldPosition(x + 1, y + 1, z, 0.0);
+    //     drone3->cmdWorldPosition(x - 1, y + 1, z, 0.0);
+    //     drone4->cmdWorldPosition(x - 1, y - 1, z, 0.0);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // }
+    // std::this_thread::sleep_for(std::chrono::milliseconds(20000));
+    while(rclcpp::ok()) {
+        drone1->cmdRates(0, 0, 0.5, 0.75);
+        // drone1->cmdWorldPosition(x + 1, y - 1, z, 0.0);
         // drone2->cmdWorldPosition(x + 1, y + 1, z, 0.0);
         // drone3->cmdWorldPosition(x - 1, y + 1, z, 0.0);
         // drone4->cmdWorldPosition(x - 1, y - 1, z, 0.0);
         std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
-    std::this_thread::sleep_for(std::chrono::milliseconds(20000));
 
     server_exec_thread.join();
     rclcpp::shutdown();

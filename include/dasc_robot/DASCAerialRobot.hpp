@@ -24,18 +24,18 @@ class DASCAerialRobot : public DASCRobot {
         bool init();
         bool arm();
         bool disarm();
-        std::array<float, 3> getWorldPosition();
-        std::array<float, 3> getWorldVelocity();
-        std::array<float, 3> getWorldAcceleration();
-        std::array<float, 3> getBodyAcceleration();
-        std::array<float, 3> getBodyRate();
-        bool getBodyQuaternion(std::array<float, 4>& quat, bool blocking);
+        std::array<double, 3> getWorldPosition();
+        std::array<double, 3> getWorldVelocity();
+        std::array<double, 3> getWorldAcceleration();
+        std::array<double, 3> getBodyAcceleration();
+        std::array<double, 3> getBodyRate();
+        bool getBodyQuaternion(std::array<double, 4>& quat, bool blocking);
         bool setCmdMode(DASCRobot::ControlMode mode);
-        bool cmdWorldPosition(float x, float y, float z, float yaw);
-        bool cmdWorldVelocity(float x, float y, float z, float yaw_rate);
-        bool cmdWorldAcceleration(float x, float y, float z, float yaw);
-        bool cmdAttitude(float q_w, float q_x, float q_y, float q_z, float thrust);
-        bool cmdRates(float roll, float pitch, float yaw, float thrust);
+        bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate);
+        bool cmdWorldVelocity(double x, double y, double z, double yaw, double yaw_rate);
+        bool cmdWorldAcceleration(double x, double y, double z, double yaw, double yaw_rate);
+        bool cmdAttitude(double q_w, double q_x, double q_y, double q_z, double thrust);
+        bool cmdRates(double roll, double pitch, double yaw, double thrust);
         bool cmdOffboardMode();
         /**
          * @brief Set the Global GPS coordinates reference for local frame
@@ -44,7 +44,10 @@ class DASCAerialRobot : public DASCRobot {
          * @param lon Longitude, (degrees)
          * @param alt Altitude AMSL, (meters)
          */
-        void setGPSGlobalOrigin(float lat, float lon, float alt);
+        void setGPSGlobalOrigin(double lat, double lon, double alt);
+        void emergencyStop();
+        bool takeoff();
+        bool land();
     private:
         enum class AerialRobotServerState {
             kInit = 0,
@@ -63,12 +66,13 @@ class DASCAerialRobot : public DASCRobot {
         AerialRobotServerState server_state_;
         AerialRobotServerState last_server_state_;
         std::string robot_name_;
-        const uint64_t pos_vel_acc_timeout_ns_;
+        const uint64_t vel_acc_timeout_ns_;
         const uint64_t att_rate_timeout_ns_;
         unsigned int controllerTimeoutCount_;
         uint8_t robot_id_;
         
         std::atomic<uint64_t> px4_timestamp_;
+        std::atomic<uint64_t> px4_server_timestamp_;
         std::atomic<uint64_t> last_publish_timestamp_;
         std::unique_ptr<tf2_ros::TransformBroadcaster> tf_broadcaster_;
         std::mutex acc_queue_mutex_;
@@ -79,12 +83,12 @@ class DASCAerialRobot : public DASCRobot {
         std::mutex world_acceleration_queue_mutex_;
         std::condition_variable quaternion_queue_cv_;
 
-        std::queue<std::array<float, 3>> accelerometer_m_s2_queue_;
-        std::queue<std::array<float, 3>> gyro_rad_queue_;
-        std::queue<std::array<float, 4>> quaternion_queue_;
-        std::queue<std::array<float, 3>> world_position_queue;
-        std::queue<std::array<float, 3>> world_velocity_queue;
-        std::queue<std::array<float, 3>> world_acceleration_queue;
+        std::queue<std::array<double, 3>> accelerometer_m_s2_queue_;
+        std::queue<std::array<double, 3>> gyro_rad_queue_;
+        std::queue<std::array<double, 4>> quaternion_queue_;
+        std::queue<std::array<double, 3>> world_position_queue;
+        std::queue<std::array<double, 3>> world_velocity_queue;
+        std::queue<std::array<double, 3>> world_acceleration_queue;
         
         rclcpp::TimerBase::SharedPtr timer_;
 
@@ -111,9 +115,10 @@ class DASCAerialRobot : public DASCRobot {
         void rateFSMUpdate();
         void controllerTimeoutFSMUpdate();
         void failsafeFSMUpdate();
-        void emergencyStop();
-
-        float clampToPi(float yaw);
+        uint64_t get_current_timestamp();
+        double clampToPi(double yaw);
+        std::array<double, 4> ned_to_enu(const std::array<double, 4> &quat);
+        std::array<double, 4> enu_to_ned(const std::array<double, 4> &quat);
 };
 
 #endif // DASC_ROBOT_DASCAERIALROBOT_HPP_
