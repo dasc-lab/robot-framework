@@ -35,9 +35,9 @@ Two telemetry wires are needed for wiring the pi to the pixhawk. We will be usin
     - Set EKF2_HGT_MODE to GPS if doing outdoor testing and Vision if doing indoor testing
     - set MAV_0_RATE to 0 B/s
     - set COM_RC_IN_MODE set to joystick only
-    - set MAV_RADIO_CTL to disable
+    - set MAV_0_RADIO_CTL to disable
     - set SER_TEL1_BAUD to 115200 8N1
-    - set SER_TEL2_BAUD to 926100
+    - set SER_TEL2_BAUD to 921600
     - set RTPS_CONFIG to TELEM 2
-    
+
 
