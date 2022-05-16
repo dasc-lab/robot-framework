@@ -21,7 +21,6 @@ Place double sided tape on the bottom of the legs and the middle of the top of t
 Two telemetry wires are needed for wiring the pi to the pixhawk. We will be using 2 Green (Tx), 2 Yellow (Rx), and 2 Black (Ground) wires, 2 six header pins, 2 single pin dupont, a 2 pin dupont, and a 3 pin dupont. Plug the ground into the 6th pin from the left, the green the third, and the yellow in the second (Picture here). They can just be pushed in from the __ end (pic here?). then put the yellow wire in the single pin dupont and the green and balck wires on the the ends of each 2 and 3 pin dupont.
 
 ## Pixhawk
-
 1. Set up the pixhawk by connecting it to the ground station via microUSB
 2. In the settings of QGC, flash the latest firmware (rn it's _____)
 3.  Make sure to set the airframe as generic quadcopter
@@ -29,7 +28,8 @@ Two telemetry wires are needed for wiring the pi to the pixhawk. We will be usin
 5. set the parameters properly
     - Set MAV_SYS_ID to be a different value from other quads
     - Check off Hold and Offboard for COM_RCL_EXCEPT 
-    - Check off GPS, vision position fusion, and yaw position fusion for EKF2_AID_MASK 
+    - Check off GPS, vision position fusion, and yaw position fusion for EKF2_AID_MASK if outdoor, and only vision position fusino and yaw position fusion if indoor
+        - NOTE: Code for vision position fusion is different whether or note use GPS is checked
     - Set EKF2_GPS_P_NOISE to 0.2 m
     - Set EKF2_GPS_V_NOISE to 0.15 m/s
     - Set EKF2_HGT_MODE to GPS if doing outdoor testing and Vision if doing indoor testing
@@ -39,5 +39,4 @@ Two telemetry wires are needed for wiring the pi to the pixhawk. We will be usin
     - set SER_TEL1_BAUD to 115200 8N1
     - set SER_TEL2_BAUD to 921600
     - set RTPS_CONFIG to TELEM 2
-
 
