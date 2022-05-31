@@ -23,3 +23,15 @@ NOTE: drone-5G does not have internet, so when setting up, use swarm-5G, and whe
 There should be a voltage converter connected to the roboclaw to connect to the pi power, and there should be a power connector to connect to the pixhawk cube black.
 
 ## TX2 Setup
+
+delete this part in the “microRTPS_transport.cpp”
+'''
+        serial_ctl.flags |= ASYNC_LOW_LATENCY;
+
+		if (ioctl(_uart_fd, TIOCSSERIAL, &serial_ctl) < 0) {
+			int errno_bkp = errno;
+			printf("\033[0;31m[ micrortps_transport ]\tError while trying to write serial port latency: %d\033[0m\n", errno);
+			close();
+			return -errno_bkp;
+		}
+'''
