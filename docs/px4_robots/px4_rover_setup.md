@@ -16,4 +16,10 @@ set the vehicle frame to generic ground rover
 
 NOTE: to ssh into pi using ubuntu 20.04 server, you need to first run ```sudo apt-get install libnss-mdns```
 
-The setup is the same as the small quad setup, but being connected to drone-5G instead of swarm-5G. NOTE: drone-5G does not have internet, so when setting up, use swarm-5G, and when testing go into /etc/netplan/50-cloud-init.yaml and edit it back to drone-5G. There should be a voltage converter connected ot the roboclaw to connect to the pi power, and there should be a power connector to connect to the pixhawk cube black.
+The setup is the same as the small quad setup, but being connected to drone-5G instead of swarm-5G. 
+
+NOTE: drone-5G does not have internet, so when setting up, use swarm-5G, and when testing go into /etc/netplan/50-cloud-init.yaml and edit it back to drone-5G. 
+
+There should be a voltage converter connected to the roboclaw to connect to the pi power, and there should be a power connector to connect to the pixhawk cube black.
+
+## TX2 Setup
