@@ -27,9 +27,28 @@ There should be a voltage converter connected to the roboclaw to connect to the 
 ## Wiring
 Connect the black wire to pin 1 (GND), which is closest to the edge of the board. Connect the yellow to pin 4 (RX) and the green wire to pin 5 (TX). The other end goes into TELEM 2 of the cube black. 
 
+## Firmware 
+
+
 ## Software 
 
-delete this part in the “microRTPS_transport.cpp”
+pull the docker container for the rover by using the command 
+```
+sudo docker run -it --privileged --net=host --name=ros2_px4_bridge chenrc98/ros2-px4-pi:rover1.4
+```
+
+In the container change folders and source
+```
+cd px4_ros_com/
+source install/setup.bash
+```
+
+To start the gps for the rover, run the command
+```
+micrortps_agent -d /dev/ttyTHS2 -b 921600
+```
+
+This part in the “microRTPS_transport.cpp” is deleted in this version
 '''
         serial_ctl.flags |= ASYNC_LOW_LATENCY;
 
