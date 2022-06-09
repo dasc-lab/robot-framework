@@ -7,8 +7,8 @@ parent: Px4 Robot
 nav_order: 6
 ---
 
-## Pixhawk Setup
-Flash fmu-v3 as the firmware onto a cube black
+## Pixhawk Firmware Setup
+Flash the custom firmware px3_fmu-v3_default.px4as the firmware onto a cube black
 set the vehicle frame to generic ground rover
 
 
@@ -27,10 +27,17 @@ There should be a voltage converter connected to the roboclaw to connect to the 
 ## Wiring
 Connect the black wire to pin 1 (GND), which is closest to the edge of the board. Connect the yellow to pin 4 (RX) and the green wire to pin 5 (TX). The other end goes into TELEM 2 of the cube black. 
 
-To wire to the roboclaw, 
+To wire to the Pixhawk side the white wire goes into the top of 1, the purple goes to the bottom of two and the grey goes into the bottom of 3. The roboclaw side, purple goes into s2, and the grey goes into s1 below it, while white goes into left side of s1.  
 
-## Firmware 
-Use the firmware px3_fmu-v3_default.px4
+## Remoting into the Rover
+Since most of the software setup is done on the rover directly, you can remote into the rover using
+```
+ssh rover[number]@rover[number].local
+```
+or
+``` 
+ssh rover[number]@ubuntu.local (rover2)
+```
 
 ## Software 
 
@@ -51,7 +58,7 @@ micrortps_agent -d /dev/ttyTHS2 -b 921600
 ```
 
 This part in the “microRTPS_transport.cpp” is deleted in this version
-'''
+```
         serial_ctl.flags |= ASYNC_LOW_LATENCY;
 
 		if (ioctl(_uart_fd, TIOCSSERIAL, &serial_ctl) < 0) {
@@ -60,4 +67,19 @@ This part in the “microRTPS_transport.cpp” is deleted in this version
 			close();
 			return -errno_bkp;
 		}
-'''
+```
+
+# Operation
+
+## Indoor
+When using the rover indoor, we need to convert the vicon messages into gps messages for the pixhawk using vicon_px4_bridge, and PX4 into ros commands using ros2_vicon_receiver. 
+
+These libraries can both be pulled from a docker container into the rover using
+```
+sudo docker pull chenrc98/vicon_px4_ros2_bridge
+```
+once inside 
+
+
+## Outdoor
+Outdoor operation does not need any additional setup, and you can directly start using the robot framework
