@@ -24,6 +24,9 @@ There should be a voltage converter connected to the roboclaw to connect to the 
 
 # TX2 Setup
 
+## Firmware
+Make sure jetpack 4.6 is installed (can be installed using DASC 1) using the nvidia jetpack installer on one of the computeres.
+
 ## Wiring
 Connect the black wire to pin 1 (GND), which is closest to the edge of the board. Connect the yellow to pin 4 (RX) and the green wire to pin 5 (TX). The other end goes into TELEM 2 of the cube black. 
 
