@@ -77,7 +77,7 @@ This part in the “microRTPS_transport.cpp” is deleted in this version
 ## Indoor
 When using the rover indoor, we need to convert the vicon messages into gps messages for the pixhawk using vicon_px4_bridge, and PX4 into ros commands using ros2_vicon_receiver. 
 
-These libraries can both be pulled from a docker container into the rover using
+These libraries can both be pulled from a docker container into the operating laptop
 ```
 sudo docker pull chenrc98/vicon_px4_ros2_bridge
 ```
