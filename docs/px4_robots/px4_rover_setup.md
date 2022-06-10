@@ -9,12 +9,13 @@ nav_order: 6
 
 ## Pixhawk Firmware Setup
 Flash the custom firmware px3_fmu-v3_default.px4 as the firmware onto a cube black
-set the vehicle frame to generic ground rover. This firmware can be built from the PX4 repo using
+set the vehicle frame to generic ground rover. This firmware can be built from the PX4 repo by using
 ```
+cd boards
+cd px4
+cd fmu-v3
 make px4_fmu-v3_default upload
 ```
-while plugged into the Pixhawk. 
-
 
 
 ## Pi Setup
