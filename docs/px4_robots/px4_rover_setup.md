@@ -8,8 +8,13 @@ nav_order: 6
 ---
 
 ## Pixhawk Firmware Setup
-Flash the custom firmware px3_fmu-v3_default.px4as the firmware onto a cube black
-set the vehicle frame to generic ground rover
+Flash the custom firmware px3_fmu-v3_default.px4 as the firmware onto a cube black
+set the vehicle frame to generic ground rover. This firmware can be built from the PX4 repo using
+```
+make px4_fmu-v3_default upload
+```
+while plugged into the Pixhawk. 
+
 
 
 ## Pi Setup
@@ -57,8 +62,10 @@ source install/setup.bash
 
 To start the gps for the rover, run the command
 ```
-micrortps_agent -d /dev/ttyTHS2 -b 921600
+micrortps_agent -d /dev/ttyTHS2 -b 921600 -n "namespace"
 ```
+
+The namespace is set on the vehicle itself for later use
 
 This part in the “microRTPS_transport.cpp” is deleted in this version
 ```
