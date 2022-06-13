@@ -7,6 +7,8 @@ parent: Px4 Robot
 nav_order: 8
 ---
 
+# Framework
+Make sure to make some position/velocity commands before commanding to arm
 
 # Ground Robot
 

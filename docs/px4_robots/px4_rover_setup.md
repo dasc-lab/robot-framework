@@ -31,12 +31,12 @@ There should be a voltage converter connected to the roboclaw to connect to the 
 # TX2 Setup
 
 ## Firmware
-Make sure jetpack 4.6 is installed (can be installed using DASC 1) using the nvidia jetpack installer on one of the computeres.
+Make sure jetpack 4.6 is installed (can be installed using DASC 1) using the nvidia jetpack installer on one of the computeres. Make sure to set the qgc parameter COM_RCL_EXCEPT to HOLD and OFFBOARD.
 
 ## Wiring
 Connect the black wire to pin 1 (GND), which is closest to the edge of the board. Connect the yellow to pin 4 (RX) and the green wire to pin 5 (TX). The other end goes into TELEM 2 of the cube black. 
 
-To wire to the Pixhawk side the white wire goes into the top of 1, the purple goes to the bottom of two and the grey goes into the bottom of 3. The roboclaw side, purple goes into s2, and the grey goes into s1 below it, while white goes into left side of s1.  
+To wire to the Pixhawk side the white wire goes into the top of 1, the purple goes to the bottom of two and the grey goes into the bottom of 4. Reference PX4 documentation (https://dev.px4.io/master/en/airframes/airframe_reference.html) to see  The roboclaw side, purple goes into s2, and the grey goes into s1 below it, while white goes into left side of s1.  
 
 ## Remoting into the Rover
 Since most of the software setup is done on the rover directly, you can remote into the rover using
