@@ -43,7 +43,7 @@ then do
  **Note:** If using tmux, start tmux after getting inside teh docker environment.
 
 # Step 3: start micrortps agent on Jetson
-micrortps is the ros program that communicates with pixhawk and let us recieve and send data to and from Jetson. To start this run the following command on Jetson
+micrortps is the ros program that communicates with pixhawk and let us recieve and send data to and from Jetson. To start this, run the following command on Jetson
 ```
 micrortps_agent -d /dev/ttyTHS2 -b 921600 -n "rover3"
 ```
@@ -86,6 +86,11 @@ root@rover3:/# bridge
 -----------------------
 
 ```
+**Note:** verify that the data is coming from pixhawk. Sometimes the output is not as displayed above and in that case, you need to stop and run bridge again until you see the complete output as above. It is also possible that the above output is displayed but there is no data (should not happen anymore but what if cables got loose? ). A quick check is to print the sensor data and see if it is there with folloiwing command:
+```
+ros2 topic echo /rover3/fmu/sensor_combined/out
+```
+Do this from Jetson docker and form laptop dokcer. in ROS2, any two machines on same network automatically share data with no extra setup! Therefore, even though this ros node was started on Jetson, the data should be visible from laptop too. If it is not, then there are issues. However, it just works usually and you won't face this issue.
 
 # Step 4: start vicon to px4 node on Laptop
 Inside the docker container on laptop, start the vicon node with following command
