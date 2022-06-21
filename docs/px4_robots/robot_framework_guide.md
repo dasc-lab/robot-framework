@@ -102,7 +102,7 @@ Check after doing this that the px4's location and yaw angle is same as vicon po
 
 **Note**: vicon/ros2 follows ENU (east-north-up) convention for defining x,y,z whereas PX4 follows NED convention. Therefore, vicon and px4 yaw angles re off by 90 degrees. The x,y,z are also not the same. They have the following relationship: `x_NED=y_ENU, y_NED=x_ENU, z_NED=-z_ENU`. Therefore, when comparing the above ros messages, take care of comparing the right components against each other. Even when sending waypoints (keep reading below on how to do that), you send the waypoints in ENU frame and the code converts them to NED behind the scenes.
 
-# Step 5: 
+# Step 5: Send Waypoints
 Start running the rover around. The whole framework is in the robot-framework folder in src of ros workspace. You can edit any file by opening it in the terminal directly or use vs code to acces the docker container and all its files.
 
 The whole framework and a sample code is inside a single file right now whose location is
