@@ -89,7 +89,7 @@ root@rover3:/# bridge
 # Step 4: start vicon to px4 node on Laptop
 Inside the docker container on laptop, start the vicon node with following command
 ```
-ros2 launch vicon_px4_bridge bridge_launch.py
+ros2 launch vicon_px4_bridge bridge_launch.py 
 ```
 Check that after doing this that the px4's location and yaw angle is same as vicon position and angle. The simplest way to do so is to check the yaw/heading angle on dashboard in Qgc home screen. It should change properly as you rotate rover around. Otherwise, you can do ros2 topic echo for vicon topic and local_position topic and see that they match.
 
@@ -98,7 +98,7 @@ Start running the rover around. The whole framework is in the robot-framework fo
 
 The whole framework and a sample code is inside a single file right now whose location is
 ```
-
+/root/px4_ros_com_ros2/src/robot-framework/src/DASCAerialRobot.cpp
 ```
 In order to run this node, do
 ```
@@ -107,12 +107,9 @@ ros2 run dasc_robot dascRobot
 
 Note: the folder name is robot-framework but the ros package name is dasc_robot. Hence the above command.
 
-The cuurent code makes the rover go to location (x=1,y=0) from wherever it is. The only thing you need to modify is the `main()` function according to your application. Hence, I will go over it below:
-
-
+The cuurent code makes the rover go to a location (x=1,y=0) from wherever it is. The only thing you need to modify is the `main()` function according to your application. Hence, I will go over it below:
 
 ```
-
 int main(int argc, char* argv[]) {
 	std::cout << "Starting offboard control node..." << std::endl;
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
