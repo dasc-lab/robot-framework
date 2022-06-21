@@ -58,7 +58,12 @@ Inside the docker container on laptop, start the vicon node with following comma
 ```
 ros2 launch vicon_px4_bridge bridge_launch.py
 ```
-Check that after doing this
+Check that after doing this that the px4's location and yaw angle is same as vicon position and angle. The simplest way to do so is to check the yaw/heading angle on dashboard in Qgc home screen. It should change properly as you rotate rover around. Otherwise, you can do ros2 topic echo for vicon topic and local_position topic and see that they match.
+
+# Step 5: 
+Start running the rover around.
+
+
 
 
 
