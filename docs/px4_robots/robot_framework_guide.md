@@ -29,7 +29,7 @@ We only work inside dockers.
 ```
 This starts a docker container. This step needs to be done only once. Now to run and get inside the docker environment do
 ```
-sudo docker run -it px4_vicon_bridge_display bash
+sudo docker exec -it px4_vicon_bridge_display bash
 ```
 This will get you inside docker environment. The default location is root. You can go to home by just doing `cd` or `cd ~`. Not needed though.
 - Jetson: in the terminal that you started with ssh, do
@@ -61,7 +61,22 @@ ros2 launch vicon_px4_bridge bridge_launch.py
 Check that after doing this that the px4's location and yaw angle is same as vicon position and angle. The simplest way to do so is to check the yaw/heading angle on dashboard in Qgc home screen. It should change properly as you rotate rover around. Otherwise, you can do ros2 topic echo for vicon topic and local_position topic and see that they match.
 
 # Step 5: 
-Start running the rover around.
+Start running the rover around. The whole framework is in the robot-framework folder in src of ros workspace. You can edit any file by opening it in the terminal directly or use vs code to acces the docker containerd and all its files.
+
+The whole framework and a sample code is inside a single file right now whose location is
+```
+
+```
+In order to run this node, do
+```
+ros2 run dasc_robot dascRobot
+```
+
+Note: the folder name is robot-framework but the ros package name is dasc_robot. Hence the above command.
+
+The cuurent code makes the rover go to location (x=1,y=0) from wherever it is. The only thing you need to modify is the `main()` function according to your application. Hence, I will go over it below:
+
+
 
 
 
