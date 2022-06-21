@@ -55,7 +55,6 @@ bridge
 
 The output is supposed to look like this
 ```
-root@rover3:/# nano ~/.bashrc
 root@rover3:/# bridge
 --- MicroRTPS Agent ---
 [   micrortps_agent   ]	Starting link...
