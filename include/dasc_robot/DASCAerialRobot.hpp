@@ -33,6 +33,7 @@ class DASCAerialRobot : public DASCRobot {
         bool setCmdMode(DASCRobot::ControlMode mode);
         bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdWorldVelocity(double x, double y, double z, double yaw, double yaw_rate);
+        bool cmdLocalVelocity(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdWorldAcceleration(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdAttitude(double q_w, double q_x, double q_y, double q_z, double thrust);
         bool cmdRates(double roll, double pitch, double yaw, double thrust);

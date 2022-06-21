@@ -20,6 +20,7 @@ DASCAerialRobot::DASCAerialRobot(std::string robot_name, uint8_t id) :
 }
 
 bool DASCAerialRobot::init() {
+    std::cout << "Initializing" << std::endl;
     if (!rclcpp::ok()) {
         return false;
     }
@@ -89,6 +90,7 @@ bool DASCAerialRobot::init() {
         this->updateState();
     };
     this->timer_ = this->create_wall_timer(100ms, timer_callback);
+    std::cout << "State Updated" << std::endl;
     this->server_state_ = AerialRobotServerState::kReady;
     RCLCPP_INFO(this->get_logger(), "DASC Aerial Robot Server initialized!");
     return true;
@@ -226,10 +228,10 @@ bool DASCAerialRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocki
 }
 
 bool DASCAerialRobot::setCmdMode(ControlMode mode) {
-    if (this->server_state_ == AerialRobotServerState::kInit) {
-        RCLCPP_ERROR(this->get_logger(), "Calling setCmdMode with uninitialized server!");
-        return false;
-    }
+    // if (this->server_state_ == AerialRobotServerState::kInit) {
+    //     RCLCPP_ERROR(this->get_logger(), "Calling setCmdMode with uninitialized server!");
+    //     return false;
+    // }
     switch (mode)
     {
     case ControlMode::kPositionMode:
@@ -258,7 +260,7 @@ bool DASCAerialRobot::setCmdMode(ControlMode mode) {
         break;
 
     default:
-        RCLCPP_ERROR(this->get_logger(), "Unknow Control Mode %d", mode);
+        RCLCPP_ERROR(this->get_logger(), "Unknown Control Mode %d", mode);
         return false;
     }
     //update current_timestamp
@@ -527,6 +529,7 @@ void DASCAerialRobot::vehicleLocalPositionCallback(const VehicleLocalPosition::U
 }
 
 void DASCAerialRobot::updateState() {
+    std::cout << "Inside update, state: " << this->server_state_ << std::endl;
     switch (this->server_state_)
     {
     case AerialRobotServerState::kInit:
@@ -537,10 +540,12 @@ void DASCAerialRobot::updateState() {
         break;
 
     case AerialRobotServerState::kPosition:
+    std::cout << "Inside update Velocity" << std::endl;
         this->positionFSMUpdate();
         break;
 
     case AerialRobotServerState::kVelocity:
+    std::cout << "Inside update Velocity" << std::endl;
         this->velocityFSMUpdate();
         break;
 
@@ -567,7 +572,7 @@ void DASCAerialRobot::updateState() {
         break;
     
     default:
-        RCLCPP_ERROR(this->get_logger(), "Unknow server state %d", this->server_state_);
+        RCLCPP_ERROR(this->get_logger(), "Unknown server state %d", this->server_state_);
         return;
     }
 
@@ -579,7 +584,6 @@ void DASCAerialRobot::positionFSMUpdate() {
     msg.timestamp = get_current_timestamp();
     msg.position = true;
     offboard_control_mode_publisher_->publish(msg);
-    // std::cout << "Send offboard position command \n"; 
 }
 
 void DASCAerialRobot::velocityFSMUpdate() {
@@ -590,11 +594,11 @@ void DASCAerialRobot::velocityFSMUpdate() {
         RCLCPP_WARN(this->get_logger(), "Velocity Timeout, switch to ControllerTimeout state!");
     }
     else {
+        std::cout << "Sending offboard mode command " << std::endl;
         OffboardControlMode msg;
         msg.timestamp = get_current_timestamp();
         msg.velocity = true;
         offboard_control_mode_publisher_->publish(msg);
-        // std::cout << "Send offboard velocity command \n"; 
     }
 }
 
@@ -779,60 +783,153 @@ uint64_t DASCAerialRobot::get_current_timestamp() {
     return px4_timestamp_.load() + delta;
 }
 
+
 int main(int argc, char* argv[]) {
 	std::cout << "Starting offboard control node..." << std::endl;
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
 	rclcpp::init(argc, argv);
     auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 1);
+    // auto drone2 = std::make_shared<DASCAerialRobot>("drone2", 2);
+    // auto drone3 = std::make_shared<DASCAerialRobot>("drone3", 3);
+    // auto drone4 = std::make_shared<DASCAerialRobot>("drone4", 4);
+    // auto drone5 = std::make_shared<DASCAerialRobot>("drone5", 5);
+
+    
     
     rover3->init();
-    
+    // drone2->init();
+    // drone3->init();
+    // drone4->init();
+    // drone5->init();
+
     rclcpp::executors::MultiThreadedExecutor server_exec;
     server_exec.add_node(rover3);
+    // server_exec.add_node(drone2);
+    // server_exec.add_node(drone3);
+    // server_exec.add_node(drone4);
+    // server_exec.add_node(drone5);
     
     auto server_spin_exec = [&server_exec]() {
         server_exec.spin();
     };
     std::thread server_exec_thread(server_spin_exec);
     std::cout << "Node init" << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000)); // 20000???
     std::cout << "Node start" << std::endl;
-    double rad = 2.0;
-    double theta = 0.0;
-    double height = 2.0;
+    // double rad = 2.0;
+    // double theta = 0.0;
+    // double height = 0.0;
 
-    double vx = 2.0;
-    double wz = 3.14/3;
+    rover3->setCmdMode(DASCRobot::ControlMode::kVelocityMode);
+    // drone2->setCmdMode(DASCRobot::ControlMode::kVelocityMode);
+    // drone3->setCmdMode(DASCRobot::ControlMode::kPositionMode);
+    // drone4->setCmdMode(DASCRobot::ControlMode::kPositionMode);
+    // drone5->setCmdMode(DASCRobot::ControlMode::kPositionMode);
 
-    rover3->setCmdMode(DASCRobot::ControlMode::kPositionMode);
+    // rover3->setCmdMode(DASCRobot::ControlMode::kPositionMode);
+    
+    // rover3->setGPSGlobalOrigin(42.2944313, -83.71044393888889, 275.0);
+    // drone2->setGPSGlobalOrigin(42.2944313, -83.71044393888889, 275.0);
+    // drone3->setGPSGlobalOrigin(42.2944313, -83.71044393888889, 275.0);
+    // drone4->setGPSGlobalOrigin(42.2944313, -83.71044393888889, 275.0);
+    // drone5->setGPSGlobalOrigin(42.2944313, -83.71044393888889, 275.0);
+    
+    // drone2->setGPSGlobalOrigin(47.3977419, 8.5455950, 488.105);
+    // drone3->setGPSGlobalOrigin(47.3977419, 8.5455950, 488.105);
+    // drone4->setGPSGlobalOrigin(47.3977419, 8.5455950, 488.105);
+    // for (int i = 0; i < 100; i++) {
+    //     rover2->cmdWorldPosition(rad * cos(theta), rad * sin(theta), height, 0, 0);
+    //     // drone2->cmdWorldPosition(rad * cos(theta + M_PI_2), rad * sin(theta + M_PI_2), height, 0, 0);
+    //     // drone3->cmdWorldPosition(rad * cos(theta + M_PI_2 * 2.0), rad * sin(theta + M_PI_2 * 2.0), height, 0, 0);
+    //     // drone4->cmdWorldPosition(rad * cos(theta + M_PI_2 * 3.0), rad * sin(theta + M_PI_2 * 3.0), height, 0, 0);
+    //     // drone5->cmdWorldPosition(0, 0, height + 0.5, 0, 0);
+    //     // drone3->cmdWorldPosition(x - 1, y + 1, z, 0.0);
+    //     // drone4->cmdWorldPosition(x - 1, y - 1, z, 0.0);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    //}
 
+    // NEED TO SEND A SHORT COMMAND BEFORE ARMING 
     for (int i = 0; i < 100; i++) {
-        // rover3->cmdWorldPosition(rad * cos(theta), rad * sin(theta), height, 0, 0);
-        rover3->cmdWorldPosition(1.0,0,0,0,0);  
-        // rover3->cmdLocalVelocity(0.0,vx,0.0,0.0,wz);  
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        // rover3->cmdWorldPosition(1.0,0,0,0,0);        
+        rover3->cmdLocalVelocity(0.0,0.5,0.0,0.0,3.14/4.0);  
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
         rover3->cmdOffboardMode();
         rover3->arm();
-    
+        // drone2->cmdOffboardMode();
+        // drone2->arm();
+        // drone3->cmdOffboardMode();
+        // drone3->arm();
+        // drone4->cmdOffboardMode();
+        // drone4->arm();
+        // drone5->cmdOffboardMode();
+        // drone5->arm();
     std::cout << "Arm" << std::endl;
-
-    for (int i = 0; i < 200; i++) {
-        // rover3->cmdWorldPosition(rad * cos(theta), rad * sin(theta), height, 0, 0);
-        rover3->cmdWorldPosition(1.0,0,0,0,0);  
-        // rover3->cmdLocalVelocity(0.0,vx,0.0,0.0,wz);  
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    // for(int i = 0; i < 10; i++) {
+    //     std::array<double, 4> quat;
+    //     rover2->getBodyQuaternion(quat, true);
+    //     std::cout << quat[0] << quat[1] << quat[2] << quat[3] << std::endl;
+    // }
+    for (int i = 0; i < 20; i++) {
+        // rover3->cmdWorldPosition(1.0,0.0,0.0,0.0,0.0);     
+        rover3->cmdLocalVelocity(0.0,0.5,0.0,0.0,0.0);//3.14/4.0);        
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+    std::cout << "Position sent" << std::endl;
     while(rclcpp::ok()) {
-        // theta += 0.00785;
-        // if (theta > M_PI * 2.0) {
-        //     theta = 0.0;
-        // }
-        // rover3->cmdWorldPosition(rad * cos(theta), rad * sin(theta), height, 0, 0);
-        rover3->cmdWorldPosition(1.0,0,0,0,0);  
-        // rover3->cmdLocalVelocity(0.0,vx,0.0,0.0,wz);  
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        // rover3->cmdWorldPosition(1.0,0.0,0.0,0.0,0.0);    
+        rover3->cmdLocalVelocity(0.0,0.5,0.0,0.0,0.0);//3.14/4.0);         
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
+
+    // Velocity Control Mode example
+    // for (int i = 0; i < 20; i++) {
+    //     rover2->cmdWorldVelocity(1,0,0,0,0);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // }
+    // for (int i = 0; i < 200; i++) {
+    //     rover2->cmdWorldVelocity(0,0,0,0,2);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // }
+    // std::cout << "Velocity sent" << std::endl;
+
+    // for(int i = 0; i < 10; i++) {
+    //     std::array<double, 4> quat;
+    //     drone1->getBodyQuaternion(quat, true);
+    //     std::cout << quat[0] << quat[1] << quat[2] << quat[3] << std::endl;
+    // }
+    // for (int i = 0; i < 200; i++) {
+    //     drone1->cmdWorldPosition(x + 1, y - 1, z, 0.0);
+    //     drone2->cmdWorldPosition(x + 1, y + 1, z, 0.0);
+    //     drone3->cmdWorldPosition(x - 1, y + 1, z, 0.0);
+    //     drone4->cmdWorldPosition(x - 1, y - 1, z, 0.0);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    // }
+    // std::this_thread::sleep_for(std::chrono::milliseconds(20000));
+    // for (int i = 0; i < 200; i++) {
+    //     rover2->cmdWorldPosition(rad * cos(theta), rad * sin(theta), height, 0, 0);
+    //     // drone2->cmdWorldPosition(rad * cos(theta + M_PI_2), rad * sin(theta + M_PI_2), height, 0, 0);
+    //     // drone3->cmdWorldPosition(rad * cos(theta + M_PI_2 * 2.0), rad * sin(theta + M_PI_2 * 2.0), height, 0, 0);
+    //     // drone4->cmdWorldPosition(rad * cos(theta + M_PI_2 * 3.0), rad * sin(theta + M_PI_2 * 3.0), height, 0, 0);
+    //     // drone5->cmdWorldPosition(0, 0, height + 0.5, 0, 0);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    // }
+    // while(rclcpp::ok()) {
+    //     theta += 0.00785;
+    //     if (theta > M_PI * 2.0) {
+    //         theta = 0.0;
+    //     }
+    //     rover2->cmdWorldPosition(rad * cos(theta), rad * sin(theta), height, 0, 0);
+    //     // drone2->cmdWorldPosition(rad * cos(theta + M_PI_2), rad * sin(theta + M_PI_2), height, 0, 0);
+    //     // drone3->cmdWorldPosition(rad * cos(theta + M_PI_2 * 2.0), rad * sin(theta + M_PI_2 * 2.0), height, 0, 0);
+    //     // drone4->cmdWorldPosition(rad * cos(theta + M_PI_2 * 3.0), rad * sin(theta + M_PI_2 * 3.0), height, 0, 0);
+    //     // drone5->cmdWorldPosition(0, 0, height + 0.5, 0, 0);
+    //     // drone1->cmdWorldPosition(x + 1, y - 1, z, 0.0);
+    //     // drone2->cmdWorldPosition(x + 1, y + 1, z, 0.0);
+    //     // drone3->cmdWorldPosition(x - 1, y + 1, z, 0.0);
+    //     // drone4->cmdWorldPosition(x - 1, y - 1, z, 0.0);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    // }
 
     server_exec_thread.join();
     rclcpp::shutdown();
