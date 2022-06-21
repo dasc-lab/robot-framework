@@ -49,7 +49,7 @@ micrortps_agent -d /dev/ttyTHS2 -b 921600 -n "rover3"
 ```
 `/dev/ttyTHS2` is the UART port on Jetson to which telem2 of pixhawk has been connected. `921600` is the baud rate and `rover3` is the namespace we want to use.
 
-I have made as alias in `~/.bashrc` so instead on writing the above long command everytime you start Jetson, you can also just write
+I have made an alias in `~/.bashrc` so instead on writing the above long command everytime you start Jetson, you can also just write
 ```
 bridge
 ```
