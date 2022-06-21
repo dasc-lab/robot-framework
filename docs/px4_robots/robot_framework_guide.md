@@ -78,6 +78,91 @@ The cuurent code makes the rover go to location (x=1,y=0) from wherever it is. T
 
 
 
+```
+
+int main(int argc, char* argv[]) {
+	std::cout << "Starting offboard control node..." << std::endl;
+	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
+	rclcpp::init(argc, argv);
+    auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 1);
+    
+    rover3->init();
+    
+    rclcpp::executors::MultiThreadedExecutor server_exec;
+    server_exec.add_node(rover3);
+    
+    auto server_spin_exec = [&server_exec]() {
+        server_exec.spin();
+    };
+    std::thread server_exec_thread(server_spin_exec);
+    std::cout << "Node init" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::cout << "Node start" << std::endl;
+```
+
+The above are the steps you need to do for initializing a robot. For multiple robots, you need to write the sames lines again for them. For example, if you have another rover2, then the code would look like this
+```
+int main(int argc, char* argv[]) {
+	std::cout << "Starting offboard control node..." << std::endl;
+	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
+	rclcpp::init(argc, argv);
+    auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 1);
+    auto rover2 = std::make_shared<DASCAerialRobot>("rover2", 1);
+    
+    rover3->init();
+    rover2->init();
+    
+    rclcpp::executors::MultiThreadedExecutor server_exec;
+    server_exec.add_node(rover3);
+    server_exec.add_node(rover2)
+    
+    auto server_spin_exec = [&server_exec]() {
+        server_exec.spin();
+    };
+    std::thread server_exec_thread(server_spin_exec);
+    std::cout << "Node init" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+    std::cout << "Node start" << std::endl;
+```
+
+Now moving on to next few lines of this example code
+```
+rover3->setCmdMode(DASCRobot::ControlMode::kPositionMode);
+
+double vx = 2.0;
+double wz = 3.14/3;
+    
+for (int i = 0; i < 100; i++) {
+        // rover3->cmdWorldPosition(rad * cos(theta), rad * sin(theta), height, 0, 0);
+        rover3->cmdWorldPosition(1.0,0,0,0,0);  
+        // rover3->cmdLocalVelocity(vx,0,0.0,0.0,wz);  
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+        rover3->cmdOffboardMode();
+        rover3->arm();
+    
+    std::cout << "Arm" << std::endl;
+```
+Here, we first set the command mode. `kPositionMode` is the position control mode. You can demand desired x,y from it. It does not care about yaw at the moment. If you want to use the velocity mode, it will be 'kVelocityMode' in which you need to set linear x velocity and yaw_rat. Other fields will be ignored (but better put them to 0). 
+After setting the mode, we first start sending some offboard commands (desired position) in a loop and then set the rover to use offboard mode.
+Note: in PX4, automatic mode is called 'offboard mode' as the setpoints are received from outside, like an offboard computer (Jetson/Pi/laptop). Finally we arm it.
+
+We send some offboard commands before actually setting it to offboard mode as if px does not detect any offboard waypoint commands when it is switch to offboard mode, it will reject the request to switch to offboard mode. Now moving on to next part of code.
+```
+    while(rclcpp::ok()) {
+        rover3->cmdWorldPosition(1.0,0,0,0,0);  
+        // rover3->cmdLocalVelocity(0.0,vx,0.0,0.0,wz);  
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    }
+
+    server_exec_thread.join();
+    rclcpp::shutdown();
+	return 0;
+}
+```
+Here, we just keep sending the commands in a loop that runs until you close the node from terminal (by pressing Ctrl+C for example).
+
+
 
 
 
