@@ -200,6 +200,7 @@ We send some offboard commands before actually setting it to offboard mode as if
 }
 ```
 Here, we just keep sending the commands in a loop that runs until you close the node from terminal (by pressing Ctrl+C for example).
+**Note:** for position control, the message has syntax, (x,y,z,yaw,yaw_rate) and for velocity control the syntax is (vx,vy,vz,yaw,yaw_rate). As explained above, for rovers, only x,y and vx,yaw_rate will be used. others should be 0.
 
 **Note**: If you want to stop the rover, just kill the node by pressing Ctrl+C. It will move back to manual control mode.
 
