@@ -192,7 +192,7 @@ We send some offboard commands before actually setting it to offboard mode as if
 ```
 Here, we just keep sending the commands in a loop that runs until you close the node from terminal (by pressing Ctrl+C for example).
 
-**Note**: Ig you want to stop the rover, just kill the node by pressing Ctrl+C. It will move back to manual control mode.
+**Note**: If you want to stop the rover, just kill the node by pressing Ctrl+C. It will move back to manual control mode.
 
 
 
