@@ -182,7 +182,7 @@ for (int i = 0; i < 100; i++) {
     
     std::cout << "Arm" << std::endl;
 ```
-Here, we first set the command mode. `kPositionMode` is the position control mode. You can demand desired x,y from it. It does not care about yaw at the moment. If you want to use the velocity mode, it will be 'kVelocityMode' in which you need to set linear x velocity and yaw_rat. Other fields will be ignored (but better put them to 0). 
+Here, we first set the command mode. `kPositionMode` is the position control mode. You can demand desired x,y from it. It does not care about yaw at the moment. If you want to use the velocity mode, it will be `kVelocityMode` in which you need to set linear x velocity and yaw_rat. Other fields will be ignored (but better put them to 0). 
 After setting the mode, we first start sending some offboard commands (desired position) in a loop and then set the rover to use offboard mode.
 Note: in PX4, automatic mode is called 'offboard mode' as the setpoints are received from outside, like an offboard computer (Jetson/Pi/laptop). Finally we arm it.
 
