@@ -116,7 +116,7 @@ ros2 run dasc_robot dascRobot
 
 Note: the folder name is robot-framework but the ros package name is dasc_robot. Hence the above command.
 
-The cuurent code makes the rover go to a location (x=1,y=0) from wherever it is. The only thing you need to modify is the `main()` function according to your application. Hence, I will go over it below:
+The current code makes the rover go to a location (x=1,y=0) from wherever it is. The only thing you need to modify is the `main()` function according to your application. Hence, I will go over it below:
 
 ```
 int main(int argc, char* argv[]) {
@@ -186,7 +186,9 @@ Here, we first set the command mode. `kPositionMode` is the position control mod
 After setting the mode, we first start sending some offboard commands (desired position) in a loop and then set the rover to use offboard mode.
 Note: in PX4, automatic mode is called 'offboard mode' as the setpoints are received from outside, like an offboard computer (Jetson/Pi/laptop). Finally we arm it.
 
-We send some offboard commands before actually setting it to offboard mode as if px does not detect any offboard waypoint commands when it is switch to offboard mode, it will reject the request to switch to offboard mode. Now moving on to next part of code.
+We send some offboard commands before actually setting it to offboard mode because if px4 does not detect any offboard waypoint commands when it is switch to offboard mode, it will reject the request to switch to offboard mode. 
+
+Now moving on to next part of code.
 ```
     while(rclcpp::ok()) {
         rover3->cmdWorldPosition(1.0,0,0,0,0);  
