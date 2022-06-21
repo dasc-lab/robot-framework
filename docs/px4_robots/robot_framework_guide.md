@@ -1,12 +1,69 @@
 ---
 layout: default
-title:  "8. Using Robot Framework"
+title:  "8. Using Robot Framework for Rover3"
 date:   2022-05-09
 math: katex
 parent: Px4 Robot
 nav_order: 8
 ---
 
+This page explains on how to get started with using rover3 that is completely set up.
+
+# Step 1: Power-up and connect to rover
+Power up the rover by connecting the LiPo battery (voltage should be more than 10.7 ideally). Use DASC2 laptop and boot into it's Ubuntu 20 (the default one when you power up the lapotp so nothing to change there). Make sure the laptop is connected to drone-5G-5.2 Wifi (this is the big router). On DASC2, open a terminal and do
+```
+ssh rover3@rover3.local
+```
+When prompted for password, use 'hello123'.
+
+Note: In case you need to open multiple terminals on laptop and or jetson, I recommend using tmux. tmux allows you to split a single terminal into multiple panes each of which acts as an independent terminal and you won't have to ssh again from another terminal. You can see some guides on using tmux or open multiple terminals directlt if need for subsequent steps.
+
+# Step 2: Connect to QGroundControl(QGC)
+This rover's pixhawk has the telemetry module attached to it. Just connect the other telemetry module to laptop with the usb cable and open QGC(on desktop) to connect to pixhawk. QGC will only be used for monitoring usually. The parameter values and other setup has already been done and it doesn't play any necessary role in doing the experiment but it is still good to keep it open. It can show errors like 'high accelerometer or magnetometer bias' that show up once in a while and prevent arming the robot. In this particular case, you just need to do sensor calibration again using QGC.
+
+# Step 2: Start docker contaimners on Jetson and Laptop
+We only work inside dockers. 
+- Laptop: open a terminal and do 
+```
+ sudo docker start px4_vicon_bridge_display
+```
+This starts a docker container. This step needs to be done only once. Now to run and get inside the docker environment do
+```
+sudo docker run -it px4_vicon_bridge_display bash
+```
+This will get you inside docker environment. The default location is root. You can go to home by just doing `cd` or `cd ~`. Not needed though.
+- Jetson: in the terminal that you started with ssh, do
+```
+sudo docker start px4_ros_bridge
+```
+then do 
+ ```
+ sudo docker run -it px4_ros_bridge bash
+ ```
+
+# Step 3: start micrortps agent on Jetson
+micrortps is the ros program that communicates with pixhawk and let us recieve and send data to and from Jetson. To start this run the following command on Jetson
+```
+micrortps_agent -d /dev/ttyTHS2 -b 921600 "rover3"
+```
+`/dev/ttyTHS2` is the UART port on Jetson to which telem2 of pixhawk has been connected. `921600` is the baud rate and `rover3` is the namespace we want to use.
+
+I have made as alias in `~/.bashrc` so instead on writing the above long command everytime you start Jetson, you can also just write
+```
+bridge
+```
+
+# Step 4: start vicon to px4 node on Laptop
+Inside the docker container on laptop, start the vicon node with following command
+```
+ros2 launch vicon_px4_bridge bridge_launch.py
+```
+Check that after doing this
+
+
+
+
+<!-- # Old(Incomplete) documentation from here on. 
 # Framework
 Make sure to make some position/velocity commands before commanding to arm
 
@@ -29,3 +86,4 @@ Make sure to run ```colcon build``` after whatever edits you make to the framewo
 ```
 ros2 run dasc_robot dascRobot
 ```
+-->
