@@ -174,7 +174,7 @@ double wz = 3.14/3;
 for (int i = 0; i < 100; i++) {
         // rover3->cmdWorldPosition(rad * cos(theta), rad * sin(theta), height, 0, 0);
         rover3->cmdWorldPosition(1.0,0,0,0,0);  
-        // rover3->cmdLocalVelocity(vx,0,0.0,0.0,wz);  
+        // rover3->cmdLocalVelocity(0,vx,0.0,0.0,wz);  
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
         rover3->cmdOffboardMode();
