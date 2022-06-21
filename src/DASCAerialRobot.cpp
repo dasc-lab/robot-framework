@@ -258,7 +258,7 @@ bool DASCAerialRobot::setCmdMode(ControlMode mode) {
         break;
 
     default:
-        RCLCPP_ERROR(this->get_logger(), "Unknow Control Mode %d", mode);
+        RCLCPP_ERROR(this->get_logger(), "Unknown Control Mode %d", mode);
         return false;
     }
     //update current_timestamp
@@ -567,7 +567,7 @@ void DASCAerialRobot::updateState() {
         break;
     
     default:
-        RCLCPP_ERROR(this->get_logger(), "Unknow server state %d", this->server_state_);
+        RCLCPP_ERROR(this->get_logger(), "Unknown server state %d", this->server_state_);
         return;
     }
 
