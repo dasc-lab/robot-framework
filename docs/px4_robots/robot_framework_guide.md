@@ -34,23 +34,57 @@ sudo docker exec -it px4_vicon_bridge_display bash
 This will get you inside docker environment. The default location is root. You can go to home by just doing `cd` or `cd ~`. Not needed though.
 - Jetson: in the terminal that you started with ssh, do
 ```
-sudo docker start px4_ros_bridge
+sudo docker start ros2_px4_bridge
 ```
 then do 
  ```
- sudo docker run -it px4_ros_bridge bash
+ sudo docker run -it ros2_px4_bridge bash
  ```
 
 # Step 3: start micrortps agent on Jetson
 micrortps is the ros program that communicates with pixhawk and let us recieve and send data to and from Jetson. To start this run the following command on Jetson
 ```
-micrortps_agent -d /dev/ttyTHS2 -b 921600 "rover3"
+micrortps_agent -d /dev/ttyTHS2 -b 921600 -n "rover3"
 ```
 `/dev/ttyTHS2` is the UART port on Jetson to which telem2 of pixhawk has been connected. `921600` is the baud rate and `rover3` is the namespace we want to use.
 
 I have made as alias in `~/.bashrc` so instead on writing the above long command everytime you start Jetson, you can also just write
 ```
 bridge
+```
+
+The output is supposed to look like this
+```
+root@rover3:/# nano ~/.bashrc
+root@rover3:/# bridge
+--- MicroRTPS Agent ---
+[   micrortps_agent   ]	Starting link...
+[   micrortps_agent   ]	UART transport: device: /dev/ttyTHS2; baudrate: 921600; poll: 1ms; flow_control: No
+---   Subscribers   ---
+- Timesync subscriber started
+- OffboardControlMode subscriber started
+- VehicleLocalPositionSetpoint subscriber started
+- VehicleCommand subscriber started
+- VehicleAttitudeSetpoint subscriber started
+- VehicleRatesSetpoint subscriber started
+- VehicleOdometry subscriber started
+- SensorGps subscriber started
+- ManualControlSetpoint subscriber started
+- GpsInjectData subscriber started
+- TrajectorySetpoint subscriber started
+- VehicleVisualOdometry subscriber started
+-----------------------
+
+----   Publishers  ----
+- Timesync publishers started
+- SensorCombined publisher started
+- VehicleAttitude publisher started
+- VehicleLocalPosition publisher started
+- TimesyncStatus publisher started
+- VehicleStatus publisher started
+- BatteryStatus publisher started
+-----------------------
+
 ```
 
 # Step 4: start vicon to px4 node on Laptop
