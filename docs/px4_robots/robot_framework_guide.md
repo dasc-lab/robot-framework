@@ -38,7 +38,7 @@ sudo docker start ros2_px4_bridge
 ```
 then do 
  ```
- sudo docker run -it ros2_px4_bridge bash
+ sudo docker exec -it ros2_px4_bridge bash
  ```
  **Note:** If using tmux, start tmux after getting inside teh docker environment.
 
