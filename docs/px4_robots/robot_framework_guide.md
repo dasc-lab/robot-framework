@@ -18,9 +18,6 @@ When prompted for password, use 'hello123'.
 
 Note: In case you need to open multiple terminals on laptop and or jetson, I recommend using tmux. tmux allows you to split a single terminal into multiple panes each of which acts as an independent terminal and you won't have to ssh again from another terminal. You can see some guides on using tmux or open multiple terminals directlt if need for subsequent steps.
 
-# Step 2: Connect to QGroundControl(QGC)
-This rover's pixhawk has the telemetry module attached to it. Just connect the other telemetry module to laptop with the usb cable and open QGC(double click on QGC icon inside the QGC folder on desktop on the laptop) to connect to pixhawk. QGC will only be used for monitoring usually. The parameter values and other setup has already been done and it doesn't play any necessary role in doing the experiment but it is still good to keep it open. It can show errors like 'high accelerometer or magnetometer bias' that show up once in a while and prevent arming the robot. In this particular case, you just need to do sensor calibration again using QGC.
-
 # Step 2: Start docker containers on Jetson and Laptop
 We only work inside dockers. 
 - Laptop: open a terminal and do 
@@ -42,7 +39,27 @@ then do
  ```
  **Note:** If using tmux, start tmux after getting inside teh docker environment.
 
-# Step 3: start micrortps agent on Jetson
+
+# Step 3: Connect to QGroundControl(QGC)
+
+## If using Telemetry Module
+This rover's pixhawk has the telemetry module attached to it. Just connect the other telemetry module to laptop with the usb cable and open QGC(double click on QGC icon inside the QGC folder on desktop on the laptop) to connect to pixhawk. QGC will only be used for monitoring usually. The parameter values and other setup has already been done and it doesn't play any necessary role in doing the experiment but it is still good to keep it open. It can show errors like 'high accelerometer or magnetometer bias' that show up once in a while and prevent arming the robot. In this particular case, you just need to do sensor calibration again using QGC.
+
+## If using mavlink-routerd
+mavlink-router is a program that runs on Jetson, connects to TELEM1 port of pixhawk and redirects data to the laptop so that QGC can run. The setup includes editing a config file to mention the UART port on Jetson where telem1 of pixhawk is connected and the IP address of the laptop you are working on.
+```
+nano /etc/mavlink-router/main.conf
+```
+For 'Device' use '/dev/ttyUSB0'
+For 'Baud', use '115200'
+For 'Port', use '14550'
+For 'Address' use 'IP Address of Laptop'
+Save the file and exit. Now to start this program write the following in one terminal
+```
+mavlink-routerd
+```
+
+# Step 4: start micrortps agent on Jetson
 micrortps is the ros program that communicates with pixhawk and let us recieve and send data to and from Jetson. To start this, run the following command on Jetson
 ```
 micrortps_agent -d /dev/ttyTHS2 -b 921600 -n "rover3"
@@ -92,7 +109,7 @@ ros2 topic echo /rover3/fmu/sensor_combined/out
 ```
 Do this from Jetson docker and form laptop dokcer. in ROS2, any two machines on same network automatically share data with no extra setup! Therefore, even though this ros node was started on Jetson, the data should be visible from laptop too. If it is not, then there are issues. However, it just works usually and you won't face this issue.
 
-# Step 4: start vicon to px4 node on Laptop
+# Step 5: start vicon to px4 node on Laptop
 Inside the docker container on laptop, start the vicon node with following command
 ```
 ros2 launch vicon_px4_bridge bridge_launch.py 
@@ -102,7 +119,7 @@ Check after doing this that the px4's location and yaw angle is same as vicon po
 
 **Note**: vicon/ros2 follows ENU (east-north-up) convention for defining x,y,z whereas PX4 follows NED convention. Therefore, vicon and px4 yaw angles re off by 90 degrees. The x,y,z are also not the same. They have the following relationship: `x_NED=y_ENU, y_NED=x_ENU, z_NED=-z_ENU`. Therefore, when comparing the above ros messages, take care of comparing the right components against each other. Even when sending waypoints (keep reading below on how to do that), you send the waypoints in ENU frame and the code converts them to NED behind the scenes.
 
-# Step 5: Send Waypoints
+# Step 6: Send Waypoints
 Start running the rover around. The whole framework is in the robot-framework folder in src of ros workspace. You can edit any file by opening it in the terminal directly or use vs code to acces the docker container and all its files.
 
 The whole framework and a sample code is inside a single file right now whose location is
