@@ -9,6 +9,8 @@ nav_order: 8
 
 This page explains on how to get started with using rover3 that is completely set up.
 
+NOTE: For DASC 1, dockers are set up on Ubuntu 18, For Dasc 2 the dockers are set up on Ubuntu 20
+
 # Step 1: Power-up and connect to rover
 Power up the rover by connecting the LiPo battery (voltage should be more than 10.7 ideally). Use DASC2 laptop and boot into it's Ubuntu 20 (the default one when you power up the lapotp so nothing to change there). Make sure the laptop is connected to drone-5G-5.2 Wifi (this is the big router). On DASC2, open a terminal and do
 ```

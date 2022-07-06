@@ -79,6 +79,21 @@ This part in the “microRTPS_transport.cpp” is deleted in this version
 			return -errno_bkp;
 		}
 ```
+## QGC Parameters
+- Set MAV_SYS_ID to be a different value from other Rovers (match number with name of rover)
+- Check off Hold and Offboard for COM_RCL_EXCEPT 
+- Check off GPS, vision position fusion, and yaw position fusion for EKF2_AID_MASK if outdoor, and only vision position fusino and yaw position fusion if indoor
+	- NOTE: Code for vision position fusion is different whether or note use GPS is checked
+- Set EKF2_GPS_P_NOISE to 0.2 m
+- Set EKF2_GPS_V_NOISE to 0.15 m/s
+- Set EKF2_HGT_MODE to GPS if doing outdoor testing and Vision if doing indoor testing
+- set MAV_0_RATE to 0 B/s
+- set COM_RC_IN_MODE set to joystick only
+- set MAV_0_RADIO_CTL to disable
+- set SER_TEL1_BAUD to 115200 8N1
+- set SER_TEL2_BAUD to 921600
+- set RTPS_CONFIG to TELEM 2
+- Make sure that it communicates via TELEM 1 (CHECK THE PARAM NEEDED FOR THIS)
 
 # Operation
 
