@@ -53,7 +53,7 @@ nano /etc/mavlink-router/main.conf
 - For `Device`, use `/dev/ttyUSB0
 - For `Baud`, use `115200`
 - For `Port`, use `14550`
-- For `Address`, use 'IP Address of Laptop'
+- For `Address`, use `IP Address of Laptop`
 Save the file and exit. Now to start this program write the following in one terminal
 ```
 mavlink-routerd
