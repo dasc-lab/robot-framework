@@ -9,7 +9,7 @@ nav_order: 8
 
 This page explains on how to get started with using rover3 that is completely set up.
 
-NOTE: For DASC 1, dockers are set up on Ubuntu 18, For Dasc 2 the dockers are set up on Ubuntu 20
+NOTE: Boot the laptop into Ubuntu 20. The instructions have been tested for DASC2 at the time of writing this. DASC1 has yet to be tested.
 
 # Step 1: Power-up and connect to rover
 Power up the rover by connecting the LiPo battery (voltage should be more than 10.7 ideally). Use DASC2 laptop and boot into it's Ubuntu 20 (the default one when you power up the lapotp so nothing to change there). Make sure the laptop is connected to drone-5G-5.2 Wifi (this is the big router). On DASC2, open a terminal and do
@@ -39,13 +39,14 @@ then do
  ```
  sudo docker exec -it ros2_px4_bridge bash
  ```
- **Note:** If using tmux, start tmux after getting inside teh docker environment.
+ **Note:** If using tmux, start tmux after getting inside the docker environment.
 
 
 # Step 3: Connect to QGroundControl(QGC)
+open QGC(double click on QGC icon inside the QGC folder on desktop on the laptop) to connect to pixhawk. QGC will only be used for monitoring usually. The parameter values and other setup has already been done and it doesn't play any necessary role in doing the experiment but it is still good to keep it open. It can show errors like 'high accelerometer or magnetometer bias' that show up once in a while and prevent arming the robot. In this particular case, you just need to do sensor calibration again using QGC.
 
 ## If using Telemetry Module
-This rover's pixhawk has the telemetry module attached to it. Just connect the other telemetry module to laptop with the usb cable and open QGC(double click on QGC icon inside the QGC folder on desktop on the laptop) to connect to pixhawk. QGC will only be used for monitoring usually. The parameter values and other setup has already been done and it doesn't play any necessary role in doing the experiment but it is still good to keep it open. It can show errors like 'high accelerometer or magnetometer bias' that show up once in a while and prevent arming the robot. In this particular case, you just need to do sensor calibration again using QGC.
+This rover's pixhawk has the telemetry module attached to it. Just connect the other telemetry module to laptop with the usb cable.
 
 ## If using mavlink-routerd
 mavlink-router is a program that runs on Jetson, connects to TELEM1 port of pixhawk and redirects data to the laptop so that QGC can run. The setup includes editing a config file to mention the UART port on Jetson where telem1 of pixhawk is connected and the IP address of the laptop you are working on.
@@ -122,6 +123,9 @@ Check after doing this that the px4's location and yaw angle is same as vicon po
 **Note**: vicon/ros2 follows ENU (east-north-up) convention for defining x,y,z whereas PX4 follows NED convention. Therefore, vicon and px4 yaw angles re off by 90 degrees. The x,y,z are also not the same. They have the following relationship: `x_NED=y_ENU, y_NED=x_ENU, z_NED=-z_ENU`. Therefore, when comparing the above ros messages, take care of comparing the right components against each other. Even when sending waypoints (keep reading below on how to do that), you send the waypoints in ENU frame and the code converts them to NED behind the scenes.
 
 # Step 6: Send Waypoints
+
+**Note**: The whole framework is in a single file DASCRobots.cpp (anf header file DASCRobots.hpp). This was  built as an library in CMakeLists.txt of the package. This library was then linked to the example_control.cpp that is run below. For other langiages like Pythin and Julia, it suffices to build a wrapper around this library.
+
 Start running the rover around. The whole framework is in the robot-framework folder in src of ros workspace. You can edit any file by opening it in the terminal directly or use vs code to acces the docker container and all its files.
 
 The whole framework and a sample code is inside a single file right now whose location is
@@ -130,7 +134,7 @@ The whole framework and a sample code is inside a single file right now whose lo
 ```
 In order to run this node, do
 ```
-ros2 run dasc_robot dascRobot
+ros2 run dasc_robot example_control
 ```
 
 Note: the folder name is robot-framework but the ros package name is dasc_robot. Hence the above command.
