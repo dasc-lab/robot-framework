@@ -154,7 +154,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "Starting offboard control node..." << std::endl;
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
 	rclcpp::init(argc, argv);
-    auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 1);
+    auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 3);
     
     rover3->init();
     
@@ -170,14 +170,18 @@ int main(int argc, char* argv[]) {
     std::cout << "Node start" << std::endl;
 ```
 
-The above are the steps you need to do for initializing a robot. For multiple robots, you need to write the sames lines again for them. For example, if you have another rover2, then the code would look like this
+The above are the steps you need to do for initializing a robot. 
+
+**Note**: In `std::make_shared<DASCAerialRobot>("rover3", 3);`, `rover3` is the name and `3` is the ID.  
+
+For multiple robots, you need to write the sames lines again for them. For example, if you have another rover2, then the code would look like this
 ```
 int main(int argc, char* argv[]) {
 	std::cout << "Starting offboard control node..." << std::endl;
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
 	rclcpp::init(argc, argv);
-    auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 1);
-    auto rover2 = std::make_shared<DASCAerialRobot>("rover2", 1);
+    auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 3);
+    auto rover2 = std::make_shared<DASCAerialRobot>("rover2", 2);
     
     rover3->init();
     rover2->init();
