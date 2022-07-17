@@ -27,29 +27,6 @@ find_package(eigen3_cmake_module REQUIRED)
 find_package(Eigen3 REQUIRED NO_MODULE)
 find_package(px4_ros_com REQUIRED)
 
-# add_executible(dascRobot src/DASCAerialRobot.cpp)
-# ament_target_dependencies(dascRobot rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com)
-# target_include_directories(dascRobot PUBLIC
-#   $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
-  # $<  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
-  # $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
-# )INSTALL_INTERFACE:include/${PROJECT_NAME}>
-# )
-# ament_export_libraries(dascRobot)
-# install(TARGETS
-#   dascRobot
-#   DESTINATION lib/${PROJECT_NAME})
-
-# add_executable(offboard_control_example src/offboard_control_example.cpp)
-# target_link_libraries(offboard_control_example dascRobot ${rclcpp_LIBRARIES})
-# ament_target_dependencies(offboard_control_example rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com)
-# target_include_directories(offboard_contRCE_DIR}/include/${PROJECT_NAME}>
-# $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
-# )
-# install(TARGETS
-#   offboard_control_example
-#   DESTINATION lib/${PROJECT_NAME})
-
 add_library(dascBots src/DASCRobots.cpp)
 ament_target_dependencies(dascBots rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com)
 target_include_directories(dascBots PUBLIC
@@ -76,7 +53,5 @@ target_include_directories(example_control PUBLIC
 install(TARGETS
   example_control
   DESTINATION lib/${PROJECT_NAME})
-
-
 
 ament_package()
