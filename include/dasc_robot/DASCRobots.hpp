@@ -19,7 +19,7 @@
 using namespace px4_msgs::msg;
 
 
-class DASCRobot : virtual public rclcpp::Node {
+class DASC : virtual public rclcpp::Node {
 
     public:
         enum class ControlMode {
@@ -50,9 +50,9 @@ class DASCRobot : virtual public rclcpp::Node {
         ControlMode current_control_mode_;
 };
 
-class DASCAerialRobot : public DASCRobot {
+class DASCRobot : public DASC {
     public:
-        DASCAerialRobot(std::string robot_name, uint8_t id);
+        DASCRobot(std::string robot_name, uint8_t id);
         bool init();
         bool arm();
         bool disarm();
@@ -82,7 +82,7 @@ class DASCAerialRobot : public DASCRobot {
         bool takeoff();
         bool land();
     private:
-        enum class AerialRobotServerState {
+        enum class RobotServerState {
             kInit = 0,
             kReady,
             kPosition,
@@ -96,8 +96,8 @@ class DASCAerialRobot : public DASCRobot {
             kFailSafeLand,
         };
         ControlMode current_control_mode_;
-        AerialRobotServerState server_state_;
-        AerialRobotServerState last_server_state_;
+        RobotServerState server_state_;
+        RobotServerState last_server_state_;
         std::string robot_name_;
         const uint64_t vel_acc_timeout_ns_;
         const uint64_t att_rate_timeout_ns_;

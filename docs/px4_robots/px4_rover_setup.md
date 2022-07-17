@@ -9,12 +9,13 @@ nav_order: 6
 
 ## Pixhawk Firmware Setup
 Flash the custom firmware px3_fmu-v3_default.px4 as the firmware onto a cube black
-set the vehicle frame to generic ground rover. This firmware can be built from the PX4 repo using
+set the vehicle frame to generic ground rover. This firmware can be built from the PX4 repo by using
 ```
+cd boards
+cd px4
+cd fmu-v3
 make px4_fmu-v3_default upload
 ```
-while plugged into the Pixhawk. 
-
 
 
 ## Pi Setup
@@ -30,12 +31,12 @@ There should be a voltage converter connected to the roboclaw to connect to the 
 # TX2 Setup
 
 ## Firmware
-Make sure jetpack 4.6 is installed (can be installed using DASC 1) using the nvidia jetpack installer on one of the computeres.
+Make sure jetpack 4.6 is installed (can be installed using DASC 1) using the nvidia jetpack installer on one of the computeres. Make sure to set the qgc parameter COM_RCL_EXCEPT to HOLD and OFFBOARD.
 
 ## Wiring
 Connect the black wire to pin 1 (GND), which is closest to the edge of the board. Connect the yellow to pin 4 (RX) and the green wire to pin 5 (TX). The other end goes into TELEM 2 of the cube black. 
 
-To wire to the Pixhawk side the white wire goes into the top of 1, the purple goes to the bottom of two and the grey goes into the bottom of 3. The roboclaw side, purple goes into s2, and the grey goes into s1 below it, while white goes into left side of s1.  
+To wire to the Pixhawk side the white wire goes into the top of 1, the purple goes to the bottom of two and the grey goes into the bottom of 4. Reference PX4 documentation (https://dev.px4.io/master/en/airframes/airframe_reference.html) to see  The roboclaw side, purple goes into s2, and the grey goes into s1 below it, while white goes into left side of s1.  
 
 ## Remoting into the Rover
 Since most of the software setup is done on the rover directly, you can remote into the rover using
@@ -78,6 +79,21 @@ This part in the “microRTPS_transport.cpp” is deleted in this version
 			return -errno_bkp;
 		}
 ```
+## QGC Parameters
+- Set MAV_SYS_ID to be a different value from other Rovers (match number with name of rover)
+- Check off Hold and Offboard for COM_RCL_EXCEPT 
+- Check off GPS, vision position fusion, and yaw position fusion for EKF2_AID_MASK if outdoor, and only vision position fusino and yaw position fusion if indoor
+	- NOTE: Code for vision position fusion is different whether or note use GPS is checked
+- Set EKF2_GPS_P_NOISE to 0.2 m
+- Set EKF2_GPS_V_NOISE to 0.15 m/s
+- Set EKF2_HGT_MODE to GPS if doing outdoor testing and Vision if doing indoor testing
+- set MAV_0_RATE to 0 B/s
+- set COM_RC_IN_MODE set to joystick only
+- set MAV_0_RADIO_CTL to disable
+- set SER_TEL1_BAUD to 115200 8N1
+- set SER_TEL2_BAUD to 921600
+- set RTPS_CONFIG to TELEM 2
+- Make sure that it communicates via TELEM 1 (CHECK THE PARAM NEEDED FOR THIS)
 
 # Operation
 

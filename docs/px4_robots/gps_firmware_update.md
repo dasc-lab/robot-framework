@@ -1,11 +1,13 @@
 ---
 layout: default
-title:  "Px4 Robot"
+title:  "GPS Firmware Update"
 date:   2022-05-09
 math: katex
-has_children: true
+parent: Px4 Robot
 nav_order: 7
 ---
+
+## GPS Firmware Update
 
 - Needs to be done on Windows
 - Open ArduPilot mission planner software
