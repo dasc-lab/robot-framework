@@ -117,6 +117,12 @@ Inside the docker container on laptop, start the vicon node with following comma
 ```
 ros2 launch vicon_px4_bridge bridge_launch.py 
 ```
+Before running the above command, check the launch file first. You can edit the file in vs code (it can edit files inside docker containers! on both the laptop, opening vs code should open the docker conatiner by default) or use nano
+```
+nano ~/px4_ros_com_ros2/src/vicon_px4_bridge/launch/bridge_launch.py
+```
+and then add all the robots you want to get data from vicon for. The launch files in both the laptop only have rover2 and 3 added. For other rovers, you need to add them to the launch file.
+**Note**: make sure that rover object exists in the Vicon software! if not, then add markers to the rover and make an object first -> save object ->shared.
 
 Check after doing this that the px4's location and yaw angle is same as vicon position and angle. The simplest way to do so is to check the yaw/heading angle on dashboard in Qgc home screen. It should change properly as you rotate rover around. Otherwise, you can do ros2 topic echo for vicon topic`(/vicon/rover3/rover3)` and local_position topic`(/rover3/fmu/vehicle_local_position/out
 )` and see that they match.
