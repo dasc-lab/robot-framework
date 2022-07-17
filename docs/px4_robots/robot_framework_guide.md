@@ -46,7 +46,7 @@ then do
 open QGC(double click on QGC icon inside the QGC folder on desktop on the laptop) to connect to pixhawk. QGC will only be used for monitoring usually. The parameter values and other setup has already been done and it doesn't play any necessary role in doing the experiment but it is still good to keep it open. It can show errors like 'high accelerometer or magnetometer bias' that show up once in a while and prevent arming the robot. In this particular case, you just need to do sensor calibration again using QGC.
 
 ## If using Telemetry Module
-This rover's pixhawk has the telemetry module attached to it. Just connect the other telemetry module to laptop with the usb cable.
+This rover's pixhawk has the telemetry module attached to it. Just connect the other telemetry module to laptop with the usb cable. None of the rovers use telemetry module as of now.
 
 ## If using mavlink-routerd
 mavlink-router is a program that runs on Jetson, connects to TELEM1 port of pixhawk and redirects data to the laptop so that QGC can run. The setup includes editing a config file to mention the UART port on Jetson where telem1 of pixhawk is connected and the IP address of the laptop you are working on.
@@ -117,6 +117,7 @@ Inside the docker container on laptop, start the vicon node with following comma
 ```
 ros2 launch vicon_px4_bridge bridge_launch.py 
 ```
+
 Check after doing this that the px4's location and yaw angle is same as vicon position and angle. The simplest way to do so is to check the yaw/heading angle on dashboard in Qgc home screen. It should change properly as you rotate rover around. Otherwise, you can do ros2 topic echo for vicon topic`(/vicon/rover3/rover3)` and local_position topic`(/rover3/fmu/vehicle_local_position/out
 )` and see that they match.
 
