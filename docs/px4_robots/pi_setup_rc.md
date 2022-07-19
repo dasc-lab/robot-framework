@@ -4,7 +4,7 @@ title:  "Ruichang's Pi Setup"
 date:   2022-05-09
 math: katex
 has_children: true
-nav_order: 8
+nav_order: 9
 ---
 
 ## flash pi sd card
