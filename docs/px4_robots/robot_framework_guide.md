@@ -69,7 +69,7 @@ On laptop, in one of the terminals, do
 ```
 fastdds discovery --server-id 0
 ```
-This will start the discovery server (ros2 by default is completely decentralized in which each computer runs its own process to find other computers thereby sharing lots of data. A discovery server will make this search process centralized and speed up things. In fact, if you have more than 2 robots, your wifi will just freeze. So this is an important step for multi-robot experiment).
+This will start the discovery server (ros2 by default is completely decentralized in which each computer runs its own process to find other computers thereby sharing lots of data. A discovery server will make this search process centralized and speed up things. In fact, if you have more than 2 robots, the decentralized version will make your wifi freeze. So this is an important step for multi-robot experiment).
 
 Now, on both laptop and all Jetsons, open the bashrc file
 ```
