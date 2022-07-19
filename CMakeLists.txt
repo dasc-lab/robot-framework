@@ -54,4 +54,15 @@ install(TARGETS
   example_control
   DESTINATION lib/${PROJECT_NAME})
 
+  add_executable(example_control_multi_rover src/example_control_multi_rover.cpp)
+ament_target_dependencies(example_control_multi_rover rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
+target_link_libraries(example_control_multi_rover dascBots)
+target_include_directories(example_control_multi_rover PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+)
+install(TARGETS
+  example_control_multi_rover
+  DESTINATION lib/${PROJECT_NAME})
+
 ament_package()
