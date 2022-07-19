@@ -157,7 +157,7 @@ Start running the rover around. The whole framework is in the robot-framework fo
 
 The whole framework and a sample code is inside a single file right now whose location is
 ```
-/root/px4_ros_com_ros2/src/robot-framework/src/DASCAerialRobot.cpp
+/root/px4_ros_com_ros2/src/robot-framework/src/DASCARobots.cpp
 ```
 In order to run this node, do
 ```
