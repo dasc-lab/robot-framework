@@ -7,7 +7,21 @@ parent: Px4 Robot
 nav_order: 6
 ---
 
-## Pixhawk Firmware Setup
+# Necessary Hardware
+
+In order to properly run, the rover needs to have the roboclaw, 4 motors, a Pixhawk, and either a Raspberry Pi or a Jetson TX2. If using the Jetson, make sure to also inlude the multi-usb extention, the USB to TTL converter, and the wifi antennas. Make sure to mount the Pixhawk or Pi if using them. The TX2 is already in the rover and is in the bottom. A radio control module is optional, and can be connected to the Pixhawk if RC wants to be used.
+
+# Step 1: Wiring
+
+## 1.1: TX2
+Connect the black wire to pin 1 (GND), which is closest to the edge of the board. Connect the yellow to pin 4 (RX) and the green wire to pin 5 (TX). The other end goes into TELEM 2 of the cube black. Attach the USB Hub to the USB Port of the TX2. In the current setup, the Hub is mounted in the front under the lip using a spacer to allow the lid to fit and double sided tape. Plug in the USB to TTL converter into the hub on the USB side and to TELEM 1 with the same type of cable used for TELEM 2.
+
+## 1.2: Pixhawk
+To wire to the Pixhawk side the white wire goes into the top of 1, the purple goes to the bottom of two and the grey goes into the bottom of 4. Reference PX4 documentation (https://dev.px4.io/master/en/airframes/airframe_reference.html) to see  The roboclaw side, purple goes into s2 pin, and the grey goes into s1 below it, while white goes into leftmost pin of s1.
+
+# Step 2: Pixhawk Setup
+
+## 2.1: Firmware
 Flash the custom firmware px3_fmu-v3_default.px4 as the firmware onto a cube black
 set the vehicle frame to generic ground rover. This firmware can be built from the PX4 repo by using
 ```
@@ -16,70 +30,7 @@ cd px4
 cd fmu-v3
 make px4_fmu-v3_default upload
 ```
-
-
-## Pi Setup
-
-NOTE: to ssh into pi using ubuntu 20.04 server, you need to first run ```sudo apt-get install libnss-mdns```
-
-The setup is the same as the small quad setup, but being connected to drone-5G instead of swarm-5G. 
-
-NOTE: drone-5G does not have internet, so when setting up, use swarm-5G, and when testing go into /etc/netplan/50-cloud-init.yaml and edit it back to drone-5G. 
-
-There should be a voltage converter connected to the roboclaw to connect to the pi power, and there should be a power connector to connect to the pixhawk cube black.
-
-# TX2 Setup
-
-## Firmware
-Make sure jetpack 4.6 is installed (can be installed using DASC 1) using the nvidia jetpack installer on one of the computeres. Make sure to set the qgc parameter COM_RCL_EXCEPT to HOLD and OFFBOARD.
-
-## Wiring
-Connect the black wire to pin 1 (GND), which is closest to the edge of the board. Connect the yellow to pin 4 (RX) and the green wire to pin 5 (TX). The other end goes into TELEM 2 of the cube black. 
-
-To wire to the Pixhawk side the white wire goes into the top of 1, the purple goes to the bottom of two and the grey goes into the bottom of 4. Reference PX4 documentation (https://dev.px4.io/master/en/airframes/airframe_reference.html) to see  The roboclaw side, purple goes into s2, and the grey goes into s1 below it, while white goes into left side of s1.  
-
-## Remoting into the Rover
-Since most of the software setup is done on the rover directly, you can remote into the rover using
-```
-ssh rover[number]@rover[number].local
-```
-or
-``` 
-ssh rover[number]@ubuntu.local (rover2)
-```
-
-## Software 
-
-pull the docker container for the rover by using the command 
-```
-sudo docker run -it --privileged --net=host --name=ros2_px4_bridge chenrc98/ros2-px4-pi:rover1.4
-```
-
-In the container change folders and source
-```
-cd px4_ros_com/
-source install/setup.bash
-```
-
-To start the gps for the rover, run the command
-```
-micrortps_agent -d /dev/ttyTHS2 -b 921600 -n "namespace"
-```
-
-The namespace is set on the vehicle itself for later use
-
-This part in the “microRTPS_transport.cpp” is deleted in this version
-```
-        serial_ctl.flags |= ASYNC_LOW_LATENCY;
-
-		if (ioctl(_uart_fd, TIOCSSERIAL, &serial_ctl) < 0) {
-			int errno_bkp = errno;
-			printf("\033[0;31m[ micrortps_transport ]\tError while trying to write serial port latency: %d\033[0m\n", errno);
-			close();
-			return -errno_bkp;
-		}
-```
-## QGC Parameters
+## 2.2: QGC Parameters
 - Set MAV_SYS_ID to be a different value from other Rovers (match number with name of rover)
 - Check off Hold and Offboard for COM_RCL_EXCEPT 
 - Check off GPS, vision position fusion, and yaw position fusion for EKF2_AID_MASK if outdoor, and only vision position fusino and yaw position fusion if indoor
@@ -93,19 +44,83 @@ This part in the “microRTPS_transport.cpp” is deleted in this version
 - set SER_TEL1_BAUD to 115200 8N1
 - set SER_TEL2_BAUD to 921600
 - set RTPS_CONFIG to TELEM 2
-- Make sure that it communicates via TELEM 1 (CHECK THE PARAM NEEDED FOR THIS)
 
-# Operation
+# Step 3: Jetson setup
 
-## Indoor
-When using the rover indoor, we need to convert the vicon messages into gps messages for the pixhawk using vicon_px4_bridge, and PX4 into ros commands using ros2_vicon_receiver. 
+## 3.1: Firmware
+Use the NVIDIA Jetson SDK Manager to install Jetpack 4.6.2. The necessary settings are installed on DASC 1's Ubuntu 18 installation. You will need to create an NVIDIA Developer account using your email to use it. Plug in the Jetson to the DASC via microUSB with the power off or battery disconnected. Hold the REC button and power on the Jetson, holding on the REC button for a while during startup. The SDK Manager should detect the Jetson. Follow the steps on the manager, making sure not to redownload the SDK if it's already on DASC 1, as it takes up a lot of space. 
 
-These libraries can both be pulled from a docker container into the operating laptop
+## 3.2: Setting up Remoting into the Rover
+Since most of the software setup is done on the rover directly, you can remote into the rover using
 ```
-sudo docker pull chenrc98/vicon_px4_ros2_bridge
+ssh rover[number]@rover[number].local
 ```
-once inside 
+or
+``` 
+ssh rover[number]@ubuntu.local (rover2)
+```
 
+To set this up for further rovers, you need to change the profile name and the system name for the rovers.
 
-## Outdoor
-Outdoor operation does not need any additional setup, and you can directly start using the robot framework
+To change the system name, follow the instructions in (https://www.tecmint.com/set-hostname-permanently-in-linux/), using a command line command and some editing of host files.
+
+To change the profile name, a temporary user needs to be created, follow the instructions here (https://askubuntu.com/questions/34074/how-do-i-change-my-username).
+
+## 3.3: Docker Setup 
+Follow the official instructions from the docker website to install Docker and its necessary components (https://docs.docker.com/engine/install/ubuntu/).
+
+pull the docker container for the rover by using the command 
+```
+sudo docker run -it --privileged --net=host --name=ros2_px4_bridge chenrc98/ros2-px4-pi:rover1.4
+```
+
+or 
+
+```
+sudo docker run -it --privileged --net=host --name=ros2_px4_bridge sidpra/ros2-px4-pi:rover1.5
+```
+
+This should result in a running container that with full device and network permissions. use ```docker ps``` to check if it is running.
+
+```
+sudo docker start ros2_px4_bridge
+```
+then do 
+ ```
+ sudo docker exec -it ros2_px4_bridge bash
+ ```
+
+To enter the container.
+
+In the container, use 
+```
+sudo nano ~/.bashrc
+```
+and add the lines
+```
+source /opt/ros/galactic/setup.bash
+source ~/px4_ros_com/install/setup.bash
+```
+
+This will allow users to use ```source ~/.bashrc``` instead of sourcing everything individually.
+
+change into the src folder of px4_ros_com:
+
+```
+cd \px4_ros_com\src
+```
+
+and clone the robot-framework repo
+
+```
+git clone https://github.com/dasc-lab/robot-framework.git
+```
+and cd into the robot-framework folder and switch to the ground robot branch 
+```
+git checkout ground_robot
+```
+
+change back to the px4_ros_com folder and run 
+```
+colcon build
+```
