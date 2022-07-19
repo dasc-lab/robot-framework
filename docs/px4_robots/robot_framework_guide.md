@@ -20,6 +20,8 @@ When prompted for password, use 'hello123'.
 
 Note: In case you need to open multiple terminals on laptop and or jetson, I recommend using tmux. tmux allows you to split a single terminal into multiple panes each of which acts as an independent terminal and you won't have to ssh again from another terminal. You can see some guides on using tmux or open multiple terminals directlt if need for subsequent steps.
 
+Note: I made an alias in bashrc file, so you can just type `rover3` and it will implement the above ssh command
+
 # Step 2: Start docker containers on Jetson and Laptop
 We only work inside dockers. 
 - Laptop: open a terminal and do 
@@ -61,6 +63,23 @@ Save the file and exit. Now to start this program write the following in one ter
 ```
 mavlink-routerd
 ```
+
+# Step 4: Do some ROS settings
+On laptop, in one of the terminals, do
+```
+fastdds discovery --server-id 0
+```
+This will start the discovery server (ros2 by default is completely decentralized in which each computer runs its own process to find other computers thereby sharing lots of data. A discovery server will make this search process centralized and speed up things. In fact, if you have more than 2 robots, your wifi will just freeze. So this is an important step for multi-robot experiment).
+
+Now, on both laptop and all Jetsons, open the bashrc file
+```
+nano ~/.bashrc
+```
+scroll down to the botton and make sure that the IP address is the IP address of the laptop (on Jetsons too the IP address should be of the laptop)
+```
+export ROS_DISCOVERY_SERVER=<IP address of laptop>:11811
+```
+
 
 # Step 4: start micrortps agent on Jetson
 micrortps is the ros program that communicates with pixhawk and let us recieve and send data to and from Jetson. To start this, run the following command on Jetson
