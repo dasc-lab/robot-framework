@@ -20,6 +20,8 @@ When prompted for password, use 'hello123'.
 
 Note: In case you need to open multiple terminals on laptop and or jetson, I recommend using tmux. tmux allows you to split a single terminal into multiple panes each of which acts as an independent terminal and you won't have to ssh again from another terminal. You can see some guides on using tmux or open multiple terminals directlt if need for subsequent steps.
 
+Note: I made an alias in bashrc file, so you can just type `rover3` and it will implement the above ssh command
+
 # Step 2: Start docker containers on Jetson and Laptop
 We only work inside dockers. 
 - Laptop: open a terminal and do 
@@ -46,7 +48,7 @@ then do
 open QGC(double click on QGC icon inside the QGC folder on desktop on the laptop) to connect to pixhawk. QGC will only be used for monitoring usually. The parameter values and other setup has already been done and it doesn't play any necessary role in doing the experiment but it is still good to keep it open. It can show errors like 'high accelerometer or magnetometer bias' that show up once in a while and prevent arming the robot. In this particular case, you just need to do sensor calibration again using QGC.
 
 ## If using Telemetry Module
-This rover's pixhawk has the telemetry module attached to it. Just connect the other telemetry module to laptop with the usb cable.
+This rover's pixhawk has the telemetry module attached to it. Just connect the other telemetry module to laptop with the usb cable. None of the rovers use telemetry module as of now.
 
 ## If using mavlink-routerd
 mavlink-router is a program that runs on Jetson, connects to TELEM1 port of pixhawk and redirects data to the laptop so that QGC can run. The setup includes editing a config file to mention the UART port on Jetson where telem1 of pixhawk is connected and the IP address of the laptop you are working on.
@@ -61,6 +63,23 @@ Save the file and exit. Now to start this program write the following in one ter
 ```
 mavlink-routerd
 ```
+
+# Step 4: Do some ROS settings
+On laptop, in one of the terminals, do
+```
+fastdds discovery --server-id 0
+```
+This will start the discovery server (ros2 by default is completely decentralized in which each computer runs its own process to find other computers thereby sharing lots of data. A discovery server will make this search process centralized and speed up things. In fact, if you have more than 2 robots, the decentralized version will make your wifi freeze. So this is an important step for multi-robot experiment).
+
+Now, on both laptop and all Jetsons, open the bashrc file
+```
+nano ~/.bashrc
+```
+scroll down to the botton and make sure that the IP address is the IP address of the laptop (on Jetsons too the IP address should be of the laptop)
+```
+export ROS_DISCOVERY_SERVER=<IP address of laptop>:11811
+```
+
 
 # Step 4: start micrortps agent on Jetson
 micrortps is the ros program that communicates with pixhawk and let us recieve and send data to and from Jetson. To start this, run the following command on Jetson
@@ -117,6 +136,14 @@ Inside the docker container on laptop, start the vicon node with following comma
 ```
 ros2 launch vicon_px4_bridge bridge_launch.py 
 ```
+Before running the above command, check the launch file first. You can edit the file in vs code (it can edit files inside docker containers! on both the laptop, opening vs code should open the docker conatiner by default) or use nano
+```
+nano ~/px4_ros_com_ros2/src/vicon_px4_bridge/launch/bridge_launch.py
+```
+and then add all the robots you want to get data from vicon for. The launch files in both the laptop only have rover2 and 3 added. For other rovers, you need to add them to the launch file.
+
+**Note**: make sure that rover object exists in the Vicon software! if not, then add markers to the rover and make an object first -> save object ->shared. Also, the IP address in this launch file should be that of the vicon computer. It is set to 192.168.2.136.
+
 Check after doing this that the px4's location and yaw angle is same as vicon position and angle. The simplest way to do so is to check the yaw/heading angle on dashboard in Qgc home screen. It should change properly as you rotate rover around. Otherwise, you can do ros2 topic echo for vicon topic`(/vicon/rover3/rover3)` and local_position topic`(/rover3/fmu/vehicle_local_position/out
 )` and see that they match.
 
@@ -146,7 +173,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "Starting offboard control node..." << std::endl;
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
 	rclcpp::init(argc, argv);
-    auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 1);
+    auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 3);
     
     rover3->init();
     
@@ -162,14 +189,18 @@ int main(int argc, char* argv[]) {
     std::cout << "Node start" << std::endl;
 ```
 
-The above are the steps you need to do for initializing a robot. For multiple robots, you need to write the sames lines again for them. For example, if you have another rover2, then the code would look like this
+The above are the steps you need to do for initializing a robot. 
+
+**Note**: In `std::make_shared<DASCAerialRobot>("rover3", 3);`, `rover3` is the name and `3` is the ID.  
+
+For multiple robots, you need to write the sames lines again for them. For example, if you have another rover2, then the code would look like this
 ```
 int main(int argc, char* argv[]) {
 	std::cout << "Starting offboard control node..." << std::endl;
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
 	rclcpp::init(argc, argv);
-    auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 1);
-    auto rover2 = std::make_shared<DASCAerialRobot>("rover2", 1);
+    auto rover3 = std::make_shared<DASCAerialRobot>("rover3", 3);
+    auto rover2 = std::make_shared<DASCAerialRobot>("rover2", 2);
     
     rover3->init();
     rover2->init();
