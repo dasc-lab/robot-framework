@@ -166,6 +166,11 @@ ros2 run dasc_robot example_control
 
 Note: the folder name is robot-framework but the ros package name is dasc_robot. Hence the above command.
 
+Note: there's also a multi robot example code that can be run with the following command. Have a look at the complete code [here].(https://github.com/dasc-lab/robot-framework/blob/master/src/example_control_multi_rover.cpp)
+```
+ros2 run dasc_robot example_control_multi_rover
+```
+
 The current code makes the rover go to a location (x=1,y=0) from wherever it is. The only thing you need to modify is the `main()` function according to your application. Hence, I will go over it below:
 
 ```
