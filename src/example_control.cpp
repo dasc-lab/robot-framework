@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 
     for (int i = 0; i < 100; i++) {
         // rover->cmdWorldPosition(rad * cos(theta), rad * sin(theta), height, 0, 0);
-        // rover->cmdWorldPosition(-1.0,1.0,0,0,0);  
+        // rover->cmdWorldPosition(0.0,0.0,0,0,0);  
         rover->cmdLocalVelocity(0.0,vx,0.0,0.0,wz);  
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     std::cout << "Arm" << std::endl;
 
     while(rclcpp::ok()) {
-        // rover->cmdWorldPosition(-1.0,1.0,0,0,0);  
+        // rover->cmdWorldPosition(0.0,0.0,0,0,0);  
         rover->cmdLocalVelocity(0.0,vx,0.0,0.0,wz);  
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
