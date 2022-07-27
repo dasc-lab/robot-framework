@@ -29,6 +29,6 @@ extern "C" {
     bool cmdRates(DASCRobot *robot, double roll, double pitch, double yaw, double thrust) {return robot->cmdRates(roll, pitch, yaw, thrust);}
     bool cmdOffboardMode(DASCRobot *robot) {return robot->cmdOffboardMode();}
     void emergencyStop(DASCRobot *robot) {return robot->emergencyStop();}
-    void setGPSGlobalOrigin(double lat, double lon, double alt) {return robot->setGPSGlobalOrigin(lat, lon, alt);}
+    void setGPSGlobalOrigin(DASCRobot *robot, double lat, double lon, double alt) {return robot->setGPSGlobalOrigin(lat, lon, alt);}
 
 }
