@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 
 
-def load_library(filename: str = './lib/libdascBots.a',
+def load_library(filename: str = 'libdasc_robot_lib.so',#'./lib/libdascBots.a',
                  mode: dict = None) -> ctypes.cdll:
     """Loads a C++ library specified by filename."""
     if mode is not None:

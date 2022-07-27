@@ -766,7 +766,7 @@ std::array<double, 4> DASCRobot::ned_to_enu(const std::array<double, 4> &quat) {
 }
 
 std::array<double, 4> DASCRobot::enu_to_ned(const std::array<double, 4> &quat) {
-    Eigen::Quaternion<double> quat_enu = Eigen::Quaternion<doubDASCRobots.cpple>(quat[0], quat[1], quat[2], quat[3]);
+    Eigen::Quaternion<double> quat_enu = Eigen::Quaternion<double>(quat[0], quat[1], quat[2], quat[3]);
     Eigen::Quaternion<double> quat_ned = px4_ros_com::frame_transforms::utils::quaternion::quaternion_from_euler(M_PI, M_PI, M_PI_2) * quat_enu;
     return {quat_ned.w(), quat_ned.x(), -quat_ned.y(), -quat_ned.z()};
 }
