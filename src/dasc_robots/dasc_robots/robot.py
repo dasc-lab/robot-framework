@@ -22,7 +22,7 @@ class Robot:
         """Initializes Robot in C++ and obtains corresponding object functions."""
         # From Python 3.8 onwards, there is a reported bug in CDLL.__init__()
         l_mode = dict(winmode=0) if platform.python_version() >= '3.8' else dict()
-        self._lib = load_library('./lib/libDascBots.so', l_mode)
+        self._lib = load_library('./lib/libdasc_robot_lib.so', l_mode)
         self.set_arg_res_types()
 
         # Initialize robot
