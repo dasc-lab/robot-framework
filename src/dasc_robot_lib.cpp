@@ -8,6 +8,9 @@
 using std::placeholders::_1;
 using namespace std::chrono_literals;
 
+// Global thread variable
+extern std::thread server_exec_thread_global;
+
 // Export functions
 extern "C" {
 
@@ -20,7 +23,7 @@ extern "C" {
     std::array<double, 3> getBodyAcceleration(DASCRobot *robot) {return robot->getBodyAcceleration();}
     std::array<double, 3> getBodyRate(DASCRobot *robot) {return robot->getBodyRate();}
     bool getBodyQuaternion(DASCRobot *robot, std::array<double, 4>& quat, bool blocking) {return robot->getBodyQuaternion(quat, blocking);}
-    bool setCmdMode(DASCRobot *robot, DASC::ControlMode mode) {return robot->setCmdMode(mode);}
+    bool setCmdMode(DASCRobot *robot, int mode) {return robot->setCmdMode(static_cast<DASC::ControlMode>(mode));}
     bool cmdWorldPosition(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {return robot->cmdWorldPosition(x, y, z, yaw, yaw_rate);}
     bool cmdWorldVelocity(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {return robot->cmdWorldVelocity(x, y, z, yaw, yaw_rate);}
     bool cmdLocalVelocity(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {return robot->cmdLocalVelocity(x, y, z, yaw, yaw_rate);}
@@ -30,5 +33,31 @@ extern "C" {
     bool cmdOffboardMode(DASCRobot *robot) {return robot->cmdOffboardMode();}
     void emergencyStop(DASCRobot *robot) {return robot->emergencyStop();}
     void setGPSGlobalOrigin(DASCRobot *robot, double lat, double lon, double alt) {return robot->setGPSGlobalOrigin(lat, lon, alt);}
+
+    // Functions necessary for starting ROS via Python
+    void rosInit() {rclcpp::init(0, "")}; // Arguments to rclcpp::init might be different if something in launch file
+    bool rosOk() {return rclcpp::ok()};
+    void startNodes(DASCRobot *robots, int nRobots) {
+
+        // Add nodes on separate threads
+        rclcpp::executors::MultiThreadedExecutor server_exec;
+        for (int i = 0; i < nRobots; i++){
+            server_exec.add_node(robots[i]);
+        }
+
+        auto server_spin_exec = [&server_exec]() {
+            server_exec.spin();
+        };
+
+        server_exec_thread_global(server_spin_exec);
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        std::cout << "Nodes started!" << std::endl;
+
+    }
+
+    void closeNodes(){
+        server_exec_thread_global.join();
+        rclcpp::shutdown();
+    }
 
 }
