@@ -435,7 +435,21 @@ This block makes use of wrapper functions. `ros_init` initializes ROS in c++ (rc
     node.destroy_node()
     rclpy.shutdown() 
 ```
-Here we atrt our main `while` loop, publish some string as an example, and also keep sending velocity commands to robot.
+Here we start our main `while` loop, publish some string as an example, and also keep sending velocity commands to robot. All the other processing like getting data from robot, implementing your control/planning algorithm can also happen inside this loop. Note that you need to send velocity/position commands at a minimum frequency (5/10 Hz.. not sure). So if your code is slower than that, you can either write 2 python files, one does computation and publishes results, and one sends velocity commands at high frequency based on whetever your last computation result from first file was. Or you can make a class in the way it is made in [Python ROS2 guide](https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html) and run both these process in the same python file as two different process running at their own frequencies. Many ways to do in ROS!
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <!-- # Old(Incomplete) documentation from here on. 
 # Framework
