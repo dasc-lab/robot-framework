@@ -12,80 +12,55 @@ using namespace std::chrono_literals;
 // typedef std::make_shared<DASCRobot> dasc_bot_make_shared;
 typedef std::shared_ptr<DASCRobot> dasc_bot_shared_ptr;
 
+
 // Global thread variable
 // extern std::thread server_exec_thread_global;
+
+// thread error for moving: https://stackoverflow.com/questions/27473809/error-use-of-deleted-function-stdthreadthreadconst-stdthread
+// how to write: https://thispointer.com/c11-how-to-use-stdthread-as-a-member-variable-in-class/
+// https://stackoverflow.com/questions/31280145/starting-threads-within-python-extensions
+// https://jedyang.com/post/multithreading-in-python-pytorch-using-c++-extension/
+
+class thread_executor{
+        public:
+            std::vector<std::thread> some_threads;
+            rclcpp::executors::MultiThreadedExecutor *server_exec;
+    };
+
+class ThreadWrapper
+{
+    // std::thread object
+    std::thread  threadHandler;
+public:
+    //Delete the copy constructor
+    ThreadWrapper(const ThreadWrapper&) = delete;
+    //Delete the Assignment opeartor
+    ThreadWrapper& operator=(const ThreadWrapper&) = delete;
+    // Parameterized Constructor
+    ThreadWrapper(std::function<void()> func);
+    // Move Constructor
+    ThreadWrapper(ThreadWrapper && obj);
+    //Move Assignment Operator
+    ThreadWrapper & operator=(ThreadWrapper && obj);
+    //Destructor
+    ~ThreadWrapper();
+};
 
 // Export functions
 extern "C" {
 
-    size_t to_narrow(const wchar_t * src, char * dest, size_t dest_len){
-        size_t i;
-        wchar_t code;
-
-        i = 0;
-            std::cout << "inside c++ make 003" << std::endl;
-        while (src[i] != '\0' && i < (dest_len - 1)){
-            code = src[i];
-            if (code < 128){
-            dest[i] = char(code);
-            std::cout << "inside c++ make 004" << std::endl;
-            }
-            else{
-            dest[i] = '?';
-            if (code >= 0xD800 && code <= 0xD8FF)
-                // lead surrogate, skip the next code unit, which is the trail
-                i++;
-                std::cout << "inside c++ make 005" << std::endl;
-            }
-            i++;
-        }
-            std::cout << "inside c++ make 006" << std::endl;
-        dest[i] = '\0';
-
-        return i - 1;
-
-        }
-
-    // std::shared_ptr<DASC> make_robot( std::string robot_name, uint8_t id ){
-    //     return std::make_shared<DASCRobot>(robot_name, id);
-    // }
-
-    // DASCRobot* init(std::string robot_name, uint8_t id) {
-    DASCRobot* make_robot_object(wchar_t* robot_name, uint8_t id) {
-    // dasc_bot_shared_ptr* make_robot_object(wchar_t* robot_name, uint8_t id) {
-        std::cout << "inside c++ make 0" << std::endl;
-        char* argv = (char *)malloc( 1000 );
-        std::cout << "inside c++ make 001" << std::endl;
-        // std::cout << "inside c++ make 1" << std::endl;
-        // std::cout << "inside c++ make 12" << robot_name << std::endl;
-        std::wcstombs(argv, robot_name, 1000);
-        // size_t newsize = wcslen(robot_name);
-        // std::cout << "inside c++ make 002" << std::endl;
-        // // char* argv = (char*)robot_name; 
-        // to_narrow( robot_name, argv,  newsize);
-        // std::wstring your_wchar_in_ws(robot_name);
-        std::cout << "inside c++ make 01" << std::endl;
-        // std::string your_wchar_in_str(your_wchar_in_ws.begin(), your_wchar_in_ws.end());
-        // std::cout << "inside c++ make 02" << std::endl;
-        // std::cout << your_wchar_in_str << std::endl;
-        // char* your_wchar_in_char =  your_wchar_in_str.c_str();
-        // std::cout << "inside c++ make 2 " << std::string(argv) << std::endl;
-        // // std::cout << "Initializing robot: " << argv << std::endl;
-        // auto robot = std::make_shared<DASCRobot>( std::string(argv), id );
-        // std::cout << "robot: " << robot << std::endl;
-        // std::cout << &robot << std::endl;
-        // return (&robot);
-        return new DASCRobot(std::string(argv), id);
-        // return new dasc_bot(std::string(argv), id);
-        // return make_robot( std::string(argv), id );
+    thread_executor* initialize_threads(){
+        return new thread_executor();
     }
 
-    
+    DASCRobot* make_robot_object(wchar_t* robot_name, uint8_t id) {
+        char* argv = (char *)malloc( 1000 );
+        std::wcstombs(argv, robot_name, 1000);
+        std::cout << "inside c++ make 01" << std::endl;
+        return new DASCRobot(std::string(argv), id);
+    }
 
     bool init(DASCRobot *robot) { 
-        std::cout << "Init: " << robot << std::endl;
-        std::cout << "Init: & " << &robot << std::endl;
-        // std::cout << "Init: *" << *robot << std::endl;
         return robot->init(); 
     }
     // bool init(dasc_bot_shared_ptr *robot) { 
@@ -103,11 +78,16 @@ extern "C" {
     std::array<double, 3> getWorldAcceleration(DASCRobot *robot) {return robot->getWorldAcceleration();}
     std::array<double, 3> getBodyAcceleration(DASCRobot *robot) {return robot->getBodyAcceleration();}
     std::array<double, 3> getBodyRate(DASCRobot *robot) {return robot->getBodyRate();}
-    bool getBodyQuaternion(DASCRobot *robot, std::array<double, 4>& quat, bool blocking) {return robot->getBodyQuaternion(quat, blocking);}
+    bool getBodyQuaternion(DASCRobot *robot, std::array<double, 4>& quat, bool blocking) {
+        std::cout << robot->getBodyQuaternion(quat, blocking) << std::endl;
+        return robot->getBodyQuaternion(quat, blocking);
+    }
     bool setCmdMode(DASCRobot *robot, int mode) {return robot->setCmdMode(static_cast<DASC::ControlMode>(mode));}
     bool cmdWorldPosition(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {return robot->cmdWorldPosition(x, y, z, yaw, yaw_rate);}
     bool cmdWorldVelocity(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {return robot->cmdWorldVelocity(x, y, z, yaw, yaw_rate);}
-    bool cmdLocalVelocity(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {return robot->cmdLocalVelocity(x, y, z, yaw, yaw_rate);}
+    bool cmdLocalVelocity(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {
+        return robot->cmdLocalVelocity(x, y, z, yaw, yaw_rate);
+    }
     bool cmdWorldAcceleration(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {return robot->cmdWorldAcceleration(x, y, z, yaw, yaw_rate);}
     bool cmdAttitude(DASCRobot *robot, double q_w, double q_x, double q_y, double q_z, double thrust) {return robot->cmdAttitude(q_w, q_x, q_y, q_z, thrust);}
     bool cmdRates(DASCRobot *robot, double roll, double pitch, double yaw, double thrust) {return robot->cmdRates(roll, pitch, yaw, thrust);}
@@ -144,31 +124,73 @@ extern "C" {
     // array of shared pointers
     // void startNodes(std::shared_ptr<DASCRobot> *robots, int nRobots) {
     // void startNodes(std::vector<DASCRobot*> robots, int nRobots) {
-    void startNodes(DASCRobot* robots[], int nRobots) {
+    // void startNodes(DASCRobot* robots[], int nRobots) {
+    rclcpp::executors::MultiThreadedExecutor* startNodes(DASCRobot* robots[], int nRobots) {
     
         // Add nodes on separate threads
-        std::cout << "Inside c++ 0" << std::endl;
-        rclcpp::executors::MultiThreadedExecutor server_exec;
+        rclcpp::executors::MultiThreadedExecutor *server_exec  = new rclcpp::executors::MultiThreadedExecutor;
         std::cout << "nrobots: " << nRobots << std::endl;
         // std::cout << "robots: " << robots << std::endl;
         for (int i = 0; i < nRobots; i++){
-            std::cout << "Inside c++ 3 robot: " << robots[i] << std::endl;
             std::shared_ptr<DASCRobot> robot = std::shared_ptr<DASCRobot>(robots[i], boost::null_deleter() );
-            std::cout << "Inside c++ 4" << std::endl;
-            server_exec.add_node(robot); //(robots[i]);
+            server_exec->add_node(robot); //(robots[i]);
             std::cout << "Inside c++ 5" << std::endl;
         }
-        // std::cout << "Inside c++ 1" << std::endl;
-        // auto server_spin_exec = [&server_exec]() {
-        //     server_exec.spin();
-        // };
-        // std::cout << "Inside c++ 2" << std::endl;
+        std::cout << "Inside c++ 1" << std::endl;
+        auto server_spin_exec = [server_exec]() {  //[&server_exec]() {
+            server_exec->spin();
+        };
+        // server_exec->spin();
+        std::cout << "Inside c++ 2" << std::endl;
         // server_exec_thread_global = std::thread(server_spin_exec); //server_exec_thread_global(server_spin_exec);
+        std::thread server_exec_thread(server_spin_exec);
+        server_exec_thread.detach();
+        // some_threads.push_back(server_exec_thread);
+        // std::thread server_exec_thread_global;
         // // std::thread server_exec_thread(server_spin_exec);
-        // std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
         // std::cout << "Nodes started!" << std::endl;
 
+        return server_exec;
+
     }
+
+    // void startNodes(DASCRobot* robots[], int nRobots, thread_executor* ros_threads) {
+    
+    //     // Add nodes on separate threads
+    //     // rclcpp::executors::MultiThreadedExecutor *server_exec  = new rclcpp::executors::MultiThreadedExecutor;
+    //     ros_threads->server_exec = new rclcpp::executors::MultiThreadedExecutor;
+    //     rclcpp::executors::MultiThreadedExecutor *server_exec = ros_threads->server_exec;
+    //     std::cout << "nrobots: " << nRobots << std::endl;
+    //     for (int i = 0; i < nRobots; i++){
+    //         std::shared_ptr<DASCRobot> robot = std::shared_ptr<DASCRobot>(robots[i], boost::null_deleter() );
+    //         ros_threads->server_exec->add_node(robot); //(robots[i]);
+    //         std::cout << "Inside c++ 5" << std::endl;
+    //     }
+    //     std::cout << "Inside c++ 1" << std::endl;
+    //     auto server_spin_exec = [server_exec]() {  //[&server_exec]() {
+    //         server_exec->spin();
+    //     };
+    //     // server_exec->spin();
+    //     std::cout << "Inside c++ 2" << std::endl;
+    //     // server_exec_thread_global = std::thread(server_spin_exec); //server_exec_thread_global(server_spin_exec);
+    //     std::thread server_exec_thread(server_spin_exec);
+    //     server_exec_thread.detach();
+    //     // ros_threads->some_threads.push_back(server_exec_thread);
+    //     // std::thread server_exec_thread_global;
+    //     // // std::thread server_exec_thread(server_spin_exec);
+    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
+    //     std::cout << "Nodes started!" << std::endl;
+    // }
+
+    std::thread* start_global_thread(  ){
+        std::thread* server_exec_thread_global = new std::thread;
+        // std::thread server_exec_thread(server_spin_exec);
+        std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+        return server_exec_thread_global;
+    }
+
+
 
     void closeNodes(){
         server_exec_thread_global.join();
@@ -185,4 +207,32 @@ extern "C" {
         std::this_thread::sleep_for(std::chrono::milliseconds(time));
     }
 
+}
+
+
+
+// Parameterized Constructor
+ThreadWrapper::ThreadWrapper(std::function<void()> func) : threadHandler(func)
+{}
+
+// Move Constructor
+ThreadWrapper::ThreadWrapper(ThreadWrapper && obj) : threadHandler(std::move(obj.threadHandler))
+{
+    std::cout << "Move Constructor is called" << std::endl;
+}
+//Move Assignment Operator
+ThreadWrapper & ThreadWrapper::operator=(ThreadWrapper && obj)
+{
+    std::cout << "Move Assignment is called" << std::endl;
+    if (threadHandler.joinable())
+        threadHandler.join();
+    threadHandler = std::move(obj.threadHandler);
+    return *this;
+}
+
+// Destructor : Join the thread object
+ThreadWrapper::~ThreadWrapper()
+{
+    if (threadHandler.joinable())
+        threadHandler.join();
 }
