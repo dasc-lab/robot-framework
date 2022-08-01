@@ -276,7 +276,166 @@ A Python wrapper implements the same C++ based framework that was discussed befo
 declared a node name `test_run` and its location is 'asc_robot_py/test_run.py'. The `main` comes because we want to start with the main function defined in that `.py` file.
 
 
+Now, in order to run this code, you need to do
+```
+ros2 run dasc_robot_py test_run
+```
+Here is the code
 
+```
+from dasc_robots.robot import Robot
+from dasc_robots.ros_functions import *
+import rclpy
+from rclpy.node import Node
+import numpy as np
+
+import threading
+
+from std_msgs.msg import String
+
+def main(args=None):
+    rclpy.init(args=args)
+    node = rclpy.create_node('minimal_publisher')
+
+    # Spin in a separate thread
+    thread = threading.Thread(target=rclpy.spin, args=(node, ), daemon=True)
+    thread.start()
+    rate = node.create_rate(30)
+
+    publisher = node.create_publisher(String, 'topic', 10)    
+    msg = String()
+    
+    ######################## Wrapper based functions
+    ros_init("test_run")
+
+    robot3 = Robot("rover3", 3)
+    robot7 = Robot("rover7", 7)
+    print("Robot Initialized")
+
+    robot3.init()
+    robot7.init()
+
+    robots = [robot3, robot7]
+
+    robot3.set_command_mode( 'velocity' )
+    robot7.set_command_mode( 'velocity' )
+
+    vx = 0.0
+    wz = 2.0
+    for i in range(100):
+        robot3.command_velocity( np.array([0,vx,0,0,wz]) )
+        robot7.command_velocity( np.array([0,vx,0,0,wz]) )
+        rate.sleep()
+        
+    robot3.cmd_offboard_mode()
+    robot3.cmd_offboard_mode()
+    robot3.arm()
+
+    robot7.cmd_offboard_mode()
+    robot7.cmd_offboard_mode()
+    robot7.arm()
+
+    threads = start_ros_nodes(robots)
+    #####################################
+    i = 0
+    while rclpy.ok():
+        msg.data = 'Hello World: %d' % i
+        i += 1
+        # node.get_logger().info('Publishing: "%s"' % msg.data)
+        publisher.publish(msg)
+        robot3.command_velocity( np.array([0,vx,0,0,wz]) )
+        robot7.command_velocity( np.array([0,vx,0,0,wz]) )
+        rate.sleep()
+
+    print("hello")
+
+    node.destroy_node()
+    rclpy.shutdown() 
+```
+Here is a breakdown of how the code works:
+```
+from dasc_robots.robot import Robot
+from dasc_robots.ros_functions import *
+import rclpy
+from rclpy.node import Node
+import numpy as np
+import threading
+from std_msgs.msg import String
+```
+Here we import required packages. `dasc_robots.robot` and `dasc_robots.ros_functions` are from the Python wrapper in `dasc_robots` folder. `dasc_robots.robot` defines the robot class that can be used to make a robot object, get robot data such as position, velocity, and sensor data, and finally send control commands. `dasc_robots.ros_functions` defines some basic ROS2 functions. Using a warpper means that C++ works under the hood. Therefore several basic ROS commands still need to be implemented in C++ and hence the wrapper for them. Feel free to open `robot.py` and `ros_functions.py` in [dasc_robots](https://github.com/dasc-lab/robot-framework-py/tree/main/dasc_robots) folder to see a description of all the function available. The `threading` module above is imported to run your own code at a fixed rate. Keep reading to see how it is used.
+
+```
+def main(args=None):
+    rclpy.init(args=args)
+    node = rclpy.create_node('minimal_publisher')
+
+    # Spin in a separate thread
+    thread = threading.Thread(target=rclpy.spin, args=(node, ), daemon=True)
+    thread.start()
+    rate = node.create_rate(30)
+
+    publisher = node.create_publisher(String, 'topic', 10)    
+    msg = String()
+```
+We start with main function and initialize ROS2 in Pyhton with `rclpy.init(args=args)`. Then we declare out Python file as a node with node = rclpy.create_node('minimal_publisher'). You can choose the name here.(These are standard steps to be followed when writing a python node. However, compared to [basic guide](https://docs.ros.org/en/foxy/Tutorials/Beginner-Client-Libraries/Writing-A-Simple-Py-Publisher-And-Subscriber.html)) no need to make a class just to write your control/planning code. The c++ based framework makes classes for robots. We will implement our planning/control code in simple `for/while` loop below.
+
+Now, to run our loops at fixed frequency, we make a thread `threading.Thread` and set the rate in Hz with `rate = node.create_rate(30)`. The `publisher` and `msg` above are just examples to create a simple publisher and publish a data that you want.
+
+```
+
+    ######################## Wrapper based functions
+    ros_init("test_run")
+
+    robot3 = Robot("rover3", 3)
+    robot7 = Robot("rover7", 7)
+    print("Robot Initialized")
+
+    robot3.init()
+    robot7.init()
+
+    robot3.set_command_mode( 'velocity' )
+    robot7.set_command_mode( 'velocity' )
+    
+    robots = [robot3, robot7]
+    
+    threads = start_ros_nodes(robots)
+
+    vx = 0.0
+    wz = 2.0
+    for i in range(100):
+        robot3.command_velocity( np.array([0,vx,0,0,wz]) )
+        robot7.command_velocity( np.array([0,vx,0,0,wz]) )
+        rate.sleep()
+        
+    robot3.cmd_offboard_mode()
+    robot3.arm()
+
+    robot7.cmd_offboard_mode()
+    robot7.arm()
+
+    
+    #####################################
+```
+
+This block makes use of wrapper functions. `ros_init` initializes ROS in c++ (rclpy.init we did before doesn't do this). `robot3 = Robot("rover3", 3)` makes the robot object. `robot3.init()` does some initialization (the sequence of commands here are same as the C++ code.). `robot3.set_command_mode( 'velocity' )` sets the control mode to velocity control. You can also choose `position`. See `robot.py`'s description of this function for the modes that can be choosen. `threads = start_ros_nodes(robots)` is the equivalent of c++ code that runs a separate thread for each robot. In the next few lines, like C++ code, we first send some velocity commands and then we switch robot to `offboard` mode (in PX4 offboard mode is the name given to automatic control when waypoints are sent from a computer. The robot will start operating autonomously the moment it is switched to offboard mode. We start some waypoints beforehand as it needs some data to already exist in its buffer when it swicthes to offboard). Finally we `arm` the robots to give it permission to move.
+
+```
+    i = 0
+    while rclpy.ok():
+        msg.data = 'Hello World: %d' % i
+        i += 1
+        # node.get_logger().info('Publishing: "%s"' % msg.data)
+        publisher.publish(msg)
+        robot3.command_velocity( np.array([0,vx,0,0,wz]) )
+        robot7.command_velocity( np.array([0,vx,0,0,wz]) )
+        rate.sleep()
+
+    print("hello")
+
+    node.destroy_node()
+    rclpy.shutdown() 
+```
+Here we atrt our main `while` loop, publish some string as an example, and also keep sending velocity commands to robot.
 
 <!-- # Old(Incomplete) documentation from here on. 
 # Framework
