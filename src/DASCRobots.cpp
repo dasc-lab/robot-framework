@@ -323,7 +323,7 @@ bool DASCRobot::cmdWorldVelocity(double x, double y, double z, double yaw, doubl
 }
 
 bool DASCRobot::cmdLocalVelocity(double x, double y, double z, double yaw, double yaw_rate) {
-    std::cout << "Commanding velocity now" << std::endl;
+    // std::cout << "Commanding velocity now" << std::endl;
     if (this->server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdLocalVelocity with uninitialized server!");
         return false;
