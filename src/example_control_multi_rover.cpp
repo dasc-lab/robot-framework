@@ -1,6 +1,7 @@
 #include <thread>
 #include "DASCRobots.hpp"
 
+// std::thread server_exec_thread;
 
 int main(int argc, char* argv[]) {
 	std::cout << "Starting multi robot offboard control node..." << std::endl;
@@ -23,6 +24,7 @@ int main(int argc, char* argv[]) {
         server_exec.spin();
     };
     std::thread server_exec_thread(server_spin_exec);
+    // server_exec_thread = std::thread( server_spin_exec );
     std::cout << "Node init" << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(2000));
     std::cout << "Node start" << std::endl;

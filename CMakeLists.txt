@@ -15,6 +15,8 @@ if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
+SET(CMAKE_CXX_FLAGS -fPIC)
+
 # find dependencies
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
@@ -37,6 +39,23 @@ ament_export_libraries(dascBots)
 install(
   TARGETS dascBots
   EXPORT export_dascBots
+  LIBRARY DESTINATION lib/${PROJECT_NAME}
+  ARCHIVE DESTINATION lib/${PROJECT_NAME}
+  RUNTIME DESTINATION bin/${PROJECT_NAME}
+  INCLUDES DESTINATION include/${PROJECT_NAME}
+)
+
+add_library(dasc_robot_lib SHARED src/dasc_robot_lib.cpp)
+ament_target_dependencies(dasc_robot_lib rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com)
+target_link_libraries(dasc_robot_lib dascBots)
+target_include_directories(dasc_robot_lib PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+)
+ament_export_libraries(dasc_robot_lib)
+install(
+  TARGETS dasc_robot_lib
+  EXPORT export_dasc_robot_lib
   LIBRARY DESTINATION lib/${PROJECT_NAME}
   ARCHIVE DESTINATION lib/${PROJECT_NAME}
   RUNTIME DESTINATION bin/${PROJECT_NAME}

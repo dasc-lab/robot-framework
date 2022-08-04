@@ -203,22 +203,27 @@ std::array<double, 3> DASCRobot::getBodyRate() {
 
 bool DASCRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocking) {
     quat = {NAN, NAN, NAN, NAN};
+    // std::cout << "inside quat function 0" << std::endl;
     if (this->server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getBodyQuaternion with uninitialized server!");
         return false;
     }
+    // std::cout << "inside quat function 1" << std::endl;
     std::unique_lock<std::mutex> quat_ulock(this->quaternion_queue_mutex_);
     if (blocking && this->quaternion_queue_.size() == 0) {
         //RCLCPP_INFO(this->get_logger(), "Queue Empty Wait");
         this->quaternion_queue_cv_.wait(quat_ulock);
         //RCLCPP_INFO(this->get_logger(), "Wake");
+        // std::cout << "inside quat function 3" << std::endl;
     }
     if (this->quaternion_queue_.size() > 0) {
         quat = this->quaternion_queue_.front();
         this->quaternion_queue_.pop();
+        // std::cout << "inside quat function 4" << std::endl;
     }
     else {
         //RCLCPP_ERROR(this->get_logger(), "Quaternion queue empty");
+        // std::cout << "inside quat function 5" << std::endl;
         return false;
     }
 
@@ -294,6 +299,7 @@ bool DASCRobot::cmdWorldPosition(double x, double y, double z, double yaw, doubl
 }
 
 bool DASCRobot::cmdWorldVelocity(double x, double y, double z, double yaw, double yaw_rate) {
+    // std::cout << "commanding world velocity now" << std::endl;
     if (this->server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdWorldVelocity with uninitialized server!");
         return false;
@@ -317,6 +323,7 @@ bool DASCRobot::cmdWorldVelocity(double x, double y, double z, double yaw, doubl
 }
 
 bool DASCRobot::cmdLocalVelocity(double x, double y, double z, double yaw, double yaw_rate) {
+    std::cout << "Commanding velocity now" << std::endl;
     if (this->server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdLocalVelocity with uninitialized server!");
         return false;
@@ -405,6 +412,7 @@ bool DASCRobot::cmdRates(double roll, double pitch, double yaw, double thrust) {
 }
 
 bool DASCRobot::cmdOffboardMode() {
+    std::cout << "Commanding offboard mode" << std::endl;
     if (server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdOffboardMode with uninitialized server!");
         return false;
@@ -451,12 +459,14 @@ void DASCRobot::sensorCombinedCallback(const SensorCombined::UniquePtr msg) {
     if (this->gyro_rad_queue_.size() > 1) {
         this->gyro_rad_queue_.pop();
     }
+    // std::cout << "In sensor callback" << std::endl;
     // RCLCPP_INFO(this->get_logger(), "Sensor Combined callback");
 }
 
 void DASCRobot::vehicleAttitudeCallback(const VehicleAttitude::UniquePtr msg) {
     std::array<double, 4> quat;
     //RCLCPP_INFO(this->get_logger(), "try lock quat");
+    // std::cout << "Getting attitude data" << std::endl;
     std::lock_guard<std::mutex> quat_guard(this->quaternion_queue_mutex_);
     quat[0] = msg->q[0];
     quat[1] = msg->q[1];
@@ -527,6 +537,7 @@ void DASCRobot::vehicleLocalPositionCallback(const VehicleLocalPosition::UniqueP
 }
 
 void DASCRobot::updateState() {
+    // std::cout << "In update State for " << this->robot_id_ << std::endl;
     switch (this->server_state_)
     {
     case RobotServerState::kInit:
