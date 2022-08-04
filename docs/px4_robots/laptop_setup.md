@@ -12,7 +12,7 @@ nav_order: 12
 On the laptop you are using to interface with the rovers, run
 
 ```
-docker run -it --privileged --net=host --rm -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --name=px4_vicon_bridge_display chenrc98/vicon_px4_ros2_bridge:version1.1
+docker run -it --privileged --net=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tmp/.X11-unix --name=px4_vicon_bridge_display chenrc98/vicon_px4_ros2_bridge:version1.1
 ```
 
 That's all that's needed from the laptop side
