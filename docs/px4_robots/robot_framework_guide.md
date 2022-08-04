@@ -71,14 +71,17 @@ fastdds discovery --server-id 0
 ```
 This will start the discovery server (ros2 by default is completely decentralized in which each computer runs its own process to find other computers thereby sharing lots of data. A discovery server will make this search process centralized and speed up things. In fact, if you have more than 2 robots, the decentralized version will make your wifi freeze. So this is an important step for multi-robot experiment).
 
-Now, on both laptop and all Jetsons, open the bashrc file
+Now every terminal on laptop anfd Jetson needs to run these two commands
+The commands that need to be run on every terminal of laptop and Jetson
 ```
-nano ~/.bashrc
+export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
+export ROS_DISCOVERY_SERVER=LAPTOP_IP_ADDRESS:11811
 ```
-scroll down to the botton and make sure that the IP address is the IP address of the laptop (on Jetsons too the IP address should be of the laptop)
-```
-export ROS_DISCOVERY_SERVER=<IP address of laptop>:11811
-```
+
+It has been made part of `.bashrc` of all Jetsons and therefore need not be run. But you still need to check the IP address. If `.bashrc` does not contain these lines at the end yet, then just run them yourself.
+
+**Note:** The above commands cannot be made part of `.bashrc` of the laptop as the discovery server needs to be run before exporting these commands.
+
 
 
 # Step 4: start micrortps agent on Jetson
