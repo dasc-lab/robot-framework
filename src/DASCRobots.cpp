@@ -263,7 +263,7 @@ bool DASCRobot::setCmdMode(ControlMode mode) {
         break;
 
     default:
-        RCLCPP_ERROR(this->get_logger(), "Unknown Control Mode %d", mode);
+        RCLCPP_ERROR(this->get_logger(), "Unknown Control Mode %d", static_cast<int>(mode));
         return false;
     }
     //update current_timestamp
@@ -578,7 +578,7 @@ void DASCRobot::updateState() {
         break;
     
     default:
-        RCLCPP_ERROR(this->get_logger(), "Unknown server state %d", this->server_state_);
+        RCLCPP_ERROR(this->get_logger(), "Unknown server state %d", static_cast<int>(this->server_state_));
         return;
     }
 
@@ -718,7 +718,7 @@ void DASCRobot::failsafeFSMUpdate() {
         RCLCPP_INFO(this->get_logger(), "Server state FailSafeLand");
     }
     else {
-        RCLCPP_ERROR(this->get_logger(), "Unknow server state %d", this->server_state_);
+        RCLCPP_ERROR(this->get_logger(), "Unknow server state %d", static_cast<int>(this->server_state_));
         return;
     }
 }
