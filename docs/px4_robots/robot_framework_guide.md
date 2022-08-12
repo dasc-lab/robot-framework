@@ -9,6 +9,23 @@ nav_order: 8
 
 This page explains on how to get started with using rover3 that is completely set up.
 
+# TLDR:
+
+- [on ground station] start QGC
+- (optional) turn on radio transmitter
+- [on ground station] start the docker container that has ros workspace, vicon, robot-framework
+- [on ground station] `tmux`
+- [on ground station] `roslaunch launch vicon_px4_bridge bridge_launch.py`
+- [on drone pi] start docker containing ros that has ros workspace, rtps-bridge
+- [on drone_pi] `tmux`
+- [on drone pi] `mavlink-routerd`
+- [on drone pi] `bridge`
+- check QGC that the roll pitch yaw are correct
+- (optional) check that drone can be armed from radio transmitter
+- [ground station] run robot-framework: `ros2 run dasc_robot example_control`
+
+
+
 NOTE: Boot the laptop into Ubuntu 20. The instructions have been tested for DASC2 at the time of writing this. DASC1 is yet to be tested.
 
 # Step 1: Power-up and connect to rover
