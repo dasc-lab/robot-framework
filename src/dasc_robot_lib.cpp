@@ -27,25 +27,6 @@ class thread_executor{
             rclcpp::executors::MultiThreadedExecutor *server_exec;
     };
 
-class ThreadWrapper
-{
-    // std::thread object
-    std::thread  threadHandler;
-public:
-    //Delete the copy constructor
-    ThreadWrapper(const ThreadWrapper&) = delete;
-    //Delete the Assignment opeartor
-    ThreadWrapper& operator=(const ThreadWrapper&) = delete;
-    // Parameterized Constructor
-    ThreadWrapper(std::function<void()> func);
-    // Move Constructor
-    ThreadWrapper(ThreadWrapper && obj);
-    //Move Assignment Operator
-    ThreadWrapper & operator=(ThreadWrapper && obj);
-    //Destructor
-    ~ThreadWrapper();
-};
-
 // Export functions
 extern "C" {
 
@@ -63,14 +44,7 @@ extern "C" {
     bool init(DASCRobot *robot) { 
         return robot->init(); 
     }
-    // bool init(dasc_bot_shared_ptr *robot) { 
-    //     std::cout << "hello init" << std::endl;
-    //     std::cout << robot << std::endl;
-    //     std::cout << *robot << std::endl;
-    //     (*robot)->init();
-    //     std::cout << "hello init 2" << std::endl;
-    //     return true; 
-    // }
+
     bool arm(DASCRobot *robot) {return robot->arm();}
     bool disarm(DASCRobot *robot) {return robot->disarm();}
     std::array<double, 3> getWorldPosition(DASCRobot *robot) {return robot->getWorldPosition();}
@@ -100,11 +74,6 @@ extern "C" {
 
     int argc = 1;
     char *argv[1];
-    // void rosInit(char* node_name){ //(std::string node_name) {
-    //     argv[0] = node_name;
-    //     setvbuf(stdout, NULL, _IONBF, BUFSIZ);
-    //     rclcpp::init(argc, argv);
-    // } //void rosInit() {rclcpp::init(1, "")}; // Arguments to rclcpp::init might be different if something in launch file
 
     void rosInit(wchar_t* node_name){ //(std::string node_name) {
         // std::wstring ws( args.OptionArg() );
@@ -121,10 +90,6 @@ extern "C" {
 
     bool rosOk() {return rclcpp::ok();}
 
-    // array of shared pointers
-    // void startNodes(std::shared_ptr<DASCRobot> *robots, int nRobots) {
-    // void startNodes(std::vector<DASCRobot*> robots, int nRobots) {
-    // void startNodes(DASCRobot* robots[], int nRobots) {
     rclcpp::executors::MultiThreadedExecutor* startNodes(DASCRobot* robots[], int nRobots) {
     
         // Add nodes on separate threads
@@ -140,48 +105,13 @@ extern "C" {
         auto server_spin_exec = [server_exec]() {  //[&server_exec]() {
             server_exec->spin();
         };
-        // server_exec->spin();
         std::cout << "Inside c++ 2" << std::endl;
-        // server_exec_thread_global = std::thread(server_spin_exec); //server_exec_thread_global(server_spin_exec);
         std::thread server_exec_thread(server_spin_exec);
         server_exec_thread.detach();
-        // some_threads.push_back(server_exec_thread);
-        // std::thread server_exec_thread_global;
-        // // std::thread server_exec_thread(server_spin_exec);
-        // std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-        // std::cout << "Nodes started!" << std::endl;
 
         return server_exec;
 
     }
-
-    // void startNodes(DASCRobot* robots[], int nRobots, thread_executor* ros_threads) {
-    
-    //     // Add nodes on separate threads
-    //     // rclcpp::executors::MultiThreadedExecutor *server_exec  = new rclcpp::executors::MultiThreadedExecutor;
-    //     ros_threads->server_exec = new rclcpp::executors::MultiThreadedExecutor;
-    //     rclcpp::executors::MultiThreadedExecutor *server_exec = ros_threads->server_exec;
-    //     std::cout << "nrobots: " << nRobots << std::endl;
-    //     for (int i = 0; i < nRobots; i++){
-    //         std::shared_ptr<DASCRobot> robot = std::shared_ptr<DASCRobot>(robots[i], boost::null_deleter() );
-    //         ros_threads->server_exec->add_node(robot); //(robots[i]);
-    //         std::cout << "Inside c++ 5" << std::endl;
-    //     }
-    //     std::cout << "Inside c++ 1" << std::endl;
-    //     auto server_spin_exec = [server_exec]() {  //[&server_exec]() {
-    //         server_exec->spin();
-    //     };
-    //     // server_exec->spin();
-    //     std::cout << "Inside c++ 2" << std::endl;
-    //     // server_exec_thread_global = std::thread(server_spin_exec); //server_exec_thread_global(server_spin_exec);
-    //     std::thread server_exec_thread(server_spin_exec);
-    //     server_exec_thread.detach();
-    //     // ros_threads->some_threads.push_back(server_exec_thread);
-    //     // std::thread server_exec_thread_global;
-    //     // // std::thread server_exec_thread(server_spin_exec);
-    //     std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-    //     std::cout << "Nodes started!" << std::endl;
-    // }
 
     std::thread* start_global_thread(  ){
         std::thread* server_exec_thread_global = new std::thread;
@@ -211,28 +141,28 @@ extern "C" {
 
 
 
-// Parameterized Constructor
-ThreadWrapper::ThreadWrapper(std::function<void()> func) : threadHandler(func)
-{}
+// // Parameterized Constructor
+// ThreadWrapper::ThreadWrapper(std::function<void()> func) : threadHandler(func)
+// {}
 
-// Move Constructor
-ThreadWrapper::ThreadWrapper(ThreadWrapper && obj) : threadHandler(std::move(obj.threadHandler))
-{
-    std::cout << "Move Constructor is called" << std::endl;
-}
-//Move Assignment Operator
-ThreadWrapper & ThreadWrapper::operator=(ThreadWrapper && obj)
-{
-    std::cout << "Move Assignment is called" << std::endl;
-    if (threadHandler.joinable())
-        threadHandler.join();
-    threadHandler = std::move(obj.threadHandler);
-    return *this;
-}
+// // Move Constructor
+// ThreadWrapper::ThreadWrapper(ThreadWrapper && obj) : threadHandler(std::move(obj.threadHandler))
+// {
+//     std::cout << "Move Constructor is called" << std::endl;
+// }
+// //Move Assignment Operator
+// ThreadWrapper & ThreadWrapper::operator=(ThreadWrapper && obj)
+// {
+//     std::cout << "Move Assignment is called" << std::endl;
+//     if (threadHandler.joinable())
+//         threadHandler.join();
+//     threadHandler = std::move(obj.threadHandler);
+//     return *this;
+// }
 
-// Destructor : Join the thread object
-ThreadWrapper::~ThreadWrapper()
-{
-    if (threadHandler.joinable())
-        threadHandler.join();
-}
+// // Destructor : Join the thread object
+// ThreadWrapper::~ThreadWrapper()
+// {
+//     if (threadHandler.joinable())
+//         threadHandler.join();
+// }

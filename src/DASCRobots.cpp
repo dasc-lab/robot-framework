@@ -164,9 +164,11 @@ std::array<double, 3> DASCRobot::getWorldAcceleration() {
         RCLCPP_ERROR(this->get_logger(), "Calling getWorldAcceleration with uninitialized server!");
         return {NAN, NAN, NAN};
     }
+    // std::cout << "hello 0" << std::endl;
     std::lock_guard<std::mutex> acc_guard(this->world_acceleration_queue_mutex_);
     std::array<double, 3> acc = {NAN, NAN, NAN};
     if (this->world_acceleration_queue.size() > 0) {
+        // std::cout << "hello" << std::endl;
         acc = this->world_acceleration_queue.front();
         this->world_acceleration_queue.pop();
     }
@@ -511,6 +513,7 @@ void DASCRobot::vehicleLocalPositionCallback(const VehicleLocalPosition::UniqueP
     acc[0] = msg->ay;
     acc[1] = msg->ax;
     acc[2] = -msg->az;
+    // std::cout << "acc: " << acc[0] << std::endl;
     this->world_acceleration_queue.push(acc);
     if (this->world_acceleration_queue.size() > 1) {
         this->world_acceleration_queue.pop();
