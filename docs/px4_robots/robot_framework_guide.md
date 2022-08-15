@@ -81,12 +81,25 @@ Save the file and exit. Now to start this program write the following in one ter
 mavlink-routerd
 ```
 
-# Step 4: Do some ROS settings
+# Step 4: Do some ROS settings for Discovery Server
+This section is based on https://fast-dds.docs.eprosima.com/en/latest/fastdds/ros2/discovery_server/ros2_discovery_server.html#daemon-s-related-commands.
+
+
 On laptop, in one of the terminals, do
 ```
 fastdds discovery --server-id 0
 ```
 This will start the discovery server (ros2 by default is completely decentralized in which each computer runs its own process to find other computers thereby sharing lots of data. A discovery server will make this search process centralized and speed up things. In fact, if you have more than 2 robots, the decentralized version will make your wifi freeze. So this is an important step for multi-robot experiment).
+
+Next, just once on Laptop and every other system (RPi/Jetson), we need to export address to a config file and restart ros2 daemon. Make sure a dds configuration xml file exists inside the ros2 workspace folder (can be anywhere but has been placed here on most systems). Open the file and change the IP address to that of the laptop on all Jetsons/Rpis/Laptops. If the file does not exist, then make a new file `super_client_configuration_file.xml` and add the lines from ![following link to it](https://fast-dds.docs.eprosima.com/en/latest/_downloads/9f9e92b14612364b742c8ecde24b3d24/super_client_configuration_file.xml). The file name can be anything. Just make sure the IP address is correct. Now export this file as follows
+```
+export FASTRTPS_DEFAULT_PROFILES_FILE=super_client_configuration_file.xml
+```
+and restart the ros2 daemon
+```
+ros2 daemon stop
+ros2 daemon start
+```
 
 Now every terminal on laptop anfd Jetson needs to run these two commands
 The commands that need to be run on every terminal of laptop and Jetson
