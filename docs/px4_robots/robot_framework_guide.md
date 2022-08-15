@@ -101,8 +101,7 @@ ros2 daemon stop
 ros2 daemon start
 ```
 
-Now every terminal on laptop anfd Jetson needs to run these two commands
-The commands that need to be run on every terminal of laptop and Jetson
+Now every terminal on laptop anfd Jetson needs to run these two commands before running anything else
 ```
 export RMW_IMPLEMENTATION=rmw_fastrtps_cpp
 export ROS_DISCOVERY_SERVER=LAPTOP_IP_ADDRESS:11811
