@@ -307,6 +307,11 @@ A Python wrapper implements the same C++ based framework that was discussed befo
 ```
 declared a node name `test_run` and its location is 'asc_robot_py/test_run.py'. The `main` comes because we want to start with the main function defined in that `.py` file.
 
+Since the python wrapper is a python package that we will import, we need to export path to this package (I didn't do a system installation like with pip). The following line might be written in `.bashrc`. If not, then add it or do this on every terminal you want to run the python node from
+```
+export PYTHONPATH=$PYTHONPATH:path_to_dasc_robot_folder
+```
+
 
 Now, in order to run this code, you need to do
 ```
