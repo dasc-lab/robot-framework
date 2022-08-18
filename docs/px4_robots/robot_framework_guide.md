@@ -15,7 +15,7 @@ This page explains on how to get started with using rover3 that is completely se
 - (optional) turn on radio transmitter
 - [on ground station] start the docker container that has ros workspace, vicon, robot-framework
 - [on ground station] `tmux`
-- [on ground station] `roslaunch launch vicon_px4_bridge bridge_launch.py`
+- [on ground station] `ros2 launch vicon_px4_bridge bridge_launch.py`
 - [on drone pi] start docker containing ros that has ros workspace, rtps-bridge
 - [on drone_pi] `tmux`
 - [on drone pi] `mavlink-routerd`
