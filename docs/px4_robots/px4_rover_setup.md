@@ -72,11 +72,17 @@ To set this up for further rovers, you need to change the profile name and the s
 
 To change the system name, follow the instructions in (https://www.tecmint.com/set-hostname-permanently-in-linux/), using a command line command and some editing of host files.
 
-To change the hostname (when you ssh, the command you run is `ssh username@hostname.local`):
+To change the hostname to $HOSTNAME (when you ssh, the command you run is `ssh username@hostname.local`):
+
+set the file `/etc/hostname` to 
 ```
-sudo vim /etc/hostname
+$HOSTNAME
 ```
-and change the hostname. Then reboot the computer.
+then set the first line of `/etc/hosts` to 
+```
+127.0.0.1 $HOSTNAME
+```
+Then reboot the computer.
 
 To change the profile name, a temporary user needs to be created, follow the instructions here (https://askubuntu.com/questions/34074/how-do-i-change-my-username).
 
