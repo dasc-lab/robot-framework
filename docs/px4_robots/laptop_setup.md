@@ -33,3 +33,5 @@ ssh-copy-id -i ~/.ssh/id_25519.pub ubuntu@drone7.local
 complete the prompts. 
 
 Now you can simply ssh into a quad, and not need to type in the password.
+
+More details: https://superuser.com/questions/8077/how-do-i-set-up-ssh-so-i-dont-have-to-type-my-password
