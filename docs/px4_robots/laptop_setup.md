@@ -7,7 +7,7 @@ has_children: true
 nav_order: 12
 ---
 
-# Step 1: Pulling Docker Container
+## Step 1: Pulling Docker Container
 
 On the laptop you are using to interface with the rovers, run
 
@@ -16,3 +16,20 @@ docker run -it --privileged --net=host -e DISPLAY=$DISPLAY -v /tmp/.X11-unix:/tm
 ```
 
 That's all that's needed from the laptop side
+
+
+## Optional:
+
+If you want to avoid typing the ssh password everytime you log into a robot, you can run the following steps to save the password:
+
+```
+ssh-keygen -t ed25519
+```
+complete the prompts
+
+```
+ssh-copy-id -i ~/.ssh/id_25519.pub ubuntu@drone7.local
+```
+complete the prompts. 
+
+Now you can simply ssh into a quad, and not need to type in the password.
