@@ -39,11 +39,11 @@ extern "C" {
     bool arm(DASCRobot *robot) {return robot->arm();}
     bool disarm(DASCRobot *robot) {return robot->disarm();}
 
-    bool getWorldPosition(DASCRobot *robot, std::array<double, 3>& pos) { return robot->getWorldPositionWrapper(pos);}
-    bool getWorldVelocity(DASCRobot *robot, std::array<double, 3>&vel) {return robot->getWorldVelocityWrapper(vel);}
-    bool getWorldAcceleration(DASCRobot *robot, std::array<double, 3>&acc) {return robot->getWorldAccelerationWrapper(acc);}    
-    bool getBodyAcceleration(DASCRobot *robot, std::array<double, 3>& acc) { return robot->getBodyAccelerationWrapper(acc); }
-    bool getBodyRate(DASCRobot *robot, std::array<double, 3>&brate) {return robot->getBodyRateWrapper(brate);}
+    bool getWorldPosition(DASCRobot *robot, std::array<double, 3>& pos) { return robot->getWorldPosition(pos);}
+    bool getWorldVelocity(DASCRobot *robot, std::array<double, 3>&vel) {return robot->getWorldVelocity(vel);}
+    bool getWorldAcceleration(DASCRobot *robot, std::array<double, 3>&acc) {return robot->getWorldAcceleration(acc);}    
+    bool getBodyAcceleration(DASCRobot *robot, std::array<double, 3>& acc) { return robot->getBodyAcceleration(acc); }
+    bool getBodyRate(DASCRobot *robot, std::array<double, 3>&brate) {return robot->getBodyRate(brate);}
     bool getBodyQuaternion(DASCRobot *robot, std::array<double, 4>& quat, bool blocking) { return robot->getBodyQuaternion(quat, blocking); }
     bool setCmdMode(DASCRobot *robot, int mode) {return robot->setCmdMode(static_cast<DASC::ControlMode>(mode));}
     bool cmdWorldPosition(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {return robot->cmdWorldPosition(x, y, z, yaw, yaw_rate);}

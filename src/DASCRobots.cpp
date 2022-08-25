@@ -145,8 +145,7 @@ std::array<double, 3> DASCRobot::getWorldPosition() {
     return pos;
 }
 
-bool DASCRobot::getWorldPositionWrapper(std::array<double, 3>& pos) {
-    pos = {NAN, NAN, NAN};
+bool DASCRobot::getWorldPosition(std::array<double, 3>& pos) {
     pos = getWorldPosition();
     return true;
 }
@@ -164,8 +163,7 @@ std::array<double, 3> DASCRobot::getWorldVelocity() {
     return vel;
 }
 
-bool DASCRobot::getWorldVelocityWrapper(std::array<double, 3>& vel) {
-    vel = {NAN, NAN, NAN};
+bool DASCRobot::getWorldVelocity(std::array<double, 3>& vel) {
     vel = getWorldVelocity();
     return true;
 }
@@ -183,8 +181,7 @@ std::array<double, 3> DASCRobot::getWorldAcceleration() {
     return acc;
 }
 
-bool DASCRobot::getWorldAccelerationWrapper(std::array<double, 3>& acc) {
-    acc = {NAN, NAN, NAN};
+bool DASCRobot::getWorldAcceleration(std::array<double, 3>& acc) {
     acc = getWorldAcceleration();
     return true;
 }
@@ -202,8 +199,7 @@ std::array<double, 3> DASCRobot::getBodyAcceleration() {
     return acc;
 }
 
-bool DASCRobot::getBodyAccelerationWrapper(std::array<double, 3>& acc) {
-    acc = {NAN, NAN, NAN};
+bool DASCRobot::getBodyAcceleration(std::array<double, 3>& acc) {
     acc = getBodyAcceleration();
     return true;
 }
@@ -221,8 +217,7 @@ std::array<double, 3> DASCRobot::getBodyRate() {
     return gyro;
 }
 
-bool DASCRobot::getBodyRateWrapper(std::array<double, 3>& brate) {
-    brate = {NAN, NAN, NAN};
+bool DASCRobot::getBodyRate(std::array<double, 3>& brate) {
     brate = getBodyRate();
     return true;
 }
@@ -434,7 +429,7 @@ bool DASCRobot::cmdRates(double roll, double pitch, double yaw, double thrust) {
 }
 
 bool DASCRobot::cmdOffboardMode() {
-    std::cout << "Commanding offboard mode" << std::endl;
+    RCLCPP_INFO(this->get_logger(), "Commanding offboard mode");
     if (server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdOffboardMode with uninitialized server!");
         return false;
