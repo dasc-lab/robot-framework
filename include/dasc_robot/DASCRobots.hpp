@@ -61,6 +61,11 @@ class DASCRobot : public DASC {
         std::array<double, 3> getWorldAcceleration();
         std::array<double, 3> getBodyAcceleration();
         std::array<double, 3> getBodyRate();
+        bool getWorldPositionWrapper(std::array<double, 3>& pos);
+        bool getWorldVelocityWrapper(std::array<double, 3>& vel);
+        bool getWorldAccelerationWrapper(std::array<double, 3>& acc);
+        bool getBodyAccelerationWrapper(std::array<double, 3>& acc);
+        bool getBodyRateWrapper(std::array<double, 3>& brate);
         bool getBodyQuaternion(std::array<double, 4>& quat, bool blocking);
         bool setCmdMode(DASCRobot::ControlMode mode);
         bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate);
