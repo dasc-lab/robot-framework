@@ -132,6 +132,7 @@ bool DASCRobot::disarm() {
 }
 
 std::array<double, 3> DASCRobot::getWorldPosition() {
+    std::cout << "in world pos" << std::endl;
     if (this->server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getWorldPosition with uninitialized server!");
         return {NAN, NAN, NAN};
@@ -140,9 +141,13 @@ std::array<double, 3> DASCRobot::getWorldPosition() {
     std::array<double, 3> pos = {NAN, NAN, NAN};
     if (this->world_position_queue.size() > 0) {
         pos = this->world_position_queue.front();
-        this->world_velocity_queue.pop();
     }
     return pos;
+}
+
+bool DASCRobot::getWorldPosition(std::array<double, 3>& pos) {
+    pos = getWorldPosition();
+    return true;
 }
 
 std::array<double, 3> DASCRobot::getWorldVelocity() {
@@ -154,9 +159,13 @@ std::array<double, 3> DASCRobot::getWorldVelocity() {
     std::array<double, 3> vel = {NAN, NAN, NAN};
     if (this->world_velocity_queue.size() > 0) {
         vel = this->world_velocity_queue.front();
-        this->world_velocity_queue.pop();
     }
     return vel;
+}
+
+bool DASCRobot::getWorldVelocity(std::array<double, 3>& vel) {
+    vel = getWorldVelocity();
+    return true;
 }
 
 std::array<double, 3> DASCRobot::getWorldAcceleration() {
@@ -168,9 +177,13 @@ std::array<double, 3> DASCRobot::getWorldAcceleration() {
     std::array<double, 3> acc = {NAN, NAN, NAN};
     if (this->world_acceleration_queue.size() > 0) {
         acc = this->world_acceleration_queue.front();
-        this->world_acceleration_queue.pop();
     }
     return acc;
+}
+
+bool DASCRobot::getWorldAcceleration(std::array<double, 3>& acc) {
+    acc = getWorldAcceleration();
+    return true;
 }
 
 std::array<double, 3> DASCRobot::getBodyAcceleration() {
@@ -182,9 +195,13 @@ std::array<double, 3> DASCRobot::getBodyAcceleration() {
     std::array<double, 3> acc = {NAN, NAN, NAN};
     if (this->accelerometer_m_s2_queue_.size() > 0) {
         acc = this->accelerometer_m_s2_queue_.front();
-        this->accelerometer_m_s2_queue_.pop();
     }
     return acc;
+}
+
+bool DASCRobot::getBodyAcceleration(std::array<double, 3>& acc) {
+    acc = getBodyAcceleration();
+    return true;
 }
 
 std::array<double, 3> DASCRobot::getBodyRate() {
@@ -196,9 +213,13 @@ std::array<double, 3> DASCRobot::getBodyRate() {
     std::array<double, 3> gyro = {NAN, NAN, NAN};
     if (this->gyro_rad_queue_.size() > 0) {
         gyro = this->gyro_rad_queue_.front();
-        this->gyro_rad_queue_.pop();
     }
     return gyro;
+}
+
+bool DASCRobot::getBodyRate(std::array<double, 3>& brate) {
+    brate = getBodyRate();
+    return true;
 }
 
 bool DASCRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocking) {
@@ -208,22 +229,18 @@ bool DASCRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocking) {
         RCLCPP_ERROR(this->get_logger(), "Calling getBodyQuaternion with uninitialized server!");
         return false;
     }
-    // std::cout << "inside quat function 1" << std::endl;
     std::unique_lock<std::mutex> quat_ulock(this->quaternion_queue_mutex_);
     if (blocking && this->quaternion_queue_.size() == 0) {
         //RCLCPP_INFO(this->get_logger(), "Queue Empty Wait");
         this->quaternion_queue_cv_.wait(quat_ulock);
         //RCLCPP_INFO(this->get_logger(), "Wake");
-        // std::cout << "inside quat function 3" << std::endl;
     }
     if (this->quaternion_queue_.size() > 0) {
         quat = this->quaternion_queue_.front();
-        this->quaternion_queue_.pop();
-        // std::cout << "inside quat function 4" << std::endl;
+        // this->quaternion_queue_.pop();
     }
     else {
         //RCLCPP_ERROR(this->get_logger(), "Quaternion queue empty");
-        // std::cout << "inside quat function 5" << std::endl;
         return false;
     }
 
@@ -412,7 +429,7 @@ bool DASCRobot::cmdRates(double roll, double pitch, double yaw, double thrust) {
 }
 
 bool DASCRobot::cmdOffboardMode() {
-    std::cout << "Commanding offboard mode" << std::endl;
+    RCLCPP_INFO(this->get_logger(), "Commanding offboard mode");
     if (server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdOffboardMode with uninitialized server!");
         return false;
