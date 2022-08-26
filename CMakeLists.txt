@@ -103,4 +103,30 @@ install(TARGETS
 )
 
 
+add_executable(example_control_geometric_velocity src/example_control_geometric_velocity.cpp)
+ament_target_dependencies(example_control_geometric_velocity rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
+target_link_libraries(example_control_geometric_velocity dascBots)
+target_include_directories(example_control_geometric_velocity PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+)
+install(TARGETS
+  example_control_geometric_velocity
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+
+add_executable(example_control_geometric_acceleration src/example_control_geometric_acceleration.cpp)
+ament_target_dependencies(example_control_geometric_acceleration rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
+target_link_libraries(example_control_geometric_acceleration dascBots)
+target_include_directories(example_control_geometric_acceleration PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+)
+install(TARGETS
+  example_control_geometric_acceleration
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+
 ament_package()
