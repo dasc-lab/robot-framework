@@ -83,6 +83,11 @@ bool DASCRobot::init() {
         sensor_qos
     );
 
+    vehicle_useExternalController_publisher_ = this->create_publisher<ExternalController>(
+        this->robot_name_ + "/fmu/external_controller/in",
+	sensor_qos
+    );
+
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
     auto timer_callback = [this]() -> void {
@@ -121,6 +126,7 @@ bool DASCRobot::disarm() {
     VehicleCommand msg;
     msg.timestamp = get_current_timestamp();
     msg.param1 = 0.0;
+    msg.param2 = 21196; // set param2 to 21196 to force arm/disarm operation
     msg.command = VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM;
 	msg.target_system = this->robot_id_;
 	msg.target_component = 1;
@@ -246,6 +252,26 @@ bool DASCRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocking) {
 
     return true;
 }
+
+
+bool DASCRobot::useExternalController(bool mode){
+    if (this->server_state_ == RobotServerState::kInit) {
+        RCLCPP_ERROR(this->get_logger(), "Calling useExternalController with uninitialized server!");
+        return false;
+    }
+
+    ExternalController msg;
+    msg.timestamp = get_current_timestamp();
+    msg.use_geometric_control = mode;
+
+    vehicle_useExternalController_publisher_->publish(msg);
+
+    return true;
+}
+
+
+
+
 
 bool DASCRobot::setCmdMode(ControlMode mode) {
     if (this->server_state_ == RobotServerState::kInit) {

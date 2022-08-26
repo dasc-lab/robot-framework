@@ -46,6 +46,7 @@ extern "C" {
     bool getBodyRate(DASCRobot *robot, std::array<double, 3>&brate) {return robot->getBodyRate(brate);}
     bool getBodyQuaternion(DASCRobot *robot, std::array<double, 4>& quat, bool blocking) { return robot->getBodyQuaternion(quat, blocking); }
     bool setCmdMode(DASCRobot *robot, int mode) {return robot->setCmdMode(static_cast<DASC::ControlMode>(mode));}
+    bool useExternalController(DASCRobot *robot, bool mode) { return robot->useExternalController(mode); }
     bool cmdWorldPosition(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {return robot->cmdWorldPosition(x, y, z, yaw, yaw_rate);}
     bool cmdWorldVelocity(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {return robot->cmdWorldVelocity(x, y, z, yaw, yaw_rate);}
     bool cmdLocalVelocity(DASCRobot *robot, double x, double y, double z, double yaw, double yaw_rate) {

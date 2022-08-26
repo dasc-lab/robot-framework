@@ -5,6 +5,7 @@
 
 #include <rclcpp/rclcpp.hpp>
 #include <px4_msgs/msg/offboard_control_mode.hpp>
+#include <px4_msgs/msg/external_controller.hpp>
 #include <px4_msgs/msg/trajectory_setpoint.hpp>
 #include <px4_msgs/msg/timesync.hpp>
 #include <px4_msgs/msg/vehicle_command.hpp>
@@ -68,7 +69,8 @@ class DASCRobot : public DASC {
         bool getBodyRate(std::array<double, 3>& brate);
         bool getBodyQuaternion(std::array<double, 4>& quat, bool blocking);
         bool setCmdMode(DASCRobot::ControlMode mode);
-        bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate);
+        bool useExternalController(bool mode);
+	bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdWorldVelocity(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdLocalVelocity(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdWorldAcceleration(double x, double y, double z, double yaw, double yaw_rate);
@@ -86,6 +88,8 @@ class DASCRobot : public DASC {
         void emergencyStop();
         bool takeoff();
         bool land();
+        uint64_t get_current_timestamp(); // DEV: in what units? DEV: i thinks ms
+    
     private:
         enum class RobotServerState {
             kInit = 0,
@@ -136,6 +140,7 @@ class DASCRobot : public DASC {
         rclcpp::Subscription<VehicleLocalPosition>::SharedPtr vehicle_local_position_sub_;
 
         rclcpp::Publisher<OffboardControlMode>::SharedPtr offboard_control_mode_publisher_;
+        rclcpp::Publisher<ExternalController>::SharedPtr vehicle_useExternalController_publisher_;
         rclcpp::Publisher<TrajectorySetpoint>::SharedPtr trajectory_setpoint_publisher_;
         rclcpp::Publisher<VehicleCommand>::SharedPtr vehicle_command_publisher_;
         rclcpp::Publisher<VehicleAttitudeSetpoint>::SharedPtr vehicle_attitude_publisher_;
@@ -153,7 +158,6 @@ class DASCRobot : public DASC {
         void rateFSMUpdate();
         void controllerTimeoutFSMUpdate();
         void failsafeFSMUpdate();
-        uint64_t get_current_timestamp();
         double clampToPi(double yaw);
         std::array<double, 4> ned_to_enu(const std::array<double, 4> &quat);
         std::array<double, 4> enu_to_ned(const std::array<double, 4> &quat);
