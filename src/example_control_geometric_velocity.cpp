@@ -3,9 +3,9 @@
 
 
 int main(int argc, char* argv[]) {
-	std::cout << "Starting offboard control node..." << std::endl;
-	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
-	rclcpp::init(argc, argv);
+    std::cout << "Starting offboard control node..." << std::endl;
+    setvbuf(stdout, NULL, _IONBF, BUFSIZ);
+    rclcpp::init(argc, argv);
 
     auto rover = std::make_shared<DASCRobot>("drone1", 1);
     
@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
     rover->setCmdMode(DASCRobot::ControlMode::kVelocityMode);
    
     for (int i = 0; i < 100; i++) {
-	rover->cmdWorldVelocity(0, 0, 0.0, 0, 0.0);
+        rover->cmdWorldVelocity(0, 0, 0.0, 0, 0.0);
         std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
     
@@ -40,41 +40,38 @@ int main(int argc, char* argv[]) {
 
     while(rclcpp::ok()) {
 
-	std::array<double, 3> des_pos {0.0, 0.0, 0.0};
+        std::array<double, 3> des_pos {0.0, 0.0, 0.0};
 
-	//rover->cmdWorldPosition(0,0,0.5,0,0);
-	auto now = rover->get_current_timestamp();
+        auto now = rover->get_current_timestamp();
 
         auto elapsed = now - start;
 
-	if (elapsed <= 10000*1000) {
-		des_pos[2] = 0.5;
-	}
-	else if (elapsed <= 15000*1000) {
-		des_pos[2] = 0.0;
-	}
-	else{
-		break;
-	}
+        if (elapsed <= 10000*1000) {
+            des_pos[2] = 0.5;
+        }
+        else if (elapsed <= 15000*1000) {
+            des_pos[2] = 0.0;
+        }
+        else{
+            break;
+        }
 
-	// feedback control
-	double kp = 2.0;
+        // feedback control
+        double kp = 2.0;
         std::array<double, 3> current_pos = rover->getWorldPosition();
-	std::array<double, 3> des_vel { 0,0,0};
-	
-	//std::cout << "current_pos: ";
-	for (int i=0; i < 3 ; i++ ){
-		des_vel[i] = - kp * (current_pos[i] - des_pos[i]);
-		//std::cout << current_pos[i] << " ";
-	}
-	//std::cout << "\n";
+        std::array<double, 3> des_vel { 0,0,0};
+  
+        for (int i=0; i < 3 ; i++ ){
+            des_vel[i] = - kp * (current_pos[i] - des_pos[i]);
+        }
 
-	// send the command
+
+        // send the command
         rover->cmdWorldVelocity(des_vel[0], des_vel[1], des_vel[2], 0, 0);
         std::cout << "Elapsed " << elapsed << "; CMD: " << des_pos[2] << std::endl;
 
         rover->useExternalController(true);
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 
     // disarm
