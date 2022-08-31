@@ -40,25 +40,24 @@ int main(int argc, char* argv[]) {
 
     while(rclcpp::ok()) {
 
-	//rover->cmdWorldPosition(0,0,0.5,0,0);
-	auto now = rover->get_current_timestamp();
+        //rover->cmdWorldPosition(0,0,0.5,0,0);
+        auto now = rover->get_current_timestamp();
 
         auto elapsed = now - start;
 
-	if (elapsed <= 10000*1000) {
-                rover->cmdWorldPosition(0.0, 0.0, 0.5, 0, 0);
-		std::cout << "Elapsed " << elapsed << "; CMD: 0.5" << std::endl;
-	}
-	else if (elapsed <= 15000*1000) {
-	        rover->cmdWorldPosition(0.0, 0.0, 0.0, 0, 0);
-		std::cout << "Elapsed " << elapsed << "; CMD: 0.0" << std::endl;
-	}
-	else{
-		break;
-	}
-
+        if (elapsed <= 10000*1000) {
+            rover->cmdWorldPosition(0.0, 0.0, 0.5, 0, 0);
+            std::cout << "Elapsed " << elapsed << "; CMD: 0.5" << std::endl;
+        }
+        else if (elapsed <= 15000*1000) {
+            rover->cmdWorldPosition(0.0, 0.0, 0.0, 0, 0);
+            std::cout << "Elapsed " << elapsed << "; CMD: 0.0" << std::endl;
+        }
+        else{
+            break;
+        }
         rover->useExternalController(true);
-	std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
     }
 
     // disarm

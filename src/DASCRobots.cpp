@@ -230,7 +230,7 @@ bool DASCRobot::getBodyRate(std::array<double, 3>& brate) {
 
 bool DASCRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocking) {
     quat = {NAN, NAN, NAN, NAN};
-    // std::cout << "inside quat function 0" << std::endl;
+
     if (this->server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getBodyQuaternion with uninitialized server!");
         return false;
@@ -243,7 +243,6 @@ bool DASCRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocking) {
     }
     if (this->quaternion_queue_.size() > 0) {
         quat = this->quaternion_queue_.front();
-        // this->quaternion_queue_.pop();
     }
     else {
         //RCLCPP_ERROR(this->get_logger(), "Quaternion queue empty");
@@ -264,13 +263,11 @@ bool DASCRobot::useExternalController(bool mode){
     msg.timestamp = get_current_timestamp();
     msg.use_geometric_control = mode;
 
+    // RCLCPP_INFO(this->get_logger(), "Setting Geometric Control use to %d", mode);
     vehicle_useExternalController_publisher_->publish(msg);
-
+    
     return true;
 }
-
-
-
 
 
 bool DASCRobot::setCmdMode(ControlMode mode) {
@@ -477,8 +474,9 @@ bool DASCRobot::cmdOffboardMode() {
 void DASCRobot::timesyncCallback(const px4_msgs::msg::Timesync::UniquePtr msg) {
     this->px4_timestamp_.store(msg->timestamp);
     this->px4_server_timestamp_.store(this->get_clock()->now().nanoseconds());
-    // RCLCPP_INFO(this->get_logger(), "store: %lu", msg->timestamp);
-    // RCLCPP_INFO(this->get_logger(), "px4_server_timestamp_: %lu", px4_server_timestamp_.load());
+    // RCLCPP_INFO(this->get_logger(), "store before: %lu", (unsigned long)(msg->timestamp));
+    // RCLCPP_INFO(this->get_logger(), "store ns: %lu", 1000 * (unsigned long)(msg->timestamp));
+    // RCLCPP_INFO(this->get_logger(), "px4_server_timestamp_ ns: %lu", (unsigned long)(px4_server_timestamp_.load()));
     // RCLCPP_INFO(this->get_logger(), "Time Sync callback");
 }
 
@@ -502,14 +500,14 @@ void DASCRobot::sensorCombinedCallback(const SensorCombined::UniquePtr msg) {
     if (this->gyro_rad_queue_.size() > 1) {
         this->gyro_rad_queue_.pop();
     }
-    // std::cout << "In sensor callback" << std::endl;
+
     // RCLCPP_INFO(this->get_logger(), "Sensor Combined callback");
 }
 
 void DASCRobot::vehicleAttitudeCallback(const VehicleAttitude::UniquePtr msg) {
     std::array<double, 4> quat;
     //RCLCPP_INFO(this->get_logger(), "try lock quat");
-    // std::cout << "Getting attitude data" << std::endl;
+
     std::lock_guard<std::mutex> quat_guard(this->quaternion_queue_mutex_);
     quat[0] = msg->q[0];
     quat[1] = msg->q[1];
@@ -825,10 +823,34 @@ std::array<double, 4> DASCRobot::enu_to_ned(const std::array<double, 4> &quat) {
     return {quat_ned.w(), quat_ned.x(), -quat_ned.y(), -quat_ned.z()};
 }
 
-uint64_t DASCRobot::get_current_timestamp() {
-    auto delta = (this->get_clock()->now().nanoseconds() - this->px4_server_timestamp_) / 1e6;
-    // RCLCPP_INFO(this->get_logger(), "px4: %lu", px4_timestamp_.load());
-    // RCLCPP_INFO(this->get_logger(), "delta: %lu", delta);
-    // RCLCPP_INFO(this->get_logger(), "time: %lu", px4_timestamp_.load() + delta);
-    return px4_timestamp_.load() + delta;
+/*
+ Returns timestamp in milliseconds
+
+ Arguments 
+ px4_sync: DEFAULT is true as most calls need syncing (to send commands or to get data)
+           option2 is false when user wants ROS time for contriolling multiple robots and does not care about individual px4 syncing
+ mode: 0 - microseconds: DEFAULT for all send command messages
+       1 - milli seconds: if user wants
+*/
+uint64_t DASCRobot::get_current_timestamp(bool px4_sync, int mode) {
+    auto delta = (this->get_clock()->now().nanoseconds() - this->px4_server_timestamp_);// this is in ns
+
+    // RCLCPP_INFO(this->get_logger(), "px4: %lu", (unsigned long)px4_timestamp_.load());
+    // RCLCPP_INFO(this->get_logger(), "ros: %lu", (unsigned long)(this->get_clock()->now().nanoseconds()));
+    // RCLCPP_INFO(this->get_logger(), "delta: %lu", (unsigned long)delta);
+    // RCLCPP_INFO(this->get_logger(), "time: %lu", (unsigned long)(px4_timestamp_.load() + delta));
+
+    if (px4_sync){
+        if (mode == 0)                                              // microseconds
+            return px4_timestamp_.load() + delta / 1000;
+        else                                                        // milliseconds
+            return px4_timestamp_.load() / 1000  + delta / 1e6;
+    }
+    else{
+        if (mode == 0)                                              // microseconds
+            return this->get_clock()->now().nanoseconds() / 1000;
+        else                                                        // milliseconds
+            return this->get_clock()->now().nanoseconds() / 1e6;
+    }
+
 }

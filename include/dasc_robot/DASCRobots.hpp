@@ -70,7 +70,7 @@ class DASCRobot : public DASC {
         bool getBodyQuaternion(std::array<double, 4>& quat, bool blocking);
         bool setCmdMode(DASCRobot::ControlMode mode);
         bool useExternalController(bool mode);
-	bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate);
+	    bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdWorldVelocity(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdLocalVelocity(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdWorldAcceleration(double x, double y, double z, double yaw, double yaw_rate);
@@ -88,7 +88,7 @@ class DASCRobot : public DASC {
         void emergencyStop();
         bool takeoff();
         bool land();
-        uint64_t get_current_timestamp(); // DEV: in what units? DEV: i thinks ms
+        uint64_t get_current_timestamp(bool px4_sync = true, int mode = 0); 
     
     private:
         enum class RobotServerState {
