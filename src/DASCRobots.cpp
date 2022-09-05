@@ -83,6 +83,11 @@ bool DASCRobot::init() {
         sensor_qos
     );
 
+    vehicle_useExternalController_publisher_ = this->create_publisher<ExternalController>(
+        this->robot_name_ + "/fmu/external_controller/in",
+	sensor_qos
+    );
+
     tf_broadcaster_ = std::make_unique<tf2_ros::TransformBroadcaster>(*this);
 
     auto timer_callback = [this]() -> void {
@@ -100,7 +105,7 @@ bool DASCRobot::arm() {
         return false;
     }
     VehicleCommand msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.param1 = 1.0;
     msg.param2 = 0.0; // set param2 to 21196 to force arm/disarm operation
     msg.command = VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM;
@@ -119,8 +124,9 @@ bool DASCRobot::disarm() {
         return false;
     }
     VehicleCommand msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.param1 = 0.0;
+    msg.param2 = 21196; // set param2 to 21196 to force arm/disarm operation
     msg.command = VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM;
 	msg.target_system = this->robot_id_;
 	msg.target_component = 1;
@@ -224,7 +230,7 @@ bool DASCRobot::getBodyRate(std::array<double, 3>& brate) {
 
 bool DASCRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocking) {
     quat = {NAN, NAN, NAN, NAN};
-    // std::cout << "inside quat function 0" << std::endl;
+
     if (this->server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getBodyQuaternion with uninitialized server!");
         return false;
@@ -237,7 +243,6 @@ bool DASCRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocking) {
     }
     if (this->quaternion_queue_.size() > 0) {
         quat = this->quaternion_queue_.front();
-        // this->quaternion_queue_.pop();
     }
     else {
         //RCLCPP_ERROR(this->get_logger(), "Quaternion queue empty");
@@ -246,6 +251,24 @@ bool DASCRobot::getBodyQuaternion(std::array<double, 4>& quat, bool blocking) {
 
     return true;
 }
+
+
+bool DASCRobot::useExternalController(bool mode){
+    if (this->server_state_ == RobotServerState::kInit) {
+        RCLCPP_ERROR(this->get_logger(), "Calling useExternalController with uninitialized server!");
+        return false;
+    }
+
+    ExternalController msg;
+    msg.timestamp = get_current_timestamp_us();
+    msg.use_geometric_control = mode;
+
+    // RCLCPP_INFO(this->get_logger(), "Setting Geometric Control use to %d", mode);
+    vehicle_useExternalController_publisher_->publish(msg);
+    
+    return true;
+}
+
 
 bool DASCRobot::setCmdMode(ControlMode mode) {
     if (this->server_state_ == RobotServerState::kInit) {
@@ -299,7 +322,7 @@ bool DASCRobot::cmdWorldPosition(double x, double y, double z, double yaw, doubl
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     TrajectorySetpoint msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.x = y;
     msg.y = x;
     msg.z = -z;
@@ -323,7 +346,7 @@ bool DASCRobot::cmdWorldVelocity(double x, double y, double z, double yaw, doubl
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     TrajectorySetpoint msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.x = NAN;
     msg.y = NAN;
     msg.z = NAN;
@@ -347,7 +370,7 @@ bool DASCRobot::cmdLocalVelocity(double x, double y, double z, double yaw, doubl
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     TrajectorySetpoint msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.x = NAN;
     msg.y = NAN;
     msg.z = NAN;
@@ -370,7 +393,7 @@ bool DASCRobot::cmdWorldAcceleration(double x, double y, double z, double yaw, d
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     TrajectorySetpoint msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.x = NAN;
     msg.y = NAN;
     msg.z = NAN;
@@ -396,7 +419,7 @@ bool DASCRobot::cmdAttitude(double q_w, double q_x, double q_y, double q_z, doub
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     VehicleAttitudeSetpoint msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.roll_body = NAN;
     msg.pitch_body = NAN;
     msg.yaw_body = NAN;
@@ -419,7 +442,7 @@ bool DASCRobot::cmdRates(double roll, double pitch, double yaw, double thrust) {
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
     VehicleRatesSetpoint msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.roll = roll;
     msg.pitch = -pitch;
     msg.yaw = -yaw;
@@ -435,7 +458,7 @@ bool DASCRobot::cmdOffboardMode() {
         return false;
     }
     VehicleCommand msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.command = VehicleCommand::VEHICLE_CMD_DO_SET_MODE;
     msg.param1 = 1;
     msg.param2 = 6; // PX4_CUSTOM_MAIN_MODE_OFFBOARD
@@ -451,8 +474,9 @@ bool DASCRobot::cmdOffboardMode() {
 void DASCRobot::timesyncCallback(const px4_msgs::msg::Timesync::UniquePtr msg) {
     this->px4_timestamp_.store(msg->timestamp);
     this->px4_server_timestamp_.store(this->get_clock()->now().nanoseconds());
-    // RCLCPP_INFO(this->get_logger(), "store: %lu", msg->timestamp);
-    // RCLCPP_INFO(this->get_logger(), "px4_server_timestamp_: %lu", px4_server_timestamp_.load());
+    // RCLCPP_INFO(this->get_logger(), "store before: %lu", (unsigned long)(msg->timestamp));
+    // RCLCPP_INFO(this->get_logger(), "store ns: %lu", 1000 * (unsigned long)(msg->timestamp));
+    // RCLCPP_INFO(this->get_logger(), "px4_server_timestamp_ ns: %lu", (unsigned long)(px4_server_timestamp_.load()));
     // RCLCPP_INFO(this->get_logger(), "Time Sync callback");
 }
 
@@ -476,14 +500,14 @@ void DASCRobot::sensorCombinedCallback(const SensorCombined::UniquePtr msg) {
     if (this->gyro_rad_queue_.size() > 1) {
         this->gyro_rad_queue_.pop();
     }
-    // std::cout << "In sensor callback" << std::endl;
+
     // RCLCPP_INFO(this->get_logger(), "Sensor Combined callback");
 }
 
 void DASCRobot::vehicleAttitudeCallback(const VehicleAttitude::UniquePtr msg) {
     std::array<double, 4> quat;
     //RCLCPP_INFO(this->get_logger(), "try lock quat");
-    // std::cout << "Getting attitude data" << std::endl;
+
     std::lock_guard<std::mutex> quat_guard(this->quaternion_queue_mutex_);
     quat[0] = msg->q[0];
     quat[1] = msg->q[1];
@@ -604,7 +628,7 @@ void DASCRobot::updateState() {
 
 void DASCRobot::positionFSMUpdate() {
     OffboardControlMode msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.position = true;
     offboard_control_mode_publisher_->publish(msg);
     // std::cout << "Send offboard position command \n"; 
@@ -619,7 +643,7 @@ void DASCRobot::velocityFSMUpdate() {
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = get_current_timestamp();
+        msg.timestamp = get_current_timestamp_us();
         msg.velocity = true;
         offboard_control_mode_publisher_->publish(msg);
         // std::cout << "Send offboard velocity command \n"; 
@@ -635,7 +659,7 @@ void DASCRobot::accelerationFSMUpdate() {
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = get_current_timestamp();
+        msg.timestamp = get_current_timestamp_us();
         msg.acceleration = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -650,7 +674,7 @@ void DASCRobot::attitudeFSMUpdate() {
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = get_current_timestamp();
+        msg.timestamp = get_current_timestamp_us();
         msg.attitude = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -665,7 +689,7 @@ void DASCRobot::rateFSMUpdate() {
     }
     else {
         OffboardControlMode msg;
-        msg.timestamp = get_current_timestamp();
+        msg.timestamp = get_current_timestamp_us();
         msg.body_rate = true;
         offboard_control_mode_publisher_->publish(msg);
     }
@@ -679,7 +703,7 @@ void DASCRobot::controllerTimeoutFSMUpdate() {
          * https://github.com/PX4/PX4-Autopilot/blob/master/src/modules/commander/Commander.cpp
          */
         VehicleCommand msg;
-        msg.timestamp = get_current_timestamp();
+        msg.timestamp = get_current_timestamp_us();
         msg.command = VehicleCommand::VEHICLE_CMD_DO_SET_MODE;
         msg.param1 = 1;
         msg.param2 = 4; // PX4_CUSTOM_MAIN_MODE_AUTO
@@ -717,7 +741,7 @@ void DASCRobot::controllerTimeoutFSMUpdate() {
 void DASCRobot::failsafeFSMUpdate() {
     if (this->server_state_ == RobotServerState::kFailSafe) {
         VehicleCommand msg;
-        msg.timestamp = get_current_timestamp();
+        msg.timestamp = get_current_timestamp_us();
         msg.command = VehicleCommand::VEHICLE_CMD_DO_SET_MODE;
         msg.param1 = 1;
         msg.param2 = 4; // PX4_CUSTOM_MAIN_MODE_AUTO
@@ -742,7 +766,7 @@ void DASCRobot::failsafeFSMUpdate() {
 
 void DASCRobot::emergencyStop() {
     VehicleCommand msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.command = VehicleCommand::VEHICLE_CMD_COMPONENT_ARM_DISARM;
     msg.param1 = VehicleCommand::ARMING_ACTION_DISARM;
     msg.param2 = 21196; // set param2 to 21196 to force arm/disarm operation
@@ -760,7 +784,7 @@ void DASCRobot::setGPSGlobalOrigin(double lat, double lon, double alt) {
      * https://github.com/PX4/PX4-Autopilot/blob/master/msg/vehicle_command.msg
      */
     VehicleCommand msg;
-    msg.timestamp = get_current_timestamp();
+    msg.timestamp = get_current_timestamp_us();
     msg.command = VehicleCommand::VEHICLE_CMD_SET_GPS_GLOBAL_ORIGIN;
     msg.param5 = lat;
     msg.param6 = lon;
@@ -799,10 +823,25 @@ std::array<double, 4> DASCRobot::enu_to_ned(const std::array<double, 4> &quat) {
     return {quat_ned.w(), quat_ned.x(), -quat_ned.y(), -quat_ned.z()};
 }
 
-uint64_t DASCRobot::get_current_timestamp() {
-    auto delta = (this->get_clock()->now().nanoseconds() - this->px4_server_timestamp_) / 1e6;
-    // RCLCPP_INFO(this->get_logger(), "px4: %lu", px4_timestamp_.load());
-    // RCLCPP_INFO(this->get_logger(), "delta: %lu", delta);
-    // RCLCPP_INFO(this->get_logger(), "time: %lu", px4_timestamp_.load() + delta);
-    return px4_timestamp_.load() + delta;
+/*
+ Returns timestamp in microseconds
+
+ Arguments 
+ px4_sync: DEFAULT is true as most calls need syncing (to send commands or to get data)
+           option2 is false when user wants ROS time for contriolling multiple robots and does not care about individual px4 syncing
+*/
+uint64_t DASCRobot::get_current_timestamp_us(bool px4_sync) {
+    if (px4_sync){
+        auto delta = (this->get_clock()->now().nanoseconds() - this->px4_server_timestamp_);// this is in ns
+
+        // RCLCPP_INFO(this->get_logger(), "px4: %lu", (unsigned long)px4_timestamp_.load());
+        // RCLCPP_INFO(this->get_logger(), "ros: %lu", (unsigned long)(this->get_clock()->now().nanoseconds()));
+        // RCLCPP_INFO(this->get_logger(), "delta: %lu", (unsigned long)delta);
+        // RCLCPP_INFO(this->get_logger(), "time: %lu", (unsigned long)(px4_timestamp_.load() + delta));
+
+        return px4_timestamp_.load() + delta / 1000;
+    }
+    else{
+        return this->get_clock()->now().nanoseconds() / 1000;
+    }
 }
