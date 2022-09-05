@@ -36,14 +36,14 @@ int main(int argc, char* argv[]) {
     std::cout << "Arm" << std::endl;
     std::cout << "in loop" << std::endl;
 
-    auto start = rover->get_current_timestamp();
+    auto start = rover->get_current_timestamp_us();
 
     while(rclcpp::ok()) {
 
 	std::array<double, 3> des_pos {0.0, 0.0, 0.0};
 
 	//rover->cmdWorldPosition(0,0,0.5,0,0);
-	auto now = rover->get_current_timestamp();
+	auto now = rover->get_current_timestamp_us();
 
         auto elapsed = now - start;
 

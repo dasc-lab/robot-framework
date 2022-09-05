@@ -88,7 +88,7 @@ class DASCRobot : public DASC {
         void emergencyStop();
         bool takeoff();
         bool land();
-        uint64_t get_current_timestamp(bool px4_sync = true, int mode = 0); 
+        uint64_t get_current_timestamp_us(bool px4_sync = true); 
     
     private:
         enum class RobotServerState {

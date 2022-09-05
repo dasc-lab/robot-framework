@@ -38,7 +38,7 @@ extern "C" {
 
     bool arm(DASCRobot *robot) {return robot->arm();}
     bool disarm(DASCRobot *robot) {return robot->disarm();}
-    uint64_t get_current_timestamp(DASCRobot *robot, bool px4_sync, int mode) { return robot->get_current_timestamp(px4_sync, mode); }
+    uint64_t get_current_timestamp_us(DASCRobot *robot, bool px4_sync, int mode) { return robot->get_current_timestamp_us(px4_sync, mode); }
     bool getWorldPosition(DASCRobot *robot, std::array<double, 3>& pos) { return robot->getWorldPosition(pos);}
     bool getWorldVelocity(DASCRobot *robot, std::array<double, 3>&vel) {return robot->getWorldVelocity(vel);}
     bool getWorldAcceleration(DASCRobot *robot, std::array<double, 3>&acc) {return robot->getWorldAcceleration(acc);}    
