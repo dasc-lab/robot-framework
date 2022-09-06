@@ -52,7 +52,7 @@ make px4_fmu-v3_default upload
 - set `SER_TEL2_BAUD` to 921600 (might need to reboot vehicle to see this option)
 
 ## 2.3.2 New QGC Parameters for Rovers
-- Set 'PWM_MAIN_REV4' to 'Enabled'
+- Set `PWM_MAIN_REV4` to `Enabled`
 This is needed to reverse the polarity of PWM output to reflect the changes in new firmware on Roboclaw.
 
 Next, since the rover position control code was modified, the following parameters need to be changed when tuning the position and velocity control modes. The values mentioned here were obtained after tunin(might need more tuning!)g. To get the feedforward terms, the follwing observations were made in manual mode for max throttle: Maximum linear speed: 1.3 m/s(0.75 m in 1 s). Maximum angular velocity: 3.925 rad/s (360 degrees in 1.6 seconds)
