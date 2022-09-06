@@ -63,6 +63,10 @@ Next, since the rover position control code was modified, the following paramete
 - Set `ROVER_K_POS` to `3`
 - Set `ROVER_OMG_FF` to `0.254`
 - Set `ROVER_VEL_FF` to `0.750`
+- Set `GND_SPEED_P` to `1.0?`
+- Set `GND_SPEED_I` to `1.0?`
+- Set `GND_SPEED_D` to `1.0?`
+- Set `GND_SPEED_IMAX` to `1.0?`
 
 
 ## 2.4 PID Tuning
