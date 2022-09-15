@@ -62,7 +62,7 @@ install(
   INCLUDES DESTINATION include/${PROJECT_NAME}
 )
 
-add_executable(estop src/example_control.cpp)
+add_executable(estop src/estop.cpp)
 ament_target_dependencies(estop rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
 target_link_libraries(estop dascBots)
 target_include_directories(estop PUBLIC

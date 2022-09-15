@@ -2,11 +2,11 @@
 #include <chrono>
 #include <functional>
 #include <memory>
-#include <rclcpp>
-
+#include "rclcpp/rclcpp.hpp"
 
 #include "px4_msgs/msg/vehicle_command.hpp"
 
+using namespace std::chrono_literals;
 
 class Estop : public rclcpp::Node {
 
@@ -15,14 +15,14 @@ class Estop : public rclcpp::Node {
         : Node("estop")
     {
         for (int i=0; i < maxN; i++){
-            std::string topic_name = std::format("/drone{}/fmu/vehicle_command/in");
+            std::string topic_name = "/drone" + std::to_string(i) +  "/fmu/vehicle_command/in";
             drone_publishers_.push_back(
                     this->create_publisher<px4_msgs::msg::VehicleCommand>(topic_name,10)
                     );
         }
         
         for (int i=0; i < maxN; i++){
-            std::string topic_name = std::format("/rover{}/fmu/vehicle_command/in");
+            std::string topic_name = "/rover" + std::to_string(i) + "/fmu/vehicle_command/in";
             rover_publishers_.push_back(
                     this->create_publisher<px4_msgs::msg::VehicleCommand>(topic_name,10)
                     );
@@ -56,13 +56,13 @@ class Estop : public rclcpp::Node {
         // drone stop command
         for (int i=0; i< maxN; i++){
             msg.target_system = i;
-            drone_publishers[i]->publish(msg);
+            drone_publishers_[i]->publish(msg);
         }
 
         // rover stop command
         for (int i=0; i< maxN; i++){
             msg.target_system = i;
-            rover_publishers[i]->publish(msg);
+            rover_publishers_[i]->publish(msg);
         }
 
         RCLCPP_WARN(this->get_logger(), "sending e stop to drones with id less than %d", maxN);
