@@ -798,17 +798,7 @@ void DASCRobot::setGPSGlobalOrigin(double lat, double lon, double alt) {
 }
 
 double DASCRobot::clampToPi(double yaw) {
-    if (yaw > M_PI_2) {
-        while (yaw > M_PI_2) {
-            yaw -= M_PI;
-        }
-    }
-    else {
-        while (yaw < -M_PI_2) {
-            yaw += M_PI;
-        }
-    }
-    return yaw;
+    std::atan2(std::sin(yaw), std::cos(yaw));
 }
 
 std::array<double, 4> DASCRobot::ned_to_enu(const std::array<double, 4> &quat) {
