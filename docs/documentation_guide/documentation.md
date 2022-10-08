@@ -4,7 +4,6 @@ title:  "How To: Documentation"
 date:   2022-05-09
 math: katex
 has_children: False
-nav_order: 2
 ---
 
 # Documentation
@@ -31,14 +30,14 @@ The website should get updated soon enough.
 Sometimes, it is convenient to test the documentation locally, and then push it all at once. 
 
 To do this, after cloning the repo, run
-
 ```
-bundle exec jekyll serve --livereload --port 4001
+docker compose build
+docker compose up &
 ```
 
 and navigate to:
 ```
-http://localhost:4001/
+http://0.0.0.0:4000/robot-framework/
 ```
 
 the website will reload as you save changes to underlying files. 

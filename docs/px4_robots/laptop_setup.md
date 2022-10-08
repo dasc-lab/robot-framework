@@ -3,8 +3,9 @@ layout: default
 title:  "Laptop Setup"
 date:   2022-05-09
 math: katex
-has_children: true
-nav_order: 12
+has_children: false
+parent: Px4 Robot
+nav_order: 5
 ---
 
 ## Step 1: Pulling Docker Container

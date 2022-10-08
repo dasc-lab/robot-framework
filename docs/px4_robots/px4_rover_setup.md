@@ -1,10 +1,10 @@
 ---
 layout: default
-title:  "6. Rover Setup"
+title:  "Rover Setup"
 date:   2022-05-09
 math: katex
 parent: Px4 Robot
-nav_order: 6
+nav_order: 2
 ---
 
 # Necessary Hardware

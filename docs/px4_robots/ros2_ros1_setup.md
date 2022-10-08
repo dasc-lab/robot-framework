@@ -3,24 +3,25 @@ layout: default
 title:  "Ros2-Ros1 setup"
 date:   2022-05-09
 math: katex
-has_children: true
-nav_order: 14
+parent: Extra Info
 ---
 
-# Pulling the container
+# ROS1-ROS2 Bridge
+
+## Pulling the container
 Ros2 has a repository for bridging ros1 topics to ros2 and vice versa. This repo requires being able to run Ros2, and has numerous steps to implementing, so with docker and docker compose, it is far easier to just run the bridge container, which can be pulled with
 
 ```
 sudo docker pull ros:galactic-ros1-bridge
 ```
 
-# Running the bridge
+## Running the bridge
 Start the container with docker run, and once inside the container, run the command 
 ```
 ros2 run ros1_bridge dynamic_bridge --bridge-all-1to2-topics  --bridge-all-2to1-topics
 ```
 
-# How to implement in a docker-compose file
+## How to implement in a docker-compose file
 
 Just include this chunk of code in your docker compose file to have a properly working bridge container:
 
@@ -35,3 +36,5 @@ bridge:
       - ros1
     network_mode: "host
 ```
+
+The depends on tells it which service needs to be launched before this can be launched. The service that needs to be launched first is the ros1 node, since the ros-master needs to be created

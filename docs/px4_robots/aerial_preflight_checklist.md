@@ -4,7 +4,7 @@ title:  "Aerial Preflight Checklist"
 date:   2022-05-15
 math: katex
 parent: Px4 Robot
-nav_order: 5
+nav_order: 6
 ---
 
 # Preflight Checklist for Quadrotors

@@ -3,8 +3,7 @@ layout: default
 title:  "Startup Script Tutorial"
 date:   2022-05-09
 math: katex
-has_children: true
-nav_order: 13
+parent: Extra Info
 ---
 
 This tutorial will go over how to make the startup script for the 
