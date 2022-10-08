@@ -3,8 +3,7 @@ layout: default
 title:  "GPS Firmware Update"
 date:   2022-05-09
 math: katex
-parent: Px4 Robot
-nav_order: 7
+parent: Extra Info
 ---
 
 ## GPS Firmware Update

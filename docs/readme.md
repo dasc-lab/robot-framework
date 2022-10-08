@@ -23,4 +23,14 @@ and navigate to the listed location.
 
 After every edit, we can refresh the page to see the updates.
 
+## Development using docker 
+from the `robot-framework/docs` directory, run
+```
+docker compose build
+docker compose up &
+```
+and then navigate in a browser to
+```
+http://0.0.0.0:4000/robot-framework/
+```
 

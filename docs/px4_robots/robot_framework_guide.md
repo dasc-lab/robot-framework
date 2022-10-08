@@ -1,15 +1,17 @@
 ---
 layout: default
-title:  "8. Using Robot Framework for Rover3"
+title:  "Using Robot Framework"
 date:   2022-05-09
 math: katex
 parent: Px4 Robot
-nav_order: 8
+nav_order: 4
 ---
 
-This page explains on how to get started with using rover3 that is completely set up.
+# Using Robot Framework
 
-# TLDR:
+This page explains on how to get started with using `rover3` as an example
+
+## TLDR:
 
 - [on ground station] start QGC
 - (optional) turn on radio transmitter
@@ -28,8 +30,8 @@ This page explains on how to get started with using rover3 that is completely se
 
 NOTE: Boot the laptop into Ubuntu 20. The instructions have been tested for DASC2 at the time of writing this. DASC1 is yet to be tested.
 
-# Step 1: Power-up and connect to rover
-Power up the rover by connecting the LiPo battery (voltage should be more than 10.7 ideally). Use DASC2 laptop and boot into it's Ubuntu 20 (the default one when you power up the lapotp so nothing to change there). Make sure the laptop is connected to drone-5G-5.2 Wifi (this is the big router). On DASC2, open a terminal and do
+## Step 1: Power-up and connect to rover
+Power up the rover by connecting the LiPo battery (voltage should be more than 10.7V ideally). Use DASC2 laptop and boot into it's Ubuntu 20 (the default one when you power up the lapotp so nothing to change there). Make sure the laptop is connected to drone-5G-5.2 Wifi (this is the big router). On DASC2, open a terminal and do
 ```
 ssh rover3@rover3.local
 ```

@@ -1,10 +1,11 @@
 ---
 layout: default
-title:  "Extra info"
+title:  "Extra Info"
 date:   2022-05-09
 math: katex
-parent: Px4 Robot
-nav_order: 10
+has_children: true
+has_toc: true
+nav_order: 2
 ---
 # EXTRA INFO (Not needed for setup)
 
