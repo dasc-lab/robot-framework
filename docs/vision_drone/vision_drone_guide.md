@@ -145,7 +145,8 @@ Install Xavier module:
 - Use following command to reverse motor `dshot reverse -m [Motor number]`, `dshot save -m [Motor number]`
 
 
-
-
-
+# Docker Setup Guide
+The xavier nx modules only come with 16 gb of disk. This is not enough to run most things, so we move the docker default directory to a mounted sd card. 
+1. See https://www.ibm.com/docs/en/z-logdata-analytics/5.1.0?topic=compose-relocating-docker-root-directory for how to move the default directory
+2. Next, make sure the sd card is mounted on boot to the same directory everytime. See https://serverfault.com/questions/1046440/auto-mount-several-sd-cards-one-after-the-other-to-the-same-directory
 
