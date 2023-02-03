@@ -62,6 +62,18 @@ install(
   INCLUDES DESTINATION include/${PROJECT_NAME}
 )
 
+add_executable(estop src/estop.cpp)
+ament_target_dependencies(estop rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
+target_link_libraries(estop dascBots)
+target_include_directories(estop PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+)
+install(TARGETS
+  estop
+  DESTINATION lib/${PROJECT_NAME}
+)
+
 add_executable(example_control src/example_control.cpp)
 ament_target_dependencies(example_control rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
 target_link_libraries(example_control dascBots)
