@@ -62,71 +62,39 @@ install(
   INCLUDES DESTINATION include/${PROJECT_NAME}
 )
 
-add_executable(example_control src/example_control.cpp)
-ament_target_dependencies(example_control rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
-target_link_libraries(example_control dascBots)
-target_include_directories(example_control PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
-  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
-)
-install(TARGETS
-  example_control
-  DESTINATION lib/${PROJECT_NAME}
-)
 
 
 
-add_executable(example_control_multi_rover src/example_control_multi_rover.cpp)
-ament_target_dependencies(example_control_multi_rover rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
-target_link_libraries(example_control_multi_rover dascBots)
-target_include_directories(example_control_multi_rover PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
-  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
-)
-install(TARGETS
-  example_control_multi_rover
-  DESTINATION lib/${PROJECT_NAME})
-
-
-
-
-add_executable(example_control_geometric src/example_control_geometric.cpp)
-ament_target_dependencies(example_control_geometric rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
-target_link_libraries(example_control_geometric dascBots)
-target_include_directories(example_control_geometric PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
-  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
-)
-install(TARGETS
-  example_control_geometric
-  DESTINATION lib/${PROJECT_NAME}
+set(Examples
+	check_robot
+	example_control
+	example_control_multi_rover
+	example_control_geometric
+	example_control_geometric_velocity
+	example_control_geometric_acceleration
+	example_quad_takeoff_and_land
+	example_quad_circle
 )
 
+message(STATUS "TEST!!")
 
-add_executable(example_control_geometric_velocity src/example_control_geometric_velocity.cpp)
-ament_target_dependencies(example_control_geometric_velocity rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
-target_link_libraries(example_control_geometric_velocity dascBots)
-target_include_directories(example_control_geometric_velocity PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
-  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
-)
-install(TARGETS
-  example_control_geometric_velocity
-  DESTINATION lib/${PROJECT_NAME}
-)
+foreach( ex  ${Examples})
+    
+    add_executable(${ex}  src/${ex}.cpp)
+    ament_target_dependencies(${ex}
+    	rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
+    target_link_libraries(${ex} dascBots)
+    target_include_directories(${ex}
+    	PUBLIC
+      $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
+      $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
+    )
+    install(TARGETS
+      ${ex}
+      DESTINATION lib/${PROJECT_NAME}
+    )
 
-
-add_executable(example_control_geometric_acceleration src/example_control_geometric_acceleration.cpp)
-ament_target_dependencies(example_control_geometric_acceleration rclcpp px4_msgs geometry_msgs tf2 tf2_ros px4_ros_com) 
-target_link_libraries(example_control_geometric_acceleration dascBots)
-target_include_directories(example_control_geometric_acceleration PUBLIC
-  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include/${PROJECT_NAME}>
-  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>
-)
-install(TARGETS
-  example_control_geometric_acceleration
-  DESTINATION lib/${PROJECT_NAME}
-)
+endforeach()
 
 
 ament_package()

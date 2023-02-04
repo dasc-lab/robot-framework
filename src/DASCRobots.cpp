@@ -138,7 +138,7 @@ bool DASCRobot::disarm() {
 }
 
 std::array<double, 3> DASCRobot::getWorldPosition() {
-    std::cout << "in world pos" << std::endl;
+    //std::cout << "in world pos" << std::endl;
     if (this->server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling getWorldPosition with uninitialized server!");
         return {NAN, NAN, NAN};
