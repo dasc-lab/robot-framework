@@ -6,7 +6,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "Starting offboard control node..." << std::endl;
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
 	rclcpp::init(argc, argv);
-    auto quad = std::make_shared<DASCRobot>("visquad1", 1);
+    auto quad = std::make_shared<DASCRobot>("drone1", 1);
     
     quad->init();
     
@@ -48,10 +48,10 @@ int main(int argc, char* argv[]) {
 
 	if (elapsed <= 15*1000*1000) {
             // takeoff is for 15 seconds
-	    quad->cmdWorldPosition(0.0, 0.0, 0.5, 0, 0);
+	    quad->cmdWorldPosition(0.0, 0.0, 1.0, 0, 0);
 	}
 	else if ( elapsed <= 30*1000*1000) {
-            quad->cmdWorldPosition(0.0, 0.0, 0.0, 0, 0);
+            quad->cmdWorldPosition(0.0, 0.0, -0.2, 0, 0);
 	}
 	else {
 		break;

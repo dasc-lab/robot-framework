@@ -15,6 +15,7 @@ DASCRobot::DASCRobot(std::string robot_name, uint8_t id) :
     robot_name_(robot_name),
     vel_acc_timeout_ns_(5e8), // 500ms
     att_rate_timeout_ns_(1e8), // 100ms
+    trajectory_timeout_ns_(2e8), // 200ms
     controllerTimeoutCount_(0),
     robot_id_(id) {
 }
@@ -301,6 +302,11 @@ bool DASCRobot::setCmdMode(ControlMode mode) {
         this->server_state_ = RobotServerState::kRate;
         RCLCPP_INFO(this->get_logger(), "Server mode kRate");
         break;
+    
+    case ControlMode::kTrajectoryMode:
+        this->server_state_ = RobotServerState::kTrajectory;
+        RCLCPP_INFO(this->get_logger(), "Server mode kTrajectory");
+        break;
 
     default:
         RCLCPP_ERROR(this->get_logger(), "Unknown Control Mode %d", static_cast<int>(mode));
@@ -308,6 +314,29 @@ bool DASCRobot::setCmdMode(ControlMode mode) {
     }
     //update current_timestamp
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
+    return true;
+}
+
+bool DASCRobot::cmdTrajectorySetpoint(TrajectorySetpoint sp){
+    if (this->server_state_ == RobotServerState::kInit) {
+        RCLCPP_ERROR(this->get_logger(), "Calling cmdTrajectorySetpoint with uninitialized server!");
+        return false;
+    }
+    this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
+    TrajectorySetpoint msg;
+    msg.timestamp = get_current_timestamp_us();
+    msg.x = sp.y;
+    msg.y = sp.x;
+    msg.z = -sp.z;
+    msg.yaw = clampToPi(-sp.yaw + M_PI_2);
+    msg.yawspeed = -sp.yawspeed;
+    msg.vx = sp.vy;
+    msg.vy = sp.vx;
+    msg.vz = -sp.vz;
+    msg.acceleration = {sp.acceleration[1], sp.acceleration[0], -sp.acceleration[2]};
+    msg.jerk = {sp.jerk[1], sp.jerk[0], -sp.jerk[2]};
+    msg.thrust = {sp.thrust[1], sp.thrust[0], -sp.thrust[2]};
+    this->trajectory_setpoint_publisher_->publish(msg);
     return true;
 }
 
@@ -608,6 +637,10 @@ void DASCRobot::updateState() {
         this->rateFSMUpdate();
         break;
 
+    case RobotServerState::kTrajectory:
+        this->trajectoryFSMUpdate();
+        break;
+    
     case RobotServerState::kControllerTimeout:
     case RobotServerState::kControllerTimeoutPositionHold:
         this->controllerTimeoutFSMUpdate();
@@ -691,6 +724,23 @@ void DASCRobot::rateFSMUpdate() {
         OffboardControlMode msg;
         msg.timestamp = get_current_timestamp_us();
         msg.body_rate = true;
+        offboard_control_mode_publisher_->publish(msg);
+    }
+}
+
+void DASCRobot::trajectoryFSMUpdate() {
+    rclcpp::Time current_time = this->get_clock()->now();
+    if (current_time.nanoseconds() - this->last_publish_timestamp_ > this->trajectory_timeout_ns_) {
+        this->server_state_ = RobotServerState::kControllerTimeout;
+        this->last_server_state_ = RobotServerState::kTrajectory;
+        RCLCPP_WARN(this->get_logger(), "Trajectory Timeout, switch to ControllerTimeout state!");
+    }
+    else {
+        OffboardControlMode msg;
+        msg.timestamp = get_current_timestamp_us();
+	msg.position = true;
+	msg.velocity = false; // true;
+	msg.acceleration = false; // true;
         offboard_control_mode_publisher_->publish(msg);
     }
 }

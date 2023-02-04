@@ -6,7 +6,7 @@ int main(int argc, char* argv[]) {
 	std::cout << "Starting offboard control node..." << std::endl;
 	setvbuf(stdout, NULL, _IONBF, BUFSIZ);
 	rclcpp::init(argc, argv);
-    auto rover = std::make_shared<DASCRobot>("rover3", 3);
+    auto rover = std::make_shared<DASCRobot>("drone1", 1);
     
     rover->init();
     

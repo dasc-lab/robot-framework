@@ -42,6 +42,9 @@ int main(int argc, char* argv[]) {
     double circle_T = 10.0;
 
     traj::CircularTrajectory traj = traj::CircularTrajectory(circle_r, circle_z, circle_T);
+    
+    quad->setCmdMode(DASCRobot::ControlMode::kTrajectoryMode);
+    quad->cmdOffboardMode();
 
     while(rclcpp::ok()) {
 
@@ -50,31 +53,34 @@ int main(int argc, char* argv[]) {
 
 	// std::array<double, 3> pos = quad->getWorldPosition();
 	// RCLCPP_INFO(quad->get_logger(), "Time: %.1f, POS: %.1f, %.1f, %.1f", elapsed_s,  pos[0], pos[1], pos[2]);
+	
+
 
 	if (elapsed_s <= 15.0) {
             // takeoff is for 15 seconds
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Taking off...");
-       	    std::array<double, 3> target_pos = traj.pos(0.0);
-	quad->cmdWorldPosition(target_pos[0], target_pos[1], target_pos[2], 0, 0);
+	    auto sp = traj.setpoint(0.0);
+	    quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
 	}
 	else if ( elapsed_s <= (circle_T + 15.0)) {
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Starting Trajectory...");
-	     // circular trajectory
-	     std::array<double, 3> target_pos = traj.pos(elapsed_s - 5.0);
-	quad->cmdWorldPosition(target_pos[0], target_pos[1], target_pos[2], 0, 0);
+	    // circular trajectory
+	    auto sp = traj.setpoint(elapsed_s - 15.0);
+	    //quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
+	    quad->cmdTrajectorySetpoint(sp);
 	}
 	else if ( elapsed_s <= (circle_T + 20.0)) {
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Finished. Hovering...");
 	     // hover at end of trajectory 
-	     std::array<double, 3> target_pos = traj.pos(circle_T);
-	quad->cmdWorldPosition(target_pos[0], target_pos[1], target_pos[2], 0, 0);
+	    auto sp = traj.setpoint(circle_T);
+	    quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
 	}
 	else if ( elapsed_s <= (circle_T + 25.0)) {
      	     // land
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Landing...");
-	     std::array<double, 3> target_pos = traj.pos(circle_T);
-	     target_pos[2] = 0.0; // force it to the ground
-	quad->cmdWorldPosition(target_pos[0], target_pos[1], target_pos[2], 0, 0);
+	    auto sp = traj.setpoint(circle_T);
+	    sp.z = -0.2;
+	    quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
 	}
 	else {
 	     break;

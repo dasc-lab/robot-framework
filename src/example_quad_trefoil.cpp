@@ -37,44 +37,51 @@ int main(int argc, char* argv[]) {
 
     auto start = quad->get_current_timestamp_us(); 
 
-    double circle_r = 1.0;
-    double circle_z = 1.0;
-    double circle_T = 10.0;
+    double scale_x = 0.5;
+    double scale_y = 0.5;
+    double scale_z = 0.5;
+    double offset_z = 1.0;
+    double T = 10.0;
 
-    traj::CircularTrajectory traj = traj::CircularTrajectory(circle_r, circle_z, circle_T);
+    int N = 3; // number of repeats
+
+    auto traj = traj::TrefoilTrajectory(scale_x, scale_y, scale_z, offset_z, T);
+    
+    quad->setCmdMode(DASCRobot::ControlMode::kTrajectoryMode);
+    quad->cmdOffboardMode();
 
     while(rclcpp::ok()) {
 
 	auto now = quad->get_current_timestamp_us();
 	double elapsed_s = (double(now - start) * 1e-6);
 
-	// std::array<double, 3> pos = quad->getWorldPosition();
-	// RCLCPP_INFO(quad->get_logger(), "Time: %.1f, POS: %.1f, %.1f, %.1f", elapsed_s,  pos[0], pos[1], pos[2]);
+	//auto sp = traj.setpoint(elapsed_s);
+	//RCLCPP_INFO(quad->get_logger(), "(%.1f, %.1f, %.1f)", sp.x, sp.y, sp.z);
 
 	if (elapsed_s <= 15.0) {
             // takeoff is for 15 seconds
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Taking off...");
-       	    std::array<double, 3> target_pos = traj.pos(0.0);
-	quad->cmdWorldPosition(target_pos[0], target_pos[1], target_pos[2], 0, 0);
+	    auto sp = traj.setpoint(0.0);
+	    quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
 	}
-	else if ( elapsed_s <= (circle_T + 15.0)) {
+	else if ( elapsed_s <= (N*T + 15.0)) {
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Starting Trajectory...");
-	     // circular trajectory
-	     std::array<double, 3> target_pos = traj.pos(elapsed_s - 5.0);
-	quad->cmdWorldPosition(target_pos[0], target_pos[1], target_pos[2], 0, 0);
+	    // trajectory
+	    auto sp = traj.setpoint(elapsed_s - 15.0);
+	    quad->cmdTrajectorySetpoint(sp);
 	}
-	else if ( elapsed_s <= (circle_T + 20.0)) {
+	else if ( elapsed_s <= (N*T + 20.0)) {
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Finished. Hovering...");
 	     // hover at end of trajectory 
-	     std::array<double, 3> target_pos = traj.pos(circle_T);
-	quad->cmdWorldPosition(target_pos[0], target_pos[1], target_pos[2], 0, 0);
+	    auto sp = traj.setpoint(T);
+	    quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
 	}
-	else if ( elapsed_s <= (circle_T + 25.0)) {
+	else if ( elapsed_s <= (N*T + 25.0)) {
      	     // land
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Landing...");
-	     std::array<double, 3> target_pos = traj.pos(circle_T);
-	     target_pos[2] = 0.0; // force it to the ground
-	quad->cmdWorldPosition(target_pos[0], target_pos[1], target_pos[2], 0, 0);
+	    auto sp = traj.setpoint(T);
+	    sp.z = -0.2;
+	    quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
 	}
 	else {
 	     break;

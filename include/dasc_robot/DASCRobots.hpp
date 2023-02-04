@@ -29,6 +29,7 @@ class DASC : virtual public rclcpp::Node {
         kAccelerationMode,
         kAttitudeMode,
         kRateMode,
+	kTrajectoryMode
         };
 
         virtual bool init() = 0;
@@ -41,6 +42,7 @@ class DASC : virtual public rclcpp::Node {
         virtual std::array<double, 3> getBodyRate() = 0;
         virtual bool getBodyQuaternion(std::array<double, 4>& quat, bool blocking) = 0;
         virtual bool setCmdMode(ControlMode mode) = 0;
+	// virtual bool cmdTrajectorySetpoint(TrajectorySetpoint sp) = 0;
         virtual bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate) = 0;
         virtual bool cmdWorldVelocity(double x, double y, double z, double yaw, double yaw_rate) = 0;
         virtual bool cmdWorldAcceleration(double x, double y, double z, double yaw, double yaw_rate) = 0;
@@ -70,7 +72,8 @@ class DASCRobot : public DASC {
         bool getBodyQuaternion(std::array<double, 4>& quat, bool blocking);
         bool setCmdMode(DASCRobot::ControlMode mode);
         bool useExternalController(bool mode);
-	    bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate);
+	bool cmdTrajectorySetpoint(TrajectorySetpoint sp);
+	bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdWorldVelocity(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdLocalVelocity(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdWorldAcceleration(double x, double y, double z, double yaw, double yaw_rate);
@@ -99,6 +102,7 @@ class DASCRobot : public DASC {
             kAcceleration,
             kAttitude,
             kRate,
+	    kTrajectory,
             kControllerTimeout,
             kControllerTimeoutPositionHold,
             kFailSafe,
@@ -110,6 +114,7 @@ class DASCRobot : public DASC {
         std::string robot_name_;
         const uint64_t vel_acc_timeout_ns_;
         const uint64_t att_rate_timeout_ns_;
+        const uint64_t trajectory_timeout_ns_;
         unsigned int controllerTimeoutCount_;
         uint8_t robot_id_;
         
@@ -156,6 +161,7 @@ class DASCRobot : public DASC {
         void accelerationFSMUpdate();
         void attitudeFSMUpdate();
         void rateFSMUpdate();
+        void trajectoryFSMUpdate();
         void controllerTimeoutFSMUpdate();
         void failsafeFSMUpdate();
         double clampToPi(double yaw);
