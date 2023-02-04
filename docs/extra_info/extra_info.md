@@ -44,3 +44,14 @@ This part in the “microRTPS_transport.cpp” is deleted in this version
 			return -errno_bkp;
 		}
 ```
+
+## Troubleshooting
+
+### [RTPS_TRANSPORT_SHM Error] Failed to create segment
+See https://github.com/eProsima/Fast-DDS/issues/1606
+See https://github.com/eProsima/Fast-DDS/issues/2790
+the fix is to run
+```
+fastdds shm clean
+```
+
