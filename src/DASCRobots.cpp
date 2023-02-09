@@ -1,5 +1,6 @@
 #include <thread>
 #include "DASCRobots.hpp"
+#include "msg_conversion.hpp"
 #include <geometry_msgs/msg/transform_stamped.hpp>
 #include <tf2/LinearMath/Quaternion.h>
 #include "frame_transforms.h"
@@ -66,6 +67,11 @@ bool DASCRobot::init() {
 
     trajectory_setpoint_publisher_ = this->create_publisher<TrajectorySetpoint>(
         this->robot_name_ + "/fmu/trajectory_setpoint/in", 
+        sensor_qos
+    );
+    
+    diffflat_setpoint_publisher_ = this->create_publisher<DiffflatSetpoint>(
+        this->robot_name_ + "/fmu/diffflat_setpoint/in", 
         sensor_qos
     );
 
@@ -317,26 +323,31 @@ bool DASCRobot::setCmdMode(ControlMode mode) {
     return true;
 }
 
-bool DASCRobot::cmdTrajectorySetpoint(TrajectorySetpoint sp){
+bool DASCRobot::cmdTrajectorySetpoint(TrajectorySetpoint msg){
     if (this->server_state_ == RobotServerState::kInit) {
         RCLCPP_ERROR(this->get_logger(), "Calling cmdTrajectorySetpoint with uninitialized server!");
         return false;
     }
     this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
-    TrajectorySetpoint msg;
+
     msg.timestamp = get_current_timestamp_us();
-    msg.x = sp.y;
-    msg.y = sp.x;
-    msg.z = -sp.z;
-    msg.yaw = clampToPi(-sp.yaw + M_PI_2);
-    msg.yawspeed = -sp.yawspeed;
-    msg.vx = sp.vy;
-    msg.vy = sp.vx;
-    msg.vz = -sp.vz;
-    msg.acceleration = {sp.acceleration[1], sp.acceleration[0], -sp.acceleration[2]};
-    msg.jerk = {sp.jerk[1], sp.jerk[0], -sp.jerk[2]};
-    msg.thrust = {sp.thrust[1], sp.thrust[0], -sp.thrust[2]};
+
     this->trajectory_setpoint_publisher_->publish(msg);
+
+    return true;
+}
+
+bool DASCRobot::cmdDiffflatSetpoint(DiffflatSetpoint msg){
+    if (this->server_state_ == RobotServerState::kInit) {
+        RCLCPP_ERROR(this->get_logger(), "Calling cmdTrajectorySetpoint with uninitialized server!");
+        return false;
+    }
+    this->last_publish_timestamp_ = this->get_clock()->now().nanoseconds();
+    msg.timestamp = get_current_timestamp_us();
+    this->diffflat_setpoint_publisher_->publish(msg);
+
+    // RCLCPP_INFO(this->get_logger(), "sending flat setpoint: %.3f, %.3f, %.3f", msg.pos[0], msg.pos[1], msg.pos[2]);
+
     return true;
 }
 
@@ -363,8 +374,11 @@ bool DASCRobot::cmdWorldPosition(double x, double y, double z, double yaw, doubl
     msg.acceleration = {NAN, NAN, NAN};
     msg.jerk = {NAN, NAN, NAN};
     msg.thrust = {NAN, NAN, NAN};
-    this->trajectory_setpoint_publisher_->publish(msg);
+
+    cmdTrajectorySetpoint(msg);
+    cmdDiffflatSetpoint(convert(msg));
     return true;
+
 }
 
 bool DASCRobot::cmdWorldVelocity(double x, double y, double z, double yaw, double yaw_rate) {
@@ -387,7 +401,9 @@ bool DASCRobot::cmdWorldVelocity(double x, double y, double z, double yaw, doubl
     msg.acceleration = {NAN, NAN, NAN};
     msg.jerk = {NAN, NAN, NAN};
     msg.thrust = {NAN, NAN, NAN};
-    this->trajectory_setpoint_publisher_->publish(msg);
+
+    cmdTrajectorySetpoint(msg);
+    cmdDiffflatSetpoint(convert(msg));
     return true;
 }
 
@@ -411,8 +427,11 @@ bool DASCRobot::cmdLocalVelocity(double x, double y, double z, double yaw, doubl
     msg.acceleration = {NAN, NAN, NAN};
     msg.jerk = {NAN, NAN, NAN};
     msg.thrust = {NAN, NAN, NAN};
-    this->trajectory_setpoint_publisher_->publish(msg);
+    
+    cmdTrajectorySetpoint(msg);
+    cmdDiffflatSetpoint(convert(msg));
     return true;
+
 }
 
 bool DASCRobot::cmdWorldAcceleration(double x, double y, double z, double yaw, double yaw_rate) {
@@ -437,7 +456,9 @@ bool DASCRobot::cmdWorldAcceleration(double x, double y, double z, double yaw, d
     msg.jerk = {NAN, NAN, NAN};
     msg.thrust = {NAN, NAN, NAN};
     msg.yaw = clampToPi(-yaw + M_PI_2);
-    this->trajectory_setpoint_publisher_->publish(msg);
+    
+    cmdTrajectorySetpoint(msg);
+    cmdDiffflatSetpoint(convert(msg));
     return true;
 }
 
@@ -601,9 +622,13 @@ void DASCRobot::vehicleLocalPositionCallback(const VehicleLocalPosition::UniqueP
         transform_msg.transform.rotation.y = quat[2];
         transform_msg.transform.rotation.z = quat[3];
         this->tf_broadcaster_->sendTransform(transform_msg);
+	//RCLCPP_INFO(this->get_logger(), "published tf");
+    }
+    else {
+	    //RCLCPP_WARN(this->get_logger(), "COULD NOT PUBLISH TF");
     }
 
-    // RCLCPP_INFO(this->get_logger(), "Vehicle Local Position callback");
+    // RCLCPP_INFO(this->et_logger(), "Vehicle Local Position callback");
 }
 
 void DASCRobot::updateState() {

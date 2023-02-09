@@ -75,7 +75,7 @@ set(Examples
 	example_quad_takeoff_and_land
 	example_quad_circle
 	example_quad_circle_trajectory
-	example_quad_trefoil
+	# example_quad_trefoil
 )
 
 message(STATUS "TEST!!")

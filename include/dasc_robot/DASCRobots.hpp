@@ -7,6 +7,7 @@
 #include <px4_msgs/msg/offboard_control_mode.hpp>
 #include <px4_msgs/msg/external_controller.hpp>
 #include <px4_msgs/msg/trajectory_setpoint.hpp>
+#include <px4_msgs/msg/diffflat_setpoint.hpp>
 #include <px4_msgs/msg/timesync.hpp>
 #include <px4_msgs/msg/vehicle_command.hpp>
 #include <px4_msgs/msg/vehicle_control_mode.hpp>
@@ -18,6 +19,7 @@
 #include <tf2_ros/transform_broadcaster.h>
 
 using namespace px4_msgs::msg;
+
 
 
 class DASC : virtual public rclcpp::Node {
@@ -73,6 +75,7 @@ class DASCRobot : public DASC {
         bool setCmdMode(DASCRobot::ControlMode mode);
         bool useExternalController(bool mode);
 	bool cmdTrajectorySetpoint(TrajectorySetpoint sp);
+	bool cmdDiffflatSetpoint(DiffflatSetpoint sp);
 	bool cmdWorldPosition(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdWorldVelocity(double x, double y, double z, double yaw, double yaw_rate);
         bool cmdLocalVelocity(double x, double y, double z, double yaw, double yaw_rate);
@@ -146,6 +149,7 @@ class DASCRobot : public DASC {
 
         rclcpp::Publisher<OffboardControlMode>::SharedPtr offboard_control_mode_publisher_;
         rclcpp::Publisher<ExternalController>::SharedPtr vehicle_useExternalController_publisher_;
+        rclcpp::Publisher<DiffflatSetpoint>::SharedPtr diffflat_setpoint_publisher_;
         rclcpp::Publisher<TrajectorySetpoint>::SharedPtr trajectory_setpoint_publisher_;
         rclcpp::Publisher<VehicleCommand>::SharedPtr vehicle_command_publisher_;
         rclcpp::Publisher<VehicleAttitudeSetpoint>::SharedPtr vehicle_attitude_publisher_;

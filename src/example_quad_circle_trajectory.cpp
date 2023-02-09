@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
     double circle_r = 1.0;
     double circle_z = 1.0;
     double circle_T = 10.0;
+    int circle_N = 4; // how many times to repeat the trajectory
 
     traj::CircularTrajectory traj = traj::CircularTrajectory(circle_r, circle_z, circle_T);
     
@@ -60,27 +61,26 @@ int main(int argc, char* argv[]) {
             // takeoff is for 15 seconds
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Taking off...");
 	    auto sp = traj.setpoint(0.0);
-	    quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
+	    quad->cmdWorldPosition(sp.pos[0], sp.pos[1], sp.pos[2],  sp.yaw, 0);
 	}
-	else if ( elapsed_s <= (circle_T + 15.0)) {
+	else if ( elapsed_s <= (circle_N * circle_T + 15.0)) {
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Starting Trajectory...");
 	    // circular trajectory
 	    auto sp = traj.setpoint(elapsed_s - 15.0);
-	    //quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
-	    quad->cmdTrajectorySetpoint(sp);
+	    quad->cmdDiffflatSetpoint(sp);
 	}
-	else if ( elapsed_s <= (circle_T + 20.0)) {
+	else if ( elapsed_s <= (circle_N * circle_T + 20.0)) {
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Finished. Hovering...");
 	     // hover at end of trajectory 
 	    auto sp = traj.setpoint(circle_T);
-	    quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
+	    quad->cmdWorldPosition(sp.pos[0], sp.pos[1], sp.pos[2],  sp.yaw, 0);
 	}
-	else if ( elapsed_s <= (circle_T + 25.0)) {
+	else if ( elapsed_s <= (circle_N * circle_T + 25.0)) {
      	     // land
 	    RCLCPP_INFO_ONCE(quad->get_logger(), "Landing...");
 	    auto sp = traj.setpoint(circle_T);
-	    sp.z = -0.2;
-	    quad->cmdWorldPosition(sp.x, sp.y, sp.z,  sp.yaw, 0);
+	    sp.pos[2] = -0.2;
+	    quad->cmdWorldPosition(sp.pos[0], sp.pos[1], sp.pos[2],  sp.yaw, 0);
 	}
 	else {
 	     break;
