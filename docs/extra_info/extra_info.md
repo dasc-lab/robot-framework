@@ -9,6 +9,10 @@ nav_order: 2
 ---
 # EXTRA INFO (Not needed for setup)
 
+## Docker + ROS guide:
+Here is an awesome article:
+	https://roboticseabass.com/2021/04/21/docker-and-ros/
+
 ## Indoor
 When using the rover indoor, we need to convert the vicon messages into gps messages for the pixhawk using vicon_px4_bridge, and PX4 into ros commands using ros2_vicon_receiver. 
 
