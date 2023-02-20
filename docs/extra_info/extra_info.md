@@ -82,3 +82,9 @@ git remote set-url <new-url>
 5) go back to parent repo, add, commit and push changes. 
 
 
+Little trick:
+from the parent repo:
+```
+export REPO="<nested/repo/path">
+git submodule add $(cd $REPO && git remote get-url origin) $REPO
+```
