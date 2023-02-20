@@ -59,3 +59,26 @@ the fix is to run
 fastdds shm clean
 ```
 
+
+## converting git submodules
+When making a parent repo a git repo, and making all the nested folders into submodules:
+1) from the root of the parent repo run
+```
+git submodule add <new-url> <path/to/nested/repo>
+```
+
+2) run 
+```
+git submodule update
+```
+
+3) go to the nested repo folder
+```
+git remote set-url <new-url>
+```
+
+4) add, commit and push changes
+
+5) go back to parent repo, add, commit and push changes. 
+
+
