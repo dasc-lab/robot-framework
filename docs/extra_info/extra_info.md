@@ -59,6 +59,14 @@ the fix is to run
 fastdds shm clean
 ```
 
+### Can't ssh unless computer is logged in
+The problem could be that the computer cant access the wifi network unless the user is logged in. We can disable this as follows:
+
+Navigate to `/etc/NetworkManager/system-connections/`. There you will find a file with the same name as your wireless network. This file contains your wifi credentials and settings. Edit it, find the line with permission=, and remove everything after the = sign (or the whole line).
+
+Restart and you can connect before login.
+
+This was necessary on the Xavier NX. 
 
 ## converting git submodules
 When making a parent repo a git repo, and making all the nested folders into submodules:
