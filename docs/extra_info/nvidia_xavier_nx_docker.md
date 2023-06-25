@@ -12,6 +12,9 @@ It was not straightforward to get good performance out of the xavier NX + Realse
 
 Using these tricks I was able to get upto about 50fps depth images on the xavier. 
 
+## Check this out:
+See https://gist.github.com/andrewssobral/ae77483b8fa147cce98b5b92f1a5ae17 for an absolutely incredible list of tips and tricks for the xavier.
+
 ## Xavier Tuning
 - Make sure you setup an NVME SSD on the Xavier
 - ensure you have a good wifi connection
