@@ -96,3 +96,42 @@ from the parent repo:
 export REPO="<nested/repo/path">
 git submodule add $(cd $REPO && git remote get-url origin) $REPO
 ```
+
+## High latency, high `ping` or general network jitter
+There are many possible causes for this, including router settings, placement etc. 
+However, also check the power saving settings on ubuntu:
+
+To get the current power saving setting
+```
+iw dev wlan0 get power_save
+```
+which will print `on` if power saving is enabled for `wlan0`. Or a more general check can be done by:
+```
+iwconfig wlan0 | grep "Power Management"
+```
+
+To turn power saving off (until reboot):
+```
+sudo iwconfig wlan0 power off
+```
+To turn on power saving (unil reboot):
+```
+sudo iwconfig wlan0 power on
+```
+
+To set it permanently, edit `/etc/NetworkManager/conf.d/default-wifi-powersave-on.conf`, and change the file to read:
+```
+[connection]
+wifi.powersave = 2
+```
+
+The possible settings are:
+```
+NM_SETTING_WIRELESS_POWERSAVE_DEFAULT (0): use the default value
+NM_SETTING_WIRELESS_POWERSAVE_IGNORE  (1): don't touch existing setting
+NM_SETTING_WIRELESS_POWERSAVE_DISABLE (2): disable powersave
+NM_SETTING_WIRELESS_POWERSAVE_ENABLE  (3): enable powersave
+```
+
+Reference: https://unix.stackexchange.com/questions/269661/how-to-turn-off-wireless-power-management-permanently
+
