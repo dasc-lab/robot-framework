@@ -135,3 +135,36 @@ NM_SETTING_WIRELESS_POWERSAVE_ENABLE  (3): enable powersave
 
 Reference: https://unix.stackexchange.com/questions/269661/how-to-turn-off-wireless-power-management-permanently
 
+## Determining the opencv build information
+
+### Using Python3:
+Start `python3`:
+```
+python3
+```
+In the interpretter run
+```
+import cv2
+print(cv2.getBuildInformation())
+```
+
+### Using C++
+
+Create the file `opencv_buildinfo.cpp`
+```cpp
+#include <opencv2/opencv.hpp>
+
+int main()
+{
+	std::cout << cv::getBuildInformation() << std::endl;
+}
+```
+
+Compile it using 
+```
+g++ -o buildinfo opencv_buildinfo.cpp $(pkg-config --cflags opencv4) $(pkg-config --libs opencv4)
+```
+and run it:
+```
+./buildinfo
+```
