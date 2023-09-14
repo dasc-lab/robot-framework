@@ -56,11 +56,103 @@ See https://gist.github.com/andrewssobral/ae77483b8fa147cce98b5b92f1a5ae17 for a
     - in any `CMakeLists.txt` you can add the lines
     ```
     if(NOT CMAKE_BUILD_TYPE)
-        set(CMAKE_BUILD_TYPE "Release") or "Debug" if you want to lower compile time and increase runtime
+        set(CMAKE_BUILD_TYPE "Release") or "Debug" if you want to lower compile time but increased runtime
     endif()
     ```
     - generally you are supposed to do this from command line, i.e., run `cmake -DCMAKE_BUILD_TYPE=Release ..` but whos got time for that?
 - in the future I want to look into cross-compilation methods since the Xavier is really (really) slow at compiling code
+
+## Boosting Xavier Speed
+The power modes on the xavier NX are designed with power efficiency in mind. But we want performance. We want to unlock all the cores at their max clock speeds. To do this, we just need to define one more power mode. 
+
+Modify `/etc/nvpmodel.conf`.  Copy one of the power modes, give it a new id and name, and change whatever settings you want. in the case of the xavier NX 16GB, I settled on
+
+```
+< POWER_MODEL ID=9 NAME=MODE_MAX_ALL >
+CPU_ONLINE CORE_0 1
+CPU_ONLINE CORE_1 1
+CPU_ONLINE CORE_2 1
+CPU_ONLINE CORE_3 1
+CPU_ONLINE CORE_4 1
+CPU_ONLINE CORE_5 1
+TPC_POWER_GATING TPC_PG_MASK 1
+GPU_POWER_CONTROL_ENABLE GPU_PWR_CNTL_EN on
+CPU_DENVER_0 MIN_FREQ 1190400
+CPU_DENVER_0 MAX_FREQ 1907200
+CPU_DENVER_1 MIN_FREQ 1190400
+CPU_DENVER_1 MAX_FREQ 1907200
+CPU_DENVER_2 MIN_FREQ 1190400
+CPU_DENVER_2 MAX_FREQ 1907200
+GPU MIN_FREQ 0
+GPU MAX_FREQ 1109250000
+GPU_POWER_CONTROL_DISABLE GPU_PWR_CNTL_DIS auto
+EMC MAX_FREQ 1866000000
+NAFLL_DLA MAX_FREQ 1100800000
+NAFLL_DLA_FALCON MAX_FREQ 640000000
+DLA0_CORE MAX_FREQ 1100800000
+DLA1_CORE MAX_FREQ 1100800000
+DLA0_FALCON MAX_FREQ 640000000
+DLA1_FALCON MAX_FREQ 640000000
+NAFLL_PVA_VPS MAX_FREQ 819200000
+NAFLL_PVA_CORE MAX_FREQ 601600000
+PVA0_VPS0 MAX_FREQ 819200000
+PVA0_VPS1 MAX_FREQ 819200000
+PVA1_VPS0 MAX_FREQ 819200000
+PVA1_VPS1 MAX_FREQ 819200000
+PVA0_AXI MAX_FREQ 601600000
+PVA1_AXI MAX_FREQ 601600000
+CVNAS MAX_FREQ 576000000
+NVDEC MAX_FREQ 793600000
+NVDEC1 MAX_FREQ 793600000
+NVENC MAX_FREQ 729600000
+NVENC1 MAX_FREQ 729600000
+NVJPG MAX_FREQ 460800000
+SE1 MAX_FREQ 704000000
+SE2 MAX_FREQ 704000000
+SE3 MAX_FREQ 704000000
+SE4 MAX_FREQ 704000000
+VDDIN_OC_LIMIT WARN 4000
+VDDIN_OC_LIMIT CRIT 5000
+```
+
+where mainly I changed it so all cores are active:
+```
+CPU_ONLINE CORE_i 1
+```
+and the clock speed is maximized.
+```
+CPU_DENVER_i MIN_FREQ 1190400
+CPU_DENVER_i MAX_FREQ 1907200
+```
+and the GPU max frequency is also maximized:
+```
+GPU MIN_FREQ 0
+GPU MAX_FREQ 1109250000
+```
+
+To use this power mode, in the cmd line type
+```
+sudo nvpmodel -m 9
+```
+or change the last line of the `/etc/nvpmodel.conf` to make `9` the default.
+
+To check that the power mode is set correctly, type
+```
+nvpmodel -p --verbose
+```
+or
+```
+nvpmodel -p --verbose | grep POWER_MODEL
+```
+to list just the power modes. 
+
+Also dont forget about jetson clocks and the fan modes. 
+
+References:
+- https://forums.developer.nvidia.com/t/cpus-usage-problem-solved/65993
+- https://developer.ridgerun.com/wiki/index.php/Xavier/JetPack_5.0.2/Performance_Tuning/Maximizing_Performance
+- https://cdn.alliedvision.com/fileadmin/content/documents/products/software/software/embedded/Optimizing-Performance-Jetson_appnote.pdf
+- https://docs.nvidia.com/jetson/archives/l4t-archived/l4t-3261/index.html#page/Tegra%20Linux%20Driver%20Package%20Development%20Guide/power_management_jetson_xavier.html#wwpID0E0XO0HA
 
 
 ## Troubleshooting:
