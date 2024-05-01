@@ -121,7 +121,7 @@ Install Xavier module:
 ![](imgs/VisionDrone21.jpeg)
 
 
-# PX4 Configuration Guide
+# PX4 Configuration Guide (old version 1.13)
 ## PX4 Parameter
 - Set `MAV_SYS_ID` to be a different value from other Drone (match number with name of drone)
 - Set `Hold` and `Offboard` for `COM_RCL_EXCEPT`
@@ -136,6 +136,22 @@ Install Xavier module:
 - set `SER_TEL1_BAUD` to 115200 8N1
 - set `RTPS_CONFIG` to TELEM 2
 - set `SER_TEL2_BAUD` to 921600 (might need to reboot vehicle to see this option)
+
+# PX4 Configuration Guide (new v1.14)
+## PX4 Parameter
+- Set `MAV_SYS_ID` to be a different value from other Drone (match number with name of drone)
+- Set `Hold` and `Offboard` for `COM_RCL_EXCEPT`
+- Set `EKF2_EV_CTRL` to 15 (check all boxes)
+- Set `EKF2_HGT_MODE` to GPS if doing outdoor testing and Vision if doing indoor testing
+- Set `EKF2_GPS_P_NOISE` to 0.2 m
+- Set `EKF2_GPS_V_NOISE` to 0.15 m/s
+- set `MAV_0_RATE` to 0 B/s (i.e. unlimited data sending rate)
+- set `COM_RC_IN_MODE` set to joystick only
+- set `MAV_0_RADIO_CTL` to disable
+- set `SER_TEL1_BAUD` to 115200 8N1
+- set `XRCE_DDS_CONFIG` to TELEM2 (reboot after this)
+- set `SER_TEL2_BAUD` to 921600 (might need to reboot vehicle to see this option)
+- set `EKF2_MAG_TYPE` to None (disables mag, requires reboot)
 
 ## Setup Dshot
 - set `SYS_USE_IO` to `IO_PWM_DISABLE`
