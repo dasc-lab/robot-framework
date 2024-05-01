@@ -121,8 +121,8 @@ Install Xavier module:
 ![](imgs/VisionDrone21.jpeg)
 
 
-# PX4 Configuration Guide (old version 1.13)
-## PX4 Parameter
+# PX4 Configuration Guide 
+## PX4 Parameter (old version 1.13)
 - Set `MAV_SYS_ID` to be a different value from other Drone (match number with name of drone)
 - Set `Hold` and `Offboard` for `COM_RCL_EXCEPT`
 - in `EKF2_AID_MASK`: Check `GPS`, `vision position fusion`, and `vision yaw fusion` if outdoor, and **only** `vision position fusion` and `vision yaw fusion` if indoor
@@ -137,8 +137,7 @@ Install Xavier module:
 - set `RTPS_CONFIG` to TELEM 2
 - set `SER_TEL2_BAUD` to 921600 (might need to reboot vehicle to see this option)
 
-# PX4 Configuration Guide (new v1.14)
-## PX4 Parameter
+## PX4 Parameter (new v1.14)
 - Set `MAV_SYS_ID` to be a different value from other Drone (match number with name of drone)
 - Set `Hold` and `Offboard` for `COM_RCL_EXCEPT`
 - Set `EKF2_EV_CTRL` to 15 (check all boxes)
