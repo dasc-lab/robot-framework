@@ -135,6 +135,22 @@ NM_SETTING_WIRELESS_POWERSAVE_ENABLE  (3): enable powersave
 
 Reference: https://unix.stackexchange.com/questions/269661/how-to-turn-off-wireless-power-management-permanently
 
+## Occasional Wifi Dropouts/High Latency
+
+From Jesus Tordesillas:
+
+On Nvidia Tegra boards, `NetworkManager` is guilty of periodically scanning the entire WiFi spectrum. On our drone, this behavior caused ~3 second periods of large network latency about every 2 minutes. The fix was to kill `NetworkManager` after the drone's wifi connection has been established.
+
+To kill `NetworkManager` on the drone
+```
+sudo killall -STOP NetworkManager
+```
+
+Network manager can be reenabled with
+```
+sudo killall -CONT NetworkManager
+```
+
 ## Determining the opencv build information
 
 ### Using Python3:
