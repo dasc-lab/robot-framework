@@ -102,6 +102,8 @@ then set the first line of `/etc/hosts` to
 ```
 Then reboot the computer.
 
+If after a reboot the old hostname returns, you might need to do the following: edit `/etc/cloud/cloud.cfg` and set the parameter "preserve_hostname" from "false" to "true" and then edit /etc/hostname. Reference: https://askubuntu.com/questions/1028633/host-name-reverts-to-old-name-after-reboot-in-18-04-lts
+
 To change the profile name, a temporary user needs to be created, follow the instructions here (https://askubuntu.com/questions/34074/how-do-i-change-my-username).
 
 ## 3.3: Docker Setup 
