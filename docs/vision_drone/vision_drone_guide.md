@@ -122,6 +122,9 @@ Install Xavier module:
 
 
 # PX4 Configuration Guide 
+- For the purpose of checking the motors and calibrating the sensors, flash the default PX4 firmware using QGC on the Pix32 V6.
+
+
 ## PX4 Parameter (old version 1.13)
 - Set `MAV_SYS_ID` to be a different value from other Drone (match number with name of drone)
 - Set `Hold` and `Offboard` for `COM_RCL_EXCEPT`
