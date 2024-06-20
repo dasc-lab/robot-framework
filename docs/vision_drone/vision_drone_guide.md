@@ -130,7 +130,7 @@ Install Xavier module:
 - set `DSHOT_CONFIG` to `DShot600`
 - Verify motor order using Mavlink console `dshot beep1 -m [Motor number]`
 - Verify motor spinning direction
-- Use following command to reverse motor `dshot reverse -m [Motor number]`, `dshot save -m [Motor number]`
+- Use the following command to reverse motor `dshot reverse -m [Motor number]`, `dshot save -m [Motor number]`
 - Motors can be checked individually inside the /Vehicle Setup/Motors tab inside the QGC.  
 
 ## Flashing the custom PX4-AUTOPILOT-QUAD
@@ -138,11 +138,19 @@ Install Xavier module:
 - cd /PX4-Autopilot-Quad
 - Run the following commands to make sure that px4 build will recognize the tags:
 
+<<<<<<< HEAD
 ```
 git submodule update --init --recursive
 git remote add upstream https://github.com/PX4/PX4-Autopilot.git
 git fetch upstream --tags
 ```
+=======
+"""
+git submodule update --init --recursive
+git remote add upstream https://github.com/PX4/PX4-Autopilot.git
+git fetch upstream --tags
+"""
+>>>>>>> 39bbd27d80c4388a5f11e346e5264b999a0dfbfb
 
 - Then build and run the docker using the following commands. (If you cant find docker files in the main branch switch to the branch KBN)
 
