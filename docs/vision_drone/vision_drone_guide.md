@@ -79,21 +79,18 @@ Prepare the following items:
 
 ESC wiring table:
 
-|  ESC  |  Pix32  |
-|  CUR  |    I    |
-|  NC   |    NC   |
-|  4    |    4    |
-|  3    |    2    |
-|  2    |    1    |
-|  1    |    3    |
-|  +    |    V    |
-|  -    |    G    |
-
-| ESC   | CUR | NC | 4 | 3 | 2 | 1 | + | - |
-| Pix32 | I   | NC | 4 | 2 | 1 | 3 | V | G |
+| ESC | Pix32 |
+| CUR |   I   |
+| NC  |   NC  |
+| 4   |   4   |
+| 3   |   2   |
+| 2   |   1   |
+| 1   |   3   |
+| +   |   V   |
+| -   |   G   |
 
 
-Solder it: <font color="red">**Do not reference to the image, use the wiring table**</font>
+Solder it: **<font color="red">Do not reference to the image, use the wiring table</font>**
 ![](imgs/VisionDrone11.jpeg)
 
 
