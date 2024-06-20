@@ -216,12 +216,11 @@ $ make px4_fmu-v6c_dasc
 -  In the target components, select Jetson Linux only. You don't need to select Jetson Runtime Components as we will mostly be working inside the Docker container. Accept the terms and continue.
 
 -  In the SETUP PROCESS:
-   - choose Automatic Setup in the `Recovery mode setup`. 
+   - Choose Automatic Setup in the `Recovery mode setup`. 
    - Keep the default IP address. 
-   - If this is the first time, then enter  `username: ubuntu` and  `password: hello123`. We keeep this consistent across all modules. 
+   - If this is the first time, then enter  `username: ubuntu` and  `password: hello123`. We keep this consistent across all modules. 
    - If this is not the first time the Orin is being flashed, then enter the current username and password, and make sure the new username and password match the details given above. You can provide a new username and password by unchecking the `Use current username/password` box.
    - Select the `Storage Device` as NVMe. This is becasue we are flashing on the SSD.
-   - Then flash
 
 - The flash can fail due to a bad Orin, carrier board, or SSD. Make sure to check each component.
 
@@ -237,7 +236,7 @@ $ sudo hostnamectl set-hostname NEW_HOSTNAME
 127.0.0.1 $HOSTNAME
 ```
 
-- One can SSH into the Orin remotely using following:
+- To SSH into the Orin remotely, use following commands:
 ```
 $ ssh ubuntu@orin#.local
 $ password: hello123
@@ -249,7 +248,7 @@ $ chmod +x path/to/flash.sh
 $ ./flash.sh
 ```
 
-- Generate a new SSH key for github. [Link](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent). Or follow these commands and the copy the key from the last command to the github account
+- Generate a new SSH key for github ([Link](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)). Or follow these commands and then copy the key from the last command to the github account
 ```
 git config --global user.email "your_email.com"
 git config --global user.name "username"
@@ -258,7 +257,7 @@ eval "$(ssh-agent -s)"=
 cat ~/.ssh/id_ed25519.pub
 ```
 
-- Clone the px4-jumpstart repository.  
+- Clone the px4-jumpstart repository and build the docker file.  
 
 ```
 $ git clone https://github.com/dasc-lab/rover_px4_ros2_jumpstart.git
@@ -287,14 +286,14 @@ services:
 ```
 
 
-- The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used. Use `dmesg | grep tty` to check if the tty/UAB0 and tty/USB1 are detected. 
+- The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used. Use `dmesg | grep tty` to check if the tty/UAB0 and tty/USB1 are successfully detected. 
 
 ```
 $ cd /lib/modules/5.10.120-tegra/kernel/drivers/usb/serial/
 $ sudo mv usbserial.ko usbserial.ko.bk
 ```
 
-- Configure the `colcon_ws//src/all_launch/config/mavlink-router.conf file`. The `Address` should match the ip address of your computer running the QGC. The ip address can be checked by runnung `ifconfig`
+- Configure the `colcon_ws//src/all_launch/config/mavlink-router.conf file`. The `Address` should match the ip address of your computer running the QGC. The ip address can be checked by running `ifconfig`
 
 ```
 [UartEndpoint alpha]
@@ -313,7 +312,8 @@ Port = 14550
 # First flight
 
 - Make sure that the drone is properly tethered.
-- To avoid any crashes, first start with 1/4*mass of the quadrotor in the QGC. This is will provide less thrust than required by the drone to lift. Slowly increase the mass to the right value once motors are ensured to be working fine. 
+- To avoid any crashes, start with a quarter of the original quadrotor mass, i.e., `QUAD_M/4`. This will provide less thrust than required for the drone to lift. Slowly increase the mass to the correct value once the motors are confirmed to be working fine. 
+- Consider using the [px4 Flight Review](https://review.px4.io/upload) to debug. 
 
 ## On Orin
 
