@@ -138,24 +138,24 @@ Install Xavier module:
 - cd /PX4-Autopilot-Quad
 - Run the following commands to make sure that px4 build will recognize the tags:
 
-'''
+```
 git submodule update --init --recursive
 git remote add upstream https://github.com/PX4/PX4-Autopilot.git
 git fetch upstream --tags
-'''
+```
 
 - Then build and run the docker using the following commands. (If you cant find docker files in the main branch switch to the branch KBN)
 
-'''
+```
 docker compose build
 docker compose up -d
 docker exec -it <container-name> bash
-'''
+```
 
 - Make the px4 version using the following command inside the docker in /home/px4
-'''
+```
  make px4_fmu-v6c_dasc
-'''
+```
 
 - Flash the 'px4_fmu-v6c_dasc' using the QGC firmware
 
