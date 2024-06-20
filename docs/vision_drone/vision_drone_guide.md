@@ -79,11 +79,21 @@ Prepare the following items:
 
 ESC wiring table:
 
+|  ESC  |  Pix32  |
+|  CUR  |    I    |
+|  NC   |    NC   |
+|  4    |    4    |
+|  3    |    2    |
+|  2    |    1    |
+|  1    |    3    |
+|  +    |    V    |
+|  -    |    G    |
+
 | ESC   | CUR | NC | 4 | 3 | 2 | 1 | + | - |
 | Pix32 | I   | NC | 4 | 2 | 1 | 3 | V | G |
 
 
-Solder it: **Do not reference to the image, use the wiring table**
+Solder it: <font color="red">**Do not reference to the image, use the wiring table**</font>
 ![](imgs/VisionDrone11.jpeg)
 
 
@@ -145,8 +155,9 @@ $ git remote add upstream https://github.com/PX4/PX4-Autopilot.git
 $ git fetch upstream --tags
 ```
 
-- Then build and run the docker using the following commands. (If you cant find docker files in the main branch switch to the branch KBN)
+- Then build and run the docker using the following commands.
 ```
+$ git clone git@github.com:dev10110/PX4-Autopilot-Quad.git
 $ docker compose build
 $ docker compose up -d
 $ docker exec -it <container-name> bash
@@ -286,14 +297,16 @@ services:
 ```
 
 
-- The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used. Use `dmesg | grep tty` to check if the tty/UAB0 and tty/USB1 are successfully detected. 
+- The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used.  
 
 ```
 $ cd /lib/modules/5.10.120-tegra/kernel/drivers/usb/serial/
 $ sudo mv usbserial.ko usbserial.ko.bk
 ```
 
-- Configure the `colcon_ws//src/all_launch/config/mavlink-router.conf file`. The `Address` should match the ip address of your computer running the QGC. The ip address can be checked by running `ifconfig`
+- Use `dmesg | grep tty` to check if the tty/UAB0 and tty/USB1 are successfully detected.
+
+- Configure the `colcon_ws/src/all_launch/config/mavlink-router.conf file`. The `Address` should match the ip address of your computer running the QGC. The ip address can be checked by running `ifconfig`
 
 ```
 [UartEndpoint alpha]
@@ -337,9 +350,3 @@ $ docker compose up -d
 $ docker exec -it <Container-name> bash
 $ ros2 launch ground_station_launch gs.launch.py
 ```
-
-# Docker Setup Guide
-The xavier nx modules only come with 16 gb of disk. This is not enough to run most things, so we move the docker default directory to a mounted sd card. 
-1. See https://www.ibm.com/docs/en/z-logdata-analytics/5.1.0?topic=compose-relocating-docker-root-directory for how to move the default directory
-2. Next, make sure the sd card is mounted on boot to the same directory everytime. See https://serverfault.com/questions/1046440/auto-mount-several-sd-cards-one-after-the-other-to-the-same-directory
-
