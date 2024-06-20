@@ -265,7 +265,7 @@ $ cd rover_px4_ros2_jumpstart
 $ docker compose build
 ```
 
-The docker-compose.yaml can be changed accordingly if required. At a minimum, it should contain the following:
+14. The docker-compose.yaml can be changed accordingly if required. At a minimum, it should contain the following:
 
 ```
 version: "3"
@@ -286,14 +286,14 @@ services:
 ```
 
 
-14. The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used. Use `dmesg | grep tty` to check if the tty/UAB0 and tty/USB1 are there. 
+15. The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used. Use `dmesg | grep tty` to check if the tty/UAB0 and tty/USB1 are there. 
 
 ```
 $ cd /lib/modules/5.10.120-tegra/kernel/drivers/usb/serial/
 $ sudo mv usbserial.ko usbserial.ko.bk
 ```
 
-15. Configure the `colcon_ws//src/all_launch/config/mavlink-router.conf file`:
+16. Configure the `colcon_ws//src/all_launch/config/mavlink-router.conf file`:
 
 ```
 [UartEndpoint alpha]
@@ -308,7 +308,7 @@ Port = 14550
 
 The `Address` should match the ip address of your computer running the QGC. The ip address can be checked by runnung `ifconfig`
 
-16. Configure the `/colcon_ws/src/all_launch/launch/px4.launch.py` such that the microXRCE_bridge uses `/dev/ttyUSB1` and the `robot_name = "px4_#`, where the `#` matches the `MAV_SYS_ID` in the QGC parameters. 
+17. Configure the `/colcon_ws/src/all_launch/launch/px4.launch.py` such that the microXRCE_bridge uses `/dev/ttyUSB1` and the `robot_name = "px4_#`, where the `#` matches the `MAV_SYS_ID` in the QGC parameters. 
 
 
 
