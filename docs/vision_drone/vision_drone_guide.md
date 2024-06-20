@@ -124,6 +124,40 @@ Install Xavier module:
 # PX4 Configuration Guide 
 - For the purpose of checking the motors and calibrating the sensors, flash the default PX4 firmware using QGC on the Pix32 V6.
 
+## Setup Dshot and test motors
+- **Make sure the propellers are removed for this setup and throughout testing the motors.**
+- set `SYS_USE_IO` to `IO_PWM_DISABLE`
+- set `DSHOT_CONFIG` to `DShot600`
+- Verify motor order using Mavlink console `dshot beep1 -m [Motor number]`
+- Verify motor spinning direction
+- Use following command to reverse motor `dshot reverse -m [Motor number]`, `dshot save -m [Motor number]`
+- Motors can be checked individually inside the /Vehicle Setup/Motors tab inside the QGC.  
+
+## Flashing the custom PX4-AUTOPILOT-QUAD
+- First clone the PX4-Autopilot-Quad 
+- cd /PX4-Autopilot-Quad
+- Run the following commands to make sure that px4 build will recognize the tags:
+
+'''
+git submodule update --init --recursive
+git remote add upstream https://github.com/PX4/PX4-Autopilot.git
+git fetch upstream --tags
+'''
+
+- Then build and run the docker using the following commands. (If you cant find docker files in the main branch switch to the branch KBN)
+
+'''
+docker compose build
+docker compose up -d
+docker exec -it <container-name> bash
+'''
+
+- Make the px4 version using the following command inside the docker in /home/px4
+'''
+ make px4_fmu-v6c_dasc
+'''
+
+- Flash the 'px4_fmu-v6c_dasc' using the QGC firmware
 
 ## PX4 Parameter (old version 1.13)
 - Set `MAV_SYS_ID` to be a different value from other Drone (match number with name of drone)
