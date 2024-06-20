@@ -250,7 +250,6 @@ $ ./flash.sh
 
 12. Generate a new SSH key for github. [Link](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent). Or follow these commands and the copy the key from the last command to the github account
 ```
-## setup github account
 git config --global user.email "your_email.com"
 git config --global user.name "username"
 
@@ -264,7 +263,6 @@ cat ~/.ssh/id_ed25519.pub
 13. Clone the px4-jumpstart repository.  
 
 ```
-## setup github account
 $ git clone https://github.com/dasc-lab/rover_px4_ros2_jumpstart.git
 $ cd rover_px4_ros2_jumpstart
 $ docker compose build
