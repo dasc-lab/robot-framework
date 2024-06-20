@@ -135,16 +135,15 @@ Install Xavier module:
 
 ## Flashing the custom PX4-AUTOPILOT-QUAD
 - First clone the PX4-Autopilot-Quad 
-- cd /PX4-Autopilot-Quad
 - Run the following commands to make sure that px4 build will recognize the tags:
-
 ```
+cd /PX4-Autopilot-Quad
 git submodule update --init --recursive
 git remote add upstream https://github.com/PX4/PX4-Autopilot.git
 git fetch upstream --tags
 ```
-- Then build and run the docker using the following commands. (If you cant find docker files in the main branch switch to the branch KBN)
 
+- Then build and run the docker using the following commands. (If you cant find docker files in the main branch switch to the branch KBN)
 ```
 docker compose build
 docker compose up -d
@@ -156,7 +155,7 @@ docker exec -it <container-name> bash
  make px4_fmu-v6c_dasc
 ```
 
-- Flash the 'px4_fmu-v6c_dasc' using the QGC firmware
+- Flash the `px4_fmu-v6c_dasc` using the QGC.
 
 ## PX4 Parameter (old version 1.13)
 - Set `MAV_SYS_ID` to be a different value from other Drone (match number with name of drone)
@@ -174,7 +173,7 @@ docker exec -it <container-name> bash
 - set `SER_TEL2_BAUD` to 921600 (might need to reboot vehicle to see this option)
 
 ## PX4 Parameter (new v1.14)
-- Set `MAV_SYS_ID` to be a different value from other Drone (match number with name of drone)
+- Set `MAV_SYS_ID` to be a different value from other Drone (match number with name of drone). This number matches the number in the name `px4_#`. The current custom firmware PX4-Autopilot-Quad requires the robot name to be in the format  `px4_#`. Here `#` is the `MAV_SYS_ID`.
 - Set `Hold` and `Offboard` for `COM_RCL_EXCEPT`
 - Set `EKF2_EV_CTRL` to 15 (check all boxes)
 - Set `EKF2_HGT_MODE` to GPS if doing outdoor testing and Vision if doing indoor testing
@@ -194,7 +193,6 @@ docker exec -it <container-name> bash
 - Verify motor order using Mavlink console `dshot beep1 -m [Motor number]`
 - Verify motor spinning direction
 - Use following command to reverse motor `dshot reverse -m [Motor number]`, `dshot save -m [Motor number]`
-
 
 # Docker Setup Guide
 The xavier nx modules only come with 16 gb of disk. This is not enough to run most things, so we move the docker default directory to a mounted sd card. 
