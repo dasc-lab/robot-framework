@@ -135,7 +135,7 @@ Install Xavier module:
 - Use the following command to reverse motor `dshot reverse -m [Motor number]`, `dshot save -m [Motor number]`
 - Motors can be checked individually inside the /Vehicle Setup/Motors tab inside the QGC.  
 
-## Flashing the custom PX4-AUTOPILOT-QUAD
+## Flashing the custom PX4-Autopilot-Quad
 - First clone the PX4-Autopilot-Quad 
 - Run the following commands to make sure that px4 build will recognize the tags:
 ```
