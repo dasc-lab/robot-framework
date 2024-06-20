@@ -187,6 +187,18 @@ docker exec -it <container-name> bash
 - set `SER_TEL2_BAUD` to 921600 (might need to reboot vehicle to see this option)
 - set `EKF2_MAG_TYPE` to None (disables mag, requires reboot)
 
+
+## QuadControl Parameters(Updated 06/19/2024)
+- Set `QUAD_ESC_NONLIN` to 0.500 
+- Set `QUAD_KOMEGA` to 0.120 kOmega
+- Set `QUAD_KR`t o 0.900 kR
+- Set `QUAD_KTHRUST` to 1.370 (N / (kilo-rad/s)^2)
+- Set `QUAD_KTORQUE` to 0.190 (Nm / (kilo-rad/s)^2)
+- Set `QUAD_KV` to 4.0 kv
+- Set `QUAD_KX` to 7.0 kx
+- Set `QUAD_M` to 0.680 kg. Update this based on the mass of your quadrotor
+- Set `QUAD_OMEGA_MAX` to 2.520 krad/s
+
 ## Setup Dshot
 - set `SYS_USE_IO` to `IO_PWM_DISABLE`
 - set `DSHOT_CONFIG` to `DShot600`
