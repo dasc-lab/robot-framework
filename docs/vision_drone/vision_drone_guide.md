@@ -294,7 +294,7 @@ services:
 ```
 
 
-- The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used.  
+- **For Orin Only**: The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used.  
 
 ```
 $ cd /lib/modules/5.10.120-tegra/kernel/drivers/usb/serial/
@@ -318,6 +318,15 @@ Port = 14550
 
 - Configure the `/colcon_ws/src/all_launch/launch/px4.launch.py` such that the microXRCE_bridge uses `/dev/ttyUSB1` and the `robot_name = "px4_#`, where the `#` matches the `MAV_SYS_ID` in the QGC parameters. 
 
+
+- Once the files are configuresd, build the rover_px4_ros2_jumpstart
+
+```
+$ docker compose up -d
+$ docker exec -it <Container-name> bash
+$ cd /root/colcon_ws
+$ colcon build --symlink-install --cmake-args -DCMAKE_BUILD_TYPE=Release
+```
 
 # First flight
 
