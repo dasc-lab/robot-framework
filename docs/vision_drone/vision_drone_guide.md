@@ -253,7 +253,7 @@ $ ./flash.sh
 git config --global user.email "your_email.com"
 git config --global user.name "username"
 ssh-keygen -t ed25519 -C "your_email.com"
-eval "$(ssh-agent -s)"=
+eval "$(ssh-agent -s)"
 cat ~/.ssh/id_ed25519.pub
 ```
 
