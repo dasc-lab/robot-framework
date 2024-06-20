@@ -215,7 +215,8 @@ $ make px4_fmu-v6c_dasc
 
 -  In the target components, select Jetson Linux only. You don't need to select Jetson Runtime Components as we will mostly be working inside the Docker container. Accept the terms and continue.
 
--  - In the SETUP PROCESS, choose Automatic Setup in the `Recovery mode setup`. 
+-  In the SETUP PROCESS:
+   - choose Automatic Setup in the `Recovery mode setup`. 
    - Keep the default IP address. 
    - If this is the first time, then enter  `username: ubuntu` and  `password: hello123`. We keeep this consistent across all modules. 
    - If this is not the first time the Orin is being flashed, then enter the current username and password, and make sure the new username and password match the details given above. You can provide a new username and password by unchecking the `Use current username/password` box.
@@ -286,7 +287,7 @@ services:
 ```
 
 
-- The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used. Use `dmesg | grep tty` to check if the tty/UAB0 and tty/USB1 are there. 
+- The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used. Use `dmesg | grep tty` to check if the tty/UAB0 and tty/USB1 are detected. 
 
 ```
 $ cd /lib/modules/5.10.120-tegra/kernel/drivers/usb/serial/
@@ -327,9 +328,9 @@ $ ros2 launch all_launch px4.launch.py
 ## On ground station 
 
 Run the docker and launch the `gs.launch.py`
-$ git clone git@github.com:dasc-lab/rover_groundstation_ros2_jumpstart.git
 
 ```
+$ git clone git@github.com:dasc-lab/rover_groundstation_ros2_jumpstart.git
 $ cd rover_groundstation_ros2_jumpstart
 $ docker compose build
 $ docker compose up -d
