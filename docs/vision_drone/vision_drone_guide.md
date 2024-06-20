@@ -203,52 +203,52 @@ $ make px4_fmu-v6c_dasc
 
 
 # Setting up Orin or Xavier
-1.  First, use the SDK manager to flash the Orin
+-  First, use the SDK manager to flash the Orin
 
-2.  Connect the Orin with the carrier board to the host computer using the USB A-to-micro cable. Also, power the Orin carrier board using the power supply instead of the battery.
+-  Connect the Orin with the carrier board to the host computer using the USB A-to-micro cable. Also, power the Orin carrier board using the power supply instead of the battery.
 
-3.  At this point, you might encounter the following scenarios:
-	- The SDK manager successfully detects the board. In this case, proceed to step 4.
+-  At this point, you might encounter the following scenarios:
+	- The SDK manager successfully detects the board. In this case, proceed to next step.
 	- The SDK manager does not detect the board. In this case, you need to force the Orin into recovery mode. For the Orin carrier board A603, recovery mode can be initiated by shorting 3 and 4 in W7. Please refer to the picture and this document for more details: [A603 Documentation](https://files.seeedstudio.com/products/NVIDIA/A603-Carrier-Board-for-Jetsson-Orin-NX-Nano-Datasheet.pdf). If using Xavier with the carrier board A203, recovery mode can be initiated by shorting 6 and GND (1,2,3,4). [A203 Documentation](https://wiki.seeedstudio.com/reComputer_A203_Flash_System/)
 
 	[TODO: Add picture]
 
-4.  In the target components, select Jetson Linux only. You don't need to select Jetson Runtime Components as we will mostly be working inside the Docker container. Accept the terms and continue.
+-  In the target components, select Jetson Linux only. You don't need to select Jetson Runtime Components as we will mostly be working inside the Docker container. Accept the terms and continue.
 
-5. - In the SETUP PROCESS, choose Automatic Setup in the `Recovery mode setup`. 
+-  - In the SETUP PROCESS, choose Automatic Setup in the `Recovery mode setup`. 
    - Keep the default IP address. 
    - If this is the first time, then enter  `username: ubuntu` and  `password: hello123`. We keeep this consistent across all modules. 
    - If this is not the first time the Orin is being flashed, then enter the current username and password, and make sure the new username and password match the details given above. You can provide a new username and password by unchecking the `Use current username/password` box.
    - Select the `Storage Device` as NVMe. This is becasue we are flashing on the SSD.
    - Then flash
 
-6. The flash can fail due to a bad Orin, carrier board, or SSD. Make sure to check each component.
+- The flash can fail due to a bad Orin, carrier board, or SSD. Make sure to check each component.
 
-7. After booting up the Orin, change the hostname permanently to `orin#` such that `username@hostname = ubuntu@orin#`. The number `#` should be selected after checking all numbers on the active orin modules. Follow these commands to change the hostname permanently:
+- After booting up the Orin, change the hostname permanently to `orin#` such that `username@hostname = ubuntu@orin#`. The number `#` should be selected after checking all numbers on the active orin modules. Follow these commands to change the hostname permanently:
 ```
 $ hostname
 $ sudo hostnamectl set-hostname NEW_HOSTNAME
 ```
-8. Reboot and check if the hostanme has been set successfully.
+- Reboot and check if the hostanme has been set successfully.
 
-9. In order to SSH into the orin remotely, set the first line of `/etc/hosts` to 
+- In order to SSH into the orin remotely, set the first line of `/etc/hosts` to 
 ```
 127.0.0.1 $HOSTNAME
 ```
 
-10. One can SSH into the Orin remotely using following:
+- One can SSH into the Orin remotely using following:
 ```
 $ ssh ubuntu@orin#.local
 $ password: hello123
 ```
 
-11. Then run the flash.sh inside the Orin once it is ready. The flash file can be found [here](https://github.com/dasc-lab/rover_px4_ros2_jumpstart/blob/trajectoryfollower/flash.sh). Consider removing `sudo apt-get upgrade` as it has previously deleted Kernel. The flash file can be executed using following commands
+- Then run the flash.sh inside the Orin once it is ready. The flash file can be found [here](https://github.com/dasc-lab/rover_px4_ros2_jumpstart/blob/trajectoryfollower/flash.sh). Consider removing `sudo apt-get upgrade` as it has previously deleted Kernel. The flash file can be executed using following commands
 ```
 $ chmod +x path/to/flash.sh
 $ ./flash.sh
 ```
 
-12. Generate a new SSH key for github. [Link](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent). Or follow these commands and the copy the key from the last command to the github account
+- Generate a new SSH key for github. [Link](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent). Or follow these commands and the copy the key from the last command to the github account
 ```
 git config --global user.email "your_email.com"
 git config --global user.name "username"
@@ -257,14 +257,16 @@ eval "$(ssh-agent -s)"=
 cat ~/.ssh/id_ed25519.pub
 ```
 
-13. Clone the px4-jumpstart repository.  
+- Clone the px4-jumpstart repository.  
+
 ```
 $ git clone https://github.com/dasc-lab/rover_px4_ros2_jumpstart.git
 $ cd rover_px4_ros2_jumpstart
 $ docker compose build
 ```
 
-14. The docker-compose.yaml can be changed accordingly if required. At a minimum, it should contain the following:
+- The docker-compose.yaml can be changed accordingly if required. At a minimum, it should contain the following:
+
 ```
 version: "3"
 services:
@@ -284,13 +286,15 @@ services:
 ```
 
 
-15. The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used. Use `dmesg | grep tty` to check if the tty/UAB0 and tty/USB1 are there. 
+- The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used. Use `dmesg | grep tty` to check if the tty/UAB0 and tty/USB1 are there. 
+
 ```
 $ cd /lib/modules/5.10.120-tegra/kernel/drivers/usb/serial/
 $ sudo mv usbserial.ko usbserial.ko.bk
 ```
 
-16. Configure the `colcon_ws//src/all_launch/config/mavlink-router.conf file`. The `Address` should match the ip address of your computer running the QGC. The ip address can be checked by runnung `ifconfig`
+- Configure the `colcon_ws//src/all_launch/config/mavlink-router.conf file`. The `Address` should match the ip address of your computer running the QGC. The ip address can be checked by runnung `ifconfig`
+
 ```
 [UartEndpoint alpha]
 Device = /dev/ttyUSB0
@@ -302,8 +306,7 @@ Address = <host_computer_ip>
 Port = 14550
 ```
 
-17. Configure the `/colcon_ws/src/all_launch/launch/px4.launch.py` such that the microXRCE_bridge uses `/dev/ttyUSB1` and the `robot_name = "px4_#`, where the `#` matches the `MAV_SYS_ID` in the QGC parameters. 
-
+- Configure the `/colcon_ws/src/all_launch/launch/px4.launch.py` such that the microXRCE_bridge uses `/dev/ttyUSB1` and the `robot_name = "px4_#`, where the `#` matches the `MAV_SYS_ID` in the QGC parameters. 
 
 
 # First flight
@@ -314,6 +317,7 @@ Port = 14550
 ## On Orin
 
 Run the docker and launch the `px4.launch.py`
+
 ```
 $ docker compose up -d
 $ docker exec -it <Container-name> bash
@@ -324,6 +328,7 @@ $ ros2 launch all_launch px4.launch.py
 
 Run the docker and launch the `gs.launch.py`
 $ git clone git@github.com:dasc-lab/rover_groundstation_ros2_jumpstart.git
+
 ```
 $ cd rover_groundstation_ros2_jumpstart
 $ docker compose build
