@@ -186,6 +186,7 @@ $ make px4_fmu-v6c_dasc
 - Set `MAV_SYS_ID` to be a different value from other Drone (match number with name of drone). This number matches the number in the name `px4_#`. The current custom firmware PX4-Autopilot-Quad requires the robot name to be in the format  `px4_#`. Here `#` is the `MAV_SYS_ID`.
 - Set `Hold` and `Offboard` for `COM_RCL_EXCEPT`
 - Set `EKF2_EV_CTRL` to 15 (check all boxes)
+- Set 'EKF2_EVP_NOISE' and 'EKF2_EVA_NOISE' to lowest possible values
 - Set `EKF2_HGT_MODE` to GPS if doing outdoor testing and Vision if doing indoor testing
 - Set `EKF2_GPS_P_NOISE` to 0.2 m
 - Set `EKF2_GPS_V_NOISE` to 0.15 m/s
