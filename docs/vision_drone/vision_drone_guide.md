@@ -200,7 +200,10 @@ $ make px4_fmu-v6c_dasc
 
 
 ## QuadControl Parameters(Updated 06/19/2024)
-- Set `QUAD_ESC_NONLIN` to 0.500 
+- Set `QUAD_ESC_NONLIN` to 0.525
+- Set `QUAD_IXX` to 0.002 kgm^2
+- Set `QUAD_IYY` to 0.002 kgm^2
+- Set `QUAD_IZZ` to 0.003 kgm^2
 - Set `QUAD_KOMEGA` to 0.120 kOmega
 - Set `QUAD_KR`t o 0.900 kR
 - Set `QUAD_KTHRUST` to 1.370 (N / (kilo-rad/s)^2)
