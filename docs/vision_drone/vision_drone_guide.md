@@ -146,6 +146,7 @@ Install Xavier module:
 - First clone the PX4-Autopilot-Quad 
 - Run the following commands to make sure that px4 build will recognize the tags:
 ```
+$ git clone git@github.com:dev10110/PX4-Autopilot-Quad.git
 $ cd /PX4-Autopilot-Quad
 $ git submodule update --init --recursive
 $ git remote add upstream https://github.com/PX4/PX4-Autopilot.git
@@ -154,7 +155,6 @@ $ git fetch upstream --tags
 
 - Then build and run the docker using the following commands.
 ```
-$ git clone git@github.com:dev10110/PX4-Autopilot-Quad.git
 $ docker compose build
 $ docker compose up -d
 $ docker exec -it <container-name> bash
