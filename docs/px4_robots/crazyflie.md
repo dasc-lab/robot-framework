@@ -4,7 +4,7 @@ title:  "Crazyflie Setup"
 date:   2024-10-29
 math: katex
 parent: Px4 Robot
-nav_order: 2
+nav_order: 7
 ---
 
 
