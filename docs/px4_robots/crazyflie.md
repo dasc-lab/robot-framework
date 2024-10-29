@@ -24,7 +24,14 @@ Kill chooser
 
 For experiment:
 - roslaunch crazyswarm hover_swarm.launch
+- python3 src/crazyswarm/scripts/hellow_world.py (M shape)
+- python3 src/crazyswarm/scripts/land_all.py
 - 
     
  
--  
+Control LED lights
+
+Robot_Mode.py
+scripts/pycrazyswarm/crazyflie.py
+
+
