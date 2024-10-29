@@ -1,3 +1,13 @@
+---
+layout: default
+title:  "Crazyflie Setup"
+date:   2024-10-29
+math: katex
+parent: Px4 Robot
+nav_order: 2
+---
+
+
 - Connect crazy Radio PA to laptop
   - 2 for 8 quads
   - 
