@@ -34,6 +34,8 @@ Control LED lights
 Robot_Mode.py
 scripts/pycrazyswarm/crazyflie.py
 
+For position: PID
+For velocity control: mellinger. see strongly_r_sim.py
 
 
 
