@@ -35,3 +35,7 @@ Robot_Mode.py
 scripts/pycrazyswarm/crazyflie.py
 
 
+
+
+For sim
+- python3 led_colors.py --sim
