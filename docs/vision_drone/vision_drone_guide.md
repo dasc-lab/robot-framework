@@ -214,7 +214,25 @@ $ make px4_fmu-v6c_dasc
 - Set `QUAD_KX` to 7.0 kx
 - Set `QUAD_M` to 0.680 kg. Update this based on the mass of your quadrotor
 - Set `QUAD_OMEGA_MAX` to 2.520 krad/s
-
+- Set all the motor positions
+  - if not using Realsense (i.e., the CG is pretty much at the exact center location)
+    - `QUAD_ROT1_POSX`: 0.070
+    - `QUAD_ROT1_POSY`: 0.085
+    - `QUAD_ROT2_POSX`: -0.070
+    - `QUAD_ROT2_POSY`: -0.085
+    - `QUAD_ROT3_POSX`: 0.070
+    - `QUAD_ROT3_POSY`: -0.085
+    - `QUAD_ROT4_POSX`: -0.070
+    - `QUAD_ROT4_POSY`: 0.085
+  - if using Realsense D455: (shifts the CG in the +x direction by 6.1 mm)
+    - `QUAD_ROT1_POSX`: 0.064
+    - `QUAD_ROT1_POSY`: 0.085
+    - `QUAD_ROT2_POSX`: -0.076
+    - `QUAD_ROT2_POSY`: -0.085
+    - `QUAD_ROT3_POSX`: 0.064
+    - `QUAD_ROT3_POSY`: -0.085
+    - `QUAD_ROT4_POSX`: -0.076
+    - `QUAD_ROT4_POSY`: 0.085
 
 # Setting up Orin or Xavier
 -  First, use the SDK manager to flash the Orin
