@@ -3,14 +3,28 @@
   - 
 
 
-- crazyswarm/ros_ws/src/crazysarm/launch
+- crazyswarm/ros_ws/src/crazyswarm/launch/allCrazyflies.yaml
   -  provide all info for each crazyflie
   -  channel for number (id) of the radio attached
 
-- crazyswarm/ros_ws/src/crazysarm/scripts:
-  ```python3 chooser.py  ```
-select/deslect quads
+- crazyswarm/ros_ws/src/crazyswarm/scripts:
+  - ```python3 chooser.py  ```
+  - select/deslect quads
 
+  - crazyswarm/ros_ws/src/crazyswarm/launch/hover_swarm.launch
+  - motion capture hostname: 192.168.0.149 (IP address of mocap PC)4
+
+
+
+Test vicon only
+- Set mocap IP address in crazyswarm/ros_ws/src/crazyswarm/launch/mocap_helper.launch
+
+Kill chooser
+
+
+For experiment:
+- roslaunch crazyswarm hover_swarm.launch
 - 
+    
  
 -  
