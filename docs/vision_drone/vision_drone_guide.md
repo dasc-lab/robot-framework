@@ -212,8 +212,11 @@ $ make px4_fmu-v6c_dasc
 - Set `QUAD_KTORQUE` to 0.190 (Nm / (kilo-rad/s)^2)
 - Set `QUAD_KV` to 4.0 kv
 - Set `QUAD_KX` to 7.0 kx
-- Set `QUAD_M` to 0.680 kg. Update this based on the mass of your quadrotor
 - Set `QUAD_OMEGA_MAX` to 2.520 krad/s
+- Set `QUAD_M` to
+  - 0.680 kg if not using realsense
+  - 0.870 kg if using realsense D455
+  - Update this based on the mass of your quadrotor
 - Set all the motor positions
   - if not using Realsense (i.e., the CG is pretty much at the exact center location)
     - `QUAD_ROT1_POSX`: 0.070
