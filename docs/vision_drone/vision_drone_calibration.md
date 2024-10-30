@@ -59,18 +59,20 @@ $$
 T = k_T \omega^2
 $$
 
+and
+
 $$
 u = (1 - \alpha) \frac{\omega}{\omega_{max}} + \alpha \left(\frac{\omega}{\omega_{max}}\right)^2
 $$
 
 where
-- $T$ is the thrust in N
-- $\omega$ is the motor speed in kilo-rad/s
-- $u \in [0, 1]$ is the (normalized) PWM command to the motors
-with coefficients
-- $\omega_{max}$ is the max motor speed in kilo-rad/s
-- $k_T$ is the thrust coefficient in N / ( kilo-rad/s)^2
-- $\alpha \in [0, 1]$ is the ESC nonlinearity coefficient
+- $$T$$ is the thrust in N
+- $$\omega$$ is the motor speed in kilo-rad/s
+- $$u \in [0, 1]$$ is the (normalized) PWM command to the motors
+wi$th coefficients
+- $$\omega_{max}$$ is the max motor speed in kilo-rad/s
+- $$k_T$$ is the thrust coefficient in N / ( kilo-rad/s)^2
+- $$\alpha \in [0, 1]$$ is the ESC nonlinearity coefficient
 
 The $\omega_{max}$ depends on the battery voltage, and therefore this model will not capture all the effects.
 
