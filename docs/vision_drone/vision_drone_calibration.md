@@ -64,15 +64,15 @@ u = (1 - \alpha) \frac{\omega}{\omega_{max}} + \alpha \left(\frac{\omega}{\omega
 $$
 
 where
-- $$T$$ is the thrust in N
-- $$\omega$$ is the motor speed in kilo-rad/s
-- $$u \in [0, 1]$$ is the (normalized) PWM command to the motors
+- $T$ is the thrust in N
+- $\omega$ is the motor speed in kilo-rad/s
+- $u \in [0, 1]$ is the (normalized) PWM command to the motors
 with coefficients
-- $$\omega_{max}$$ is the max motor speed in kilo-rad/s
-- $$k_T$$ is the thrust coefficient in N / ( kilo-rad/s)^2
-- $$\alpha \in [0, 1]$$ is the ESC nonlinearity coefficient
+- $\omega_{max}$ is the max motor speed in kilo-rad/s
+- $k_T$ is the thrust coefficient in N / ( kilo-rad/s)^2
+- $\alpha \in [0, 1]$ is the ESC nonlinearity coefficient
 
-The $$\omega_{max}$$ depends on the battery voltage, and therefore this model will not capture all the effects.
+The $\omega_{max}$ depends on the battery voltage, and therefore this model will not capture all the effects.
 
 
 ## Data Analysis
@@ -80,15 +80,19 @@ The $$\omega_{max}$$ depends on the battery voltage, and therefore this model wi
 From the data, we can plot the following relationships. In each plot, the marker color is based on the measured voltage.
 
 Thrust Curve
+
 ![](./imgs/thrust_curve.svg)
 
 Speed Curve:
+
 ![](./imgs/speed_curve.svg)
 
 Power Curve:
+
 ![](./imgs/power_curve.svg)
 
 Efficiency Curve:
+
 ![](./imgs/efficiency_curve.svg)
 
 
