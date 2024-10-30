@@ -11,15 +11,6 @@ nav_order: 1
 # Vision Drone Motor Calibration Guide
 This explains how the motor coefficients were obtained experimentally. 
 
-
-$$
-\begin{aligned}
-x + y = z
-\end{aligned}
-$$
-
-
-
 # Data Collection
 
 We used the RC Benchmark 1520, mounted with the desired prop, motor and esc. In this document we used
