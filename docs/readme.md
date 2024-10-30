@@ -26,6 +26,7 @@ After every edit, we can refresh the page to see the updates.
 ## Development using docker 
 from the `robot-framework/docs` directory, run
 ```
+rm -rf Gemfile.lock
 docker compose build
 docker compose up &
 ```
