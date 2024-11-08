@@ -320,6 +320,12 @@ services:
       - ROS_DOMAIN_ID=4
 ```
 
+- Configure some ROS2 settings: Tuning the DDS settings at a system kernel level can help avoid missed messages. See https://docs.ros.org/en/humble/How-To-Guides/DDS-tuning.html for more details. The main thing to do is to create/append to the file `/etc/sysctl.d/local.conf` with the following lines:
+```
+net.ipv4.ipfrag_time=3 # 3s (default = 30s)
+net.ipv4.ipfrag_high_thresh=134217728 # 128MB (default = 4MB)
+```
+By changing this file (instead of using the cli to set the parameter) the parameters persist between reboots. These settings should also be available in the docker container. 
 
 - **For Orin Only**: The Seeed Studio A603 carrier board for the NVIDIA Orin NX has an issue with the kernel drivers for usbserial. Essentially, instead of using the usbserial.ko for the board which are modified by Seeed, the default usbserial.ko is used. This causes the FTDI driver to not work as expected. The solution is to move the usbserial.ko file which causes the new file from Seeed Studio to be used.  
 
