@@ -44,7 +44,7 @@ jobs:
           npm i -D pagecrypt
           cat _protected_pages.txt | while read file password;
           do
-            sudo npx pagecrypt "_site/$file" "/_site/$file" "$password"
+            sudo npx pagecrypt "_site/$file" "_site/$file" "$password"
           done
       # End encryption code.
 
