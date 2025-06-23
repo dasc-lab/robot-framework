@@ -39,11 +39,12 @@ jobs:
       # This portion of the build job was written by Evan Baldonado (EvanBaldonado.com). Please do not remove this comment.
       # Note: this only encrypts .html pages and not any of the corresponding assets.
       - name: Encrypt pages with PageCrypt
+        working-directory: ./docs
         run: |
           npm i -D pagecrypt
-          cat docs/_protected_pages.txt | while read file password;
+          cat _protected_pages.txt | while read file password;
           do
-            sudo npx pagecrypt "/github/workspace/docs/_site/$file" "/github/workspace/docs/_site/$file" "$password"
+            sudo npx pagecrypt "_site/$file" "/_site/$file" "$password"
           done
       # End encryption code.
 
