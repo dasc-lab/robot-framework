@@ -1,0 +1,4 @@
+docs/flylab/flylab.html flylab
+docs/flylab/calibration.html flylab
+docs/flylab/faqs.html flylab
+docs/flylab/object.html flylab
