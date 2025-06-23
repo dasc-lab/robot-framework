@@ -43,7 +43,7 @@ jobs:
           npm i -D pagecrypt
           cat docs/_protected_pages.txt | while read file password;
           do
-            sudo npx pagecrypt "/docs/_site/$file" "/docs/_site/$file" "$password"
+            sudo npx pagecrypt "/github/workspace/docs/_site/$file" "/github/workspace/docs/_site/$file" "$password"
           done
       # End encryption code.
 
