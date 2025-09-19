@@ -42,7 +42,7 @@ Current: 0.5 amps
 **Distinction between parallel and series connections (solar panels):**
 
 - **Series connection:** Increases the voltage.  
-  - For the rover, this was unnecessary since the battery operates at 12V and each solar panel also has a 12V rating.  
+  - For the rover, this was unnecessary since the battery operates at 12V and each solar panel operates at a voltage raving above 12v.  
 
 - **Parallel connection:** Increases the current.  
   - Since the battery’s voltage requirement is already satisfied, the panels must be connected in parallel to provide the necessary current.  
@@ -70,6 +70,8 @@ Moving discharge: approximately **2 A**
 ~1 m/s (on a box)
 
 Total panel surface area: 0.549918 m^2
+
+Idle current yeild: 4.5 amps 
 
 ## Turning on the solar rover  
 
