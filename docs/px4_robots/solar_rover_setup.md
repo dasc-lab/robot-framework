@@ -9,7 +9,7 @@ nav_order: 2
 
 # Solar Rover Setup
 
-## Solar rover & Solar Panels
+## Solar rover & components 
 
 Solar Rover 
 
@@ -29,7 +29,7 @@ Solar Panels
 MPPT
 ![](./images/MPPT.png)
 
-## Solar Panel Specifications 
+## Solar panel specifications 
 
 Voltage: 18v
 
@@ -52,7 +52,7 @@ To power the rover’s electronics, especially the motors, all solar panels are 
 **Simplified solar-rover wiring diagram:**  
 ![](./images/Rover_Wiring_Diagram.png)
 
-## Solar Rover Dimensions/Specifications
+## Solar rover dimensions & specifications
 
 Length: 16 inch
 
@@ -67,11 +67,11 @@ Total energy capacity: 207,792 J
 Idle discharge: approximately **0.50 A**
 
 Moving discharge: approximately **2 A**
-  ~1 m/s (on a box)
+~1 m/s (on a box)
 
 Total panel surface area: 0.549918 m^2
 
-## Turning on the Solar Rover  
+## Turning on the solar rover  
 
 **Warning:**  
 The battery must be connected to the MPPT *before* the solar panels, otherwise the MPPT could be damaged.  
@@ -87,7 +87,7 @@ The battery must be connected to the MPPT *before* the solar panels, otherwise t
    - ![](./images/MPPT.png)  
 
 
-## Connect to the solar-rover
+## Connect to the solar rover
 
 Info:
 
