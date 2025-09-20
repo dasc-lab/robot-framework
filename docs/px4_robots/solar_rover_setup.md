@@ -93,9 +93,7 @@ The battery must be connected to the MPPT *before* the solar panels, otherwise t
 
 ## Connect to the solar rover
 
-Info:
-
-The solar-rover already has all of the necessary repositories already therefore you will only need to clone groundstation_cps_solar repo on your laptop.
+Info: The solar-rover already has all of the necessary repositories already therefore you will only need to clone groundstation_cps_solar repo on your laptop.
 
 1. Clone the groundsation_cps_solar repository.
 
