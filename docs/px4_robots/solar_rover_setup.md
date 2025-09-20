@@ -74,8 +74,7 @@ Total energy capacity: 207,792 J
 
 Idle discharge: approximately **0.50 A**
 
-Moving discharge: approximately **2 A**
-~1 m/s (on a box)
+Moving discharge: approximately **2 A** moving at a rate of ~1 m/s (on a box)
 
 ## Turning on the solar rover  
 
