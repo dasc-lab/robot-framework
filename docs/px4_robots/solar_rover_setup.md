@@ -14,16 +14,14 @@ nav_order: 2
 **Solar Rover** 
 
 ![](./images/Rover_Front.png)
-
-**Topside view**
 ![](./images/Rover_Topside.png)
 
 **Components:**
 
-12V Battery with an XT60 connection
+**12V Battery with an XT60 connection**
 ![](./images/Battery.png)
 
-Solar Panels
+**Solar Panels**
 ![](./images/SolarPanels.png)
 
 **MPPT**
