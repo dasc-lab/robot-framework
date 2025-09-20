@@ -11,11 +11,11 @@ nav_order: 2
 
 ## Solar rover & components 
 
-Solar Rover 
+**Solar Rover** 
 
 ![](./images/Rover_Front.png)
 
-Topside view
+**Topside view**
 ![](./images/Rover_Topside.png)
 
 **Components:**
@@ -26,7 +26,7 @@ Topside view
 Solar Panels
 ![](./images/SolarPanels.png)
 
-MPPT
+**MPPT**
 ![](./images/MPPT.png)
 
 ## Solar panel specifications 
