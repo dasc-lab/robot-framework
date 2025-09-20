@@ -52,7 +52,7 @@ To power the rover’s electronics, especially the motors, all solar panels are 
 **Simplified solar-rover wiring diagram:**  
 ![](./images/Rover_Wiring_Diagram.png)
 
-## Solar rover dimensions & specifications
+## Solar rover dimensions
 
 Length: 16 inch
 
@@ -62,16 +62,20 @@ height: 4.5 inch
 
 Max speed: 1 m/s
 
+## Solar panel configuration specifications
+
+Total surface area: 0.549918 m^2
+
+Idle current yeild: 4.5 amps 
+
+## Solar rover energy specfications
+
 Total energy capacity: 207,792 J
 
 Idle discharge: approximately **0.50 A**
 
 Moving discharge: approximately **2 A**
 ~1 m/s (on a box)
-
-Total panel surface area: 0.549918 m^2
-
-Idle current yeild: 4.5 amps 
 
 ## Turning on the solar rover  
 
