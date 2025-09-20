@@ -47,7 +47,7 @@ Current: 0.5 amps
 
 To power the rover’s electronics, especially the motors, all solar panels are wired in **parallel**.  
 
-**Simplified solar-rover wiring diagram:**  
+**Simplified solar rover wiring diagram:**  
 ![](./images/Rover_Wiring_Diagram.png)
 
 ## Solar rover dimensions & max speed 
