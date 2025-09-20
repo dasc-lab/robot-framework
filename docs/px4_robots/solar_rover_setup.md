@@ -50,7 +50,7 @@ To power the rover’s electronics, especially the motors, all solar panels are 
 **Simplified solar-rover wiring diagram:**  
 ![](./images/Rover_Wiring_Diagram.png)
 
-## Solar rover dimensions
+## Solar rover dimensions & max speed 
 
 Length: 16 inch
 
